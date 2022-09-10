@@ -1,10 +1,25 @@
-/* A Bison parser, made by GNU Bison 2.7.  */
+<<<<<<< .mine
+/* A Bison parser, made by GNU Bison 2.4.2.  */
+=======
+>>>>>>> .r440
 
-/* Bison interface for Yacc-like parsers in C
+<<<<<<< .mine
+/* Skeleton interface for Bison's Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2006, 2009-2010 Free Software
+   Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
+=======
+/* A Bison parser, made by GNU Bison 2.4.1.  */
+
+/* Skeleton interface for Bison's Yacc-like parsers in C
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
+   
+   This program is free software: you can redistribute it and/or modify
+>>>>>>> .r440
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
@@ -30,15 +45,6 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
-/* Enabling traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -860,10 +866,20 @@ extern int yydebug;
 
 
 
+
+<<<<<<< .mine
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-/* Line 2058 of yacc.c  */
+
+/* Line 1685 of yacc.c  */
+=======
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+typedef union YYSTYPE
+{
+
+/* Line 1676 of yacc.c  */
+>>>>>>> .r440
 #line 77 "pars.y"
 
     double val;
@@ -872,10 +888,19 @@ typedef union YYSTYPE
     long func;
     long pset;
     char *str;
+<<<<<<< .mine
 
 
-/* Line 2058 of yacc.c  */
-#line 879 "y.tab.h"
+
+/* Line 1685 of yacc.c  */
+#line 874 "y.tab.h"
+=======
+
+
+
+/* Line 1676 of yacc.c  */
+#line 875 "y.tab.h"
+>>>>>>> .r440
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -884,18 +909,4 @@ typedef union YYSTYPE
 
 extern YYSTYPE yylval;
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

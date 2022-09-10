@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest/Hydro
+END
+struct_one.th
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest/Hydro/struct_one.th
+END
+test_hydraulic_structures.F90
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest/Hydro/test_hydraulic_structures.F90
+END
+test_hydraulic_structure_io.F90
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest/Hydro/test_hydraulic_structure_io.F90
+END
+hydraulic_structure_test.in
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest/Hydro/hydraulic_structure_test.in
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest/Hydro/CMakeLists.txt
+END

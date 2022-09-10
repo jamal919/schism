@@ -34,6 +34,8 @@
 
 ##########
 
+
+
 ########### Ensure that the user's Make.defs.local exists and include it
 
 make_defs_local_exists := $(wildcard ../mk/Make.defs.local)
@@ -73,10 +75,6 @@ else
     PPFLAGS := $(PPFLAGS) $(IBMCPP)-DPETSCV=2
     include ${PETSC_DIR}/lib/petsc/conf/variables
   endif
-  ifeq ($(PETSC_VERSION),v3) #v3.10
-    PPFLAGS := $(PPFLAGS) $(IBMCPP)-DPETSCV=3 -I${PETSC_DIR}/include/petsc
-    include ${PETSC_DIR}/lib/petsc/conf/variables
-  endif
 endif
 
 ############
@@ -105,8 +103,8 @@ endif
 # rules to build objects for executable programs and libraries
 
 #Search path
-VPATH = Core/ Core/PaHM/ Driver/ Hydro/ EcoSim/ COSINE/ Sediment/ Sed2d/ \
-        WWMIII/ ICM/ TIMOR/ FIB/ Ice/ Multi_ice/ Fabm/
+VPATH = Core/ Driver/ Hydro/ EcoSim/ COSINE/ Sediment/ Sed2d/ \
+        WWMIII/ ICM/ TIMOR/ FIB/ Ice/ Fabm/
 
 ifdef FUJITSU
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DFUJITSU
@@ -115,10 +113,7 @@ endif
 include o/$(config)/autosrc.mk
 
 #Cores
-#OBJS =  $(AUTO_OBJ) PaHM_Sizes.o PaHM_Global.o PaHM_Messages.o TimeDateUtils.o PaHM_Utilities.o \
-#        csv_module.o SortUtils.o csv_parameters.o PaHM_Vortex.o \
-#        csv_utilities.o  parwind.o 
-OBJS :=  $(AUTO_OBJ) schism_glbl.o schism_msgp.o scribe_io.o misc_modules.o schism_io.o schism_driver.o gen_modules_clock.o
+OBJS =  $(AUTO_OBJ) schism_glbl.o schism_msgp.o misc_modules.o schism_io.o schism_driver.o 
 
 ifdef USE_PETSC
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_PETSC
@@ -131,20 +126,13 @@ else
   PETSCMOD =
 endif
 
-ifdef NO_PARMETIS
-  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DNO_PARMETIS
-endif
-
-ifdef USE_OLDIO
-  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DOLDIO
+ifdef USE_FABM
+  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_FABM
+  OBJS := $(OBJS) fabm_schism.o
 endif
 
 ifdef USE_PREC_EVAP
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DPREC_EVAP
-endif
-
-ifdef USE_BULK_FAIRALL
-  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_BULK_FAIRALL
 endif
 
 ifdef USE_MM5
@@ -206,13 +194,6 @@ ifdef USE_HA
   OBJS := $(OBJS) harm.o
 endif
 
-ifdef USE_PAHM
-  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_PAHM
-  OBJS := $(OBJS) PaHM_Sizes.o PaHM_Global.o PaHM_Messages.o TimeDateUtils.o PaHM_Utilities.o \
-        csv_module.o SortUtils.o csv_parameters.o PaHM_Vortex.o \
-        csv_utilities.o  parwind.o
-endif
-
 ifdef USE_GEN
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_GEN
 endif
@@ -228,12 +209,12 @@ endif
 
 ifdef USE_ICM
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_ICM
-  OBJS := $(OBJS) icm_mod.o icm_misc.o icm_init.o icm_sfm.o icm.o
+  OBJS := $(OBJS) icm_mod.o icm_sed_mod.o icm_init.o icm_sed_flux.o  icm.o  read_icm_input.o
 endif
 
 ifdef USE_COSINE
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_COSINE
-  OBJS := $(OBJS) cosine_misc.o cosine_mod.o cosine_init.o cosine.o 
+  OBJS := $(OBJS) cosine_mod.o cosine_init.o cosine.o 
 endif
 
 ifdef USE_FIB
@@ -256,35 +237,24 @@ ifdef USE_SED
 
 endif
 
-ifdef USE_FABM
-  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_FABM
-  FABMINSTALLDIR = ./Fabm/build
-  FABMLIBS = -L$(FABMINSTALLDIR)/lib -lfabm
-  OBJS := $(OBJS) fabm_schism.o
-  FCPFLAGS += -I$(FABMINSTALLDIR)/include
-endif
-
-ifdef USE_DVD
-  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_DVD
-endif
-
 ifdef USE_OIL
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_OIL
 endif
 
 ifdef USE_WWM
-# please take care we have now ST41 (ardhuin_old) and ST42 (ardhuin_new)
-  PPFLAGS := $(PPFLAGS) -DUSE_WWM -DNCDF -DST42 -DWWM_SOLVER 
-  OBJS := $(OBJS) wwm_datapl.o wwm_petscpool.o  wwm_petsc_seriell.o wwm_petsc_parallel.o \
-       wwm_petsc_block.o wwm_petsc_controller.o wwm_aux.o wwm_aux_parall.o wwm_mjdv2.o wwm_blasaux.o wwm_sparskit.o \
-       wwm_ardhuin_old.o wwm_wind.o wwm_ardhuin_new.o wwm_breaking.o wwm_friction.o wwm_cycle3.o  \
-       wwm_gridcf.o wwm_hotfile.o wwm_parall_solver.o wwm_m_constants.o wwm_m_fileio.o wwm_serv_xnl4v5.o wwm_mod_xnl4v5.o wwm_snl4_wrt.o \
-       wwm_wave_setup.o wwm_initio.o wwm_netcdf.o wwm_input.o wwm_grid.o \
-       wwm_bdcons_init.o wwm_bdcons.o wwm_bdcons_wam.o wwm_nesting.o wwm_export_ww3.o \
-       wwm_specparam.o wwm_windinput.o wwm_dissipation.o wwm_snl3.o wwm_snl4.o wwm_snl42.o wwm_babanin.o wwm_sourceterms.o \
-       wwm_specint.o wwm_nums1d.o wwm_numtheta.o wwm_numsigma.o wwm_fluctsplit.o \
-       wwm_snonlin.o wwm_stress.o wwm_stresso.o wwm_sbottom.o wwm_sdiss_ardh_vec.o wwm_sinput.o wwm_sinput_ard.o wwm_wsigstar.o wwm_tauhf.o wwm_airsea.o wwm_jafu.o wwm_nlweigt.o wwm_buildstress.o wwm_inisnonlin.o wwm_fkmean.o wwm_frcutindex.o wwm_femeanws.o wwm_sdissip.o wwm_implsch.o wwm_implsch2.o \
-       wwm_output.o wwm_compute.o wwm_compute_roller.o wwm_diffrac.o wwm_coupl_roms_pipe.o wwm_coupl_roms_pgmcl.o wwm_jacobi.o wwm_coupl_shyfem.o wwm_coupl_selfe.o wwm_coupl_timor.o wwm_vegdiss.o wwm_main.o wwm_lpp_filter.o
+  PPFLAGS := $(PPFLAGS) -DUSE_WWM -DNCDF -DST42 -DWWM_SOLVER # -DDEBUG_SOURCE_TERM -DDEBUG_SOLVER -DDEBUG 
+OBJS := $(OBJS) wwm_datapl.o wwm_petscpool.o  wwm_petsc_seriell.o wwm_petsc_parallel.o \
+         wwm_petsc_block.o wwm_petsc_controller.o wwm_aux.o wwm_aux_parall.o wwm_mjdv2.o wwm_blasaux.o wwm_sparskit.o \
+         wwm_wind.o wwm_breaking.o wwm_friction.o wwm_cycle3.o \
+         wwm_gridcf.o wwm_hotfile.o wwm_parall_solver.o wwm_m_constants.o \
+         wwm_m_fileio.o wwm_serv_xnl4v5.o wwm_mod_xnl4v5.o wwm_snl4_wrt.o \
+         wwm_wave_setup.o wwm_ecmwf_local.o wwm_st4_local.o wwm_initio.o wwm_netcdf.o wwm_input.o wwm_grid.o\
+         wwm_ecmwf.o wwm_deep.o wwm_shallow.o wwm_st4.o wwm_snl4.o \
+         wwm_bdcons_init.o wwm_bdcons.o wwm_bdcons_wam.o wwm_nesting.o \
+         wwm_specparam.o wwm_windinput.o wwm_snl3.o wwm_vegdiss.o\
+         wwm_specint.o wwm_nums1d.o wwm_numtheta.o wwm_numsigma.o wwm_fluctsplit.o \
+         wwm_output.o wwm_compute.o wwm_diffrac.o wwm_coupl_roms_pipe.o wwm_coupl_roms_pgmcl.o\
+         wwm_jacobi.o wwm_coupl_shyfem.o wwm_coupl_selfe.o wwm_coupl_timor.o wwm_main.o wwm_export_ww3.o
 endif
 
 ifdef USE_ICE
@@ -293,26 +263,8 @@ ifdef USE_ICE
                   ice_fct.o ice_thermodynamics.o
 endif
 
-ifdef USE_MICE
-  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_MICE
-  OBJS := $(OBJS) icepack_kinds.o icepack_warnings.o icepack_parameters.o icepack_age.o icepack_tracers.o \
-                  icepack_mushy_physics.o icepack_orbital.o icepack_ocean.o icepack_firstyear.o \
-                  icepack_meltpond_cesm.o icepack_therm_shared.o icepack_therm_bl99.o icepack_meltpond_lvl.o \
-                  icepack_meltpond_topo.o icepack_zbgc_shared.o icepack_fsd.o icepack_atmo.o icepack_therm_mushy.o \
-                  icepack_isotope.o icepack_flux.o icepack_itd.o icepack_shortwave.o icepack_brine.o \
-                  icepack_aerosol.o icepack_therm_0layer.o icepack_zsalinity.o icepack_wavefracspec.o \
-                  icepack_mechred.o icepack_algae.o icepack_therm_vertical.o icepack_zbgc.o icepack_therm_itd.o \
-                  icepack_intfc.o icedrv_kinds.o icedrv_constants.o mice_module.o icedrv_system.o \
-                  icedrv_main.o icedrv_allocate.o icedrv_set.o mice_init.o mice_evp.o icedrv_init.o\
-                  mice_mevp.o icedrv_advection.o icedrv_transfer.o icedrv_io.o mice_step.o
-endif
-
 ifdef USE_MARSH
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_MARSH
-endif
-
-ifdef USE_ANALYSIS
-  PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_ANALYSIS
 endif
 
 ifdef USE_SED2D
@@ -326,7 +278,7 @@ endif
 OBJS := $(OBJS) grid_subs.o hydraulic_structures.o schism_init.o \
         schism_step.o schism_finalize.o bktrk_subs.o solver_subs.o \
         misc_subs.o transport_TVD.o transport_TVD_imp.o \
-        sflux_9c.o lap.o
+        sflux_9c.o lap.o single_netcdf.o
 
 ifdef USE_SIMPLE_WIND
   PPFLAGS := $(PPFLAGS) $(IBMCPP)-DUSE_SIMPLE_WIND
@@ -339,37 +291,11 @@ CONFIG_OBJS :=  $(addprefix o/$(config)/, $(OBJS))
 # Names of source files with relative path as found on $VPATH
 FULLSRC := $(foreach f,$(subst .o,.F90,$(OBJS)),$(firstword $(wildcard $(VPATH:%=%$f) not-found:$f)))
 
-#PARMETISDIR := ./ParMetis-3.1-Sep2010
-PARMETISDIR := ./ParMetis-4.0.3
-ifeq ($(ENV),EDISON)
-    PARMETISDIR := $(PARMETISDIR).cray
-endif
-ifeq ($(ENV),CORI2)
-    PARMETISDIR := $(PARMETISDIR).cray
-endif
-ifeq ($(ENV),BEBOP)
-    PARMETISDIR := $(PARMETISDIR).mpiicc
-endif
-ifeq ($(ENV),ANVIL)
-    PARMETISDIR := $(PARMETISDIR).mpiicc
-endif
-ifeq ($(ENV),COMET)
-    PARMETISDIR := $(PARMETISDIR).mpiicc
-endif
-ifeq ($(ENV),STAMPEDE2)
-    PARMETISDIR := $(PARMETISDIR).mpiicc
-endif
 
 ################################################################################
 # Library list
 ################################################################################
-ifdef NO_PARMETIS
-#Use offline partitioning and disable ParMETIS
-  MTSLIBS= 
-else
-  MTSLIBS= -L$(PARMETISDIR) -lparmetis -lmetis
-endif
-LIBS = $(MTSLIBS) $(FABMLIBS) $(CDFLIBS) $(GTMLIBS) $(PETSCLIBS)
+LIBS = $(MTSLIBS) $(CDFLIBS) $(GTMLIBS) $(PETSCLIBS)
 
 ################################################################################
 # Build commands for SCHISM
@@ -392,37 +318,36 @@ o/$(config)/autosrc.mk: o/$(config)/.dummy
 
 
 
-.PHONY: pschism psc
-
-pschism: $(EXEC) o/$(config)/.dummy 
+.PHONY: psc
 
 psc: $(EXEC) o/$(config)/.dummy 
+
+
 
 .PHONY: all
 all: pschism utility
 
 
-# This is the main executable target
-ifdef NO_PARMETIS
-$(EXEC): $(CONFIG_OBJS) 
-	$(FLD) $(FLDFLAGS) $(CONFIG_OBJS) $(LIBS) ${MODULEOUTDIR}. -I. -o $@
-	ar -ru libschism.a $(CONFIG_OBJS)
-else
-$(EXEC): $(CONFIG_OBJS) $(PARMETISDIR)/parmetis.a 
-	$(FLD) $(FLDFLAGS) $(CONFIG_OBJS) $(LIBS) ${MODULEOUTDIR}. -I. -o $@
-	ar -ru libschism.a $(CONFIG_OBJS)
-
-
-$(PARMETISDIR)/parmetis.a:
-##	+$(MAKE) distclean --directory=$(PARMETISDIR)
-	+$(MAKE) config --directory=$(PARMETISDIR)
-	+$(MAKE) --directory=$(PARMETISDIR)
+PARMETISDIR := ./ParMetis-3.1-Sep2010
+ifeq ($(ENV),CORI)
+    PARMETISDIR := ./ParMetis-3.1-Sep2010.cray
+endif
+ifeq ($(ENV),CORI2)
+    PARMETISDIR := ./ParMetis-3.1-Sep2010.cray
 endif
 
-#.PHONY: parmetis
-#parmetis:
-#	+$(MAKE) clean --directory=$(PARMETISDIR)
-#	+$(MAKE) --directory=$(PARMETISDIR)
+# This is the main executable target
+$(EXEC): $(CONFIG_OBJS) $(PARMETISDIR)/parmetis.a $(PARMETISDIR)/metis.a
+	$(FLD) $(FLDFLAGS) $(CONFIG_OBJS) $(LIBS) ${MODULEOUTDIR}. -I. -o $@
+
+
+$(PARMETISDIR)/%.a:
+	+$(MAKE) --directory=$(PARMETISDIR)
+
+.PHONY: parmetis
+parmetis:
+	+$(MAKE) clean --directory=$(PARMETISDIR)
+	+$(MAKE) --directory=$(PARMETISDIR)
 
 
 .PHONY: depend
@@ -452,11 +377,7 @@ endif
 o/$(config)/%.o: %.F90 o/$(config)/.dummy o/$(config)/.depend
 	$(QUIET)$(FCP) -c $(FCPFLAGS)  ${MODULEOUTDIR}o/$(config) -Io/$(config) $(GTMMOD) $(CDFMOD) $(PETSCMOD) $< -o $@
 
-o/$(config)/fabm_schism.o: $(FABMINSTALLDIR)/lib/libfabm.a
 
-$(FABMINSTALLDIR)/lib/libfabm.a:
-	mkdir -p $(FABMINSTALLDIR)
-	cd $(FABMINSTALLDIR) && cmake $(FABM_BASE)/src -DCMAKE_Fortran_COMPILER=$(FCP) -DFABM_HOST=schism -DCMAKE_INSTALL_PREFIX=. && make install
 
 ################# Utility
 # The utility directory contains a lot of single-file executables plus a few that rely on shared subroutines
@@ -514,7 +435,7 @@ o/$(config)/libutil_lib.a: $(util_lib_config_objs)
 
 o/$(config)/%.o : %.f90 o/$(config)/.dummy  ../bin/.dummy
 #	$(FCS) -c $(FCPFLAGS)  ${MODULEOUTDIR}o/$(config) -Io/$(config) $(GTTMOD) $(CDFMOD) $< -o $@
-	$(FCS) -c -cpp $(FCPFLAGS) $< ${MODULEOUTDIR}o/$(config) -Io/$(config) $(GTTMOD) $(CDFMOD) -o $@
+	$(FCS) -c $(FCPFLAGS) $< ${MODULEOUTDIR}o/$(config) -Io/$(config) $(GTTMOD) $(CDFMOD) -o $@
 
 
 ../bin/%.ex: o/$(config)/%.o  ../bin/.dummy
@@ -563,12 +484,11 @@ o/$(config)/.dummy:
 .PHONY: clean
 clean:
 	$(QUIET)rm -f $(EXEC)
-	$(QUIET)rm -f libschism.a
 	$(QUIET)rm -rf o/*
 	$(QUIET)rm -rf ../bin/*
 	$(QUIET)rm -rf WWMIII/*.mod
 	$(QUIET)rm -rf WWMIII/*.o
-	(cd $(PARMETISDIR); make distclean; rm -f *.a )
-	##(cd $(PARMETISDIR)/ParMETISLib ; make realclean )
-	$(QUIET)rm -rf $(FABMINSTALLDIR)
+###	$(QUIET)rm -rf $(PARMETISDIR)/*.a
+	(cd $(PARMETISDIR)/METISLib ; make realclean )
+	(cd $(PARMETISDIR)/ParMETISLib ; make realclean )
 

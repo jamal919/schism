@@ -40,7 +40,7 @@ program convert_nudge_nc
       
   print*, 'Input # of nodes and levels:'
   read*, np,nvrt
-  print*, 'Input # of tracers in nu_old.in (>=1; 1 for [TEM,SAL]_nu.in):'
+  print*, 'Input # of tracers in nu_old.in (>=1):'
   read*, ntr
   print*, 'Input # of days in file:'
   read*, rnday

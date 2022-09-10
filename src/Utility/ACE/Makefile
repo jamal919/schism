@@ -21,7 +21,7 @@ all:
 	rm -f pars.c pars.h 
 	cd ..
 	make -C xmgr5 pars.c 
-#	make -C xmgr5 clean
+	make -C xmgr5 clean
 	make -C xmgr5
 	cp xmgr5/xmgr5 $(HOME)/bin
 

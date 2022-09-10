@@ -83,14 +83,14 @@ implicit none
   contains
 
   !> init pd datastructure
-  subroutine initPD(filename, mdc, msc, comm)
+  subroutine initPD(filename, NUMDIR, NUMSIG, comm)
     use yowpd, only: initPD1=>initPD, setDimSize
     implicit none
     character(len=*), intent(in) :: filename
-    integer, intent(in) :: mdc, msc
+    integer, intent(in) :: NUMDIR, NUMSIG
     integer, intent(in) :: comm
 
-    call setDimSize(mdc, msc)
+    call setDimSize(NUMDIR, NUMSIG)
     call initPD1(filename, comm)
     call fillPublicVars()
   end subroutine
@@ -113,6 +113,7 @@ implicit none
     use yowpd,only: nTasks, ipgl1=>ipgl, npa, ne, np, ng, x, y, z, INE, abort
     implicit  none
     integer :: istat
+    integer IP, IPglob
 
     nproc = nTasks
     MNP = npa
@@ -128,15 +129,26 @@ implicit none
     DEP8 => z
 
     INETMP => INE
-
+!    DO I=1,npa
+!      WRITE(740+myrank,*) ' I=', I, ' iplg=', iplg(I)
+!    END DO
+!    DO I=1,np_global
+!      WRITE(740+myrank,*) ' I=', I, ' ipgl1=', ipgl1(I)
+!    END DO
+!    FLUSH(740+myrank)
     
     if(allocated(ipgl)) deallocate(ipgl)
     allocate(ipgl(np_global), stat=istat)
     if(istat/=0) ABORT("allocate")
     ipgl(:)%id = 0
-    ipgl(1:np_global)%id = ipgl1(1:np_global)
     ipgl(:)%rank = -1
-    ipgl(iplg(1:npa))%rank = myrank
+    DO IP=1,npa
+      IPglob=iplg(IP)
+      ipgl(IPglob) % id = IP
+      ipgl(IPglob) % rank = myrank
+    END DO
+!    ipgl(1:np_global)%id = ipgl1(1:np_global)
+!    ipgl(iplg(1:npa))%rank = myrank
 
   end subroutine
 
@@ -157,7 +169,7 @@ implicit none
     call exchange(p2d_data)
   end subroutine
 
-  !> 3D-Whole-Level Node Exchange; order of indices must be (mdc2,nm) (nm>=npa)
+  !> 3D-Whole-Level Node Exchange; order of indices must be (NUMDIR2,nm) (nm>=npa)
   subroutine exchange_p3d_wwm(p3d_wwm_data)
     use yowExchangeModule
     implicit none
@@ -170,7 +182,7 @@ implicit none
   subroutine exchange_p4d_wwm(p4d_wwm_data)
     use yowExchangeModule
     implicit none
-    real(rkind),intent(inout) :: p4d_wwm_data(:,:,:) !indices must be (msc2,mdc2,nm) where nm>=npa
+    real(rkind),intent(inout) :: p4d_wwm_data(:,:,:) !indices must be (NUMSIG2,NUMDIR2,nm) where nm>=npa
 
     call exchange(p4d_wwm_data)
   end subroutine

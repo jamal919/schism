@@ -37,23 +37,23 @@
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE PIPE_ROMS_IN(K,IFILE,IT)
+      SUBROUTINE PIPE_ROMS_IN(K)
       USE DATAPOOL
       IMPLICIT NONE
-      INTEGER, INTENT(IN)  :: K,IFILE,IT
+      INTEGER, INTENT(IN)  :: K
       INTEGER              :: IP
-# ifdef WWM_MPI
+# ifdef MPI_PARALL_GRID
       REAL(rkind), allocatable :: WINDXY_TOT(:,:), CURTXY_TOT(:,:), WATLEV_TOT(:)
       real(rkind), allocatable :: rbuf_real(:)
       integer idx, iProc
 # endif
-        LCALC=.TRUE.
+      LCALC=.TRUE.
       IF ( K-INT(K/MAIN%ICPLT)*MAIN%ICPLT .EQ. 0 ) THEN
         WATLEVOLD=WATLEV
         LCALC=.TRUE.
         WRITE(DBG%FHNDL,'("+TRACE...",A)') 'READING PIPE'
         FLUSH(DBG%FHNDL)
-# ifndef WWM_MPI
+# ifndef MPI_PARALL_GRID
         DO IP = 1, MNP
           READ(1000) WINDXY(IP,1), WINDXY(IP,2), CURTXY(IP,1), CURTXY(IP,2), WATLEV(IP)
         END DO
@@ -106,7 +106,6 @@
         WRITE(DBG%FHNDL,'("+TRACE...",A)') 'END READING PIPE'
         FLUSH(DBG%FHNDL)
       END IF
-      IF (K == 1) CALL INITIAL_CONDITION
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
@@ -116,24 +115,24 @@
       IMPLICIT NONE
       INTEGER, INTENT(IN)  :: K
       INTEGER              :: IP
-      REAL(rkind)          :: ACLOC(MSC,MDC)
+      REAL(rkind)          :: WALOC(NUMSIG,NUMDIR)
       REAL(rkind)          :: HS,WLM,LPP,FPP,CPP,BOTEXPER
       REAL(rkind)          :: UBOT,TM01,TM10
       REAL(rkind)          :: TMBOT, KPP,DM,DSPR,ORBITAL,ETOTS,ETOTC,WNPP,TPP,CGPP
       REAL(rkind)          :: PEAKDSPR, PEAKDM, HSWE, HSLIM, TM02, KLM, DPEAK
       REAL(rkind)          :: TPPD,KPPD,CGPD,CPPD
-# ifdef WWM_MPI
+# ifdef MPI_PARALL_GRID
       REAL(rkind), allocatable :: OUTT(:,:), OUTT_TOT(:,:)
       REAL(rkind)    :: TP
 # endif
       IF ( K-INT(K/MAIN%ICPLT)*MAIN%ICPLT .EQ. 0 ) THEN
-# ifndef WWM_MPI
+# ifndef MPI_PARALL_GRID
         DO IP = 1, MNP
-          ACLOC = AC2(:,:,IP)
-          CALL MEAN_PARAMETER(IP,ACLOC,MSC,HS,TM01,TM02,TM10,KLM,WLM)
-          CALL WAVE_CURRENT_PARAMETER(IP,ACLOC,UBOT,ORBITAL,BOTEXPER,TMBOT,'PIPE_ROMS_OUT 1')
-          CALL MEAN_DIRECTION_AND_SPREAD(IP,ACLOC,MSC,ETOTS,ETOTC,DM,DSPR)
-          CALL PEAK_PARAMETER(IP,ACLOC,MSC,FPP,TPP,CPP,WNPP,CGPP,KPP,LPP,PEAKDSPR,PEAKDM,DPEAK,TPPD,KPPD,CGPD,CPPD)
+          WALOC = AC2(:,:,IP)
+          CALL MEAN_PARAMETER(IP,WALOC,NUMSIG,HS,TM01,TM02,TM10,KLM,WLM)
+          CALL WAVE_CURRENT_PARAMETER(IP,WALOC,UBOT,ORBITAL,BOTEXPER,TMBOT,'PIPE_ROMS_OUT 1')
+          CALL MEAN_DIRECTION_AND_SPREAD(IP,WALOC,NUMSIG,ETOTS,ETOTC,DM,DSPR)
+          CALL PEAK_PARAMETER(IP,WALOC,NUMSIG,FPP,TPP,CPP,WNPP,CGPP,KPP,LPP,PEAKDSPR,PEAKDM,DPEAK,TPPD,KPPD,CGPD,CPPD)
 ! HS, HSWE, HSLIM  ! - Significant wave height (m) -- HS
 ! DM  ! - Wave direction (degrees)
 ! TPP ! - Surface wave relative peak period (s) -- TP
@@ -166,11 +165,11 @@
         IF (istat/=0) CALL WWM_ABORT('wwm_coupl_roms, allocate err')
         OUTT=0
         DO IP = 1, MNP
-          ACLOC = AC2(:,:,IP)
-          CALL MEAN_PARAMETER(IP,ACLOC,MSC,HS,TM01,TM02,TM10,KLM,WLM)
-          CALL WAVE_CURRENT_PARAMETER(IP,ACLOC,UBOT,ORBITAL,BOTEXPER,TMBOT,'PIPE_ROMS_OUT 2')
-          CALL MEAN_DIRECTION_AND_SPREAD(IP,ACLOC,MSC,ETOTS,ETOTC,DM,DSPR)
-          CALL PEAK_PARAMETER(IP,ACLOC,MSC,FPP,TPP,CPP,WNPP,CGPP,KPP,LPP,PEAKDSPR,PEAKDM,DPEAK,TPPD,KPPD,CGPD,CPPD)
+          WALOC = AC2(:,:,IP)
+          CALL MEAN_PARAMETER(IP,WALOC,NUMSIG,HS,TM01,TM02,TM10,KLM,WLM)
+          CALL WAVE_CURRENT_PARAMETER(IP,WALOC,UBOT,ORBITAL,BOTEXPER,TMBOT,'PIPE_ROMS_OUT 2')
+          CALL MEAN_DIRECTION_AND_SPREAD(IP,WALOC,NUMSIG,ETOTS,ETOTC,DM,DSPR)
+          CALL PEAK_PARAMETER(IP,WALOC,NUMSIG,FPP,TPP,CPP,WNPP,CGPP,KPP,LPP,PEAKDSPR,PEAKDM,DPEAK,TPPD,KPPD,CGPD,CPPD)
           HSWE=0
           HSLIM=0
           OUTT(iplg(IP), 1)=HS

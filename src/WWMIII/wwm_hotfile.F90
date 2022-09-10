@@ -77,19 +77,19 @@ MODULE wwm_hotfile_mod
       IMPLICIT NONE
       character(len=*), intent(in) :: FILEHOT
       integer, intent(in) :: NPCALL
-      real(rkind), intent(inout) :: ACread(MSC, MDC, NPCALL)
+      real(rkind), intent(inout) :: ACread(NUMSIG, NUMDIR, NPCALL)
       real(rkind), intent(inout) :: VAR_ONEDread(nbOned, NPCALL)
       integer :: NPLOC
       integer istat
       integer, allocatable :: IPLGloc(:)
       INTEGER :: HMNP, HMNE
-      INTEGER :: HMSC, HMDC
+      INTEGER :: HNUMSIG, HNUMDIR
       REAL(rkind) :: HFRLOW, HFRHIGH
       OPEN(HOTIN%FHNDL, FILE = TRIM(FILEHOT), STATUS = 'OLD', FORM = 'UNFORMATTED')
       READ(HOTIN%FHNDL) HMNP, HMNE
-      READ(HOTIN%FHNDL) HMSC, HMDC, HFRLOW, HFRHIGH
+      READ(HOTIN%FHNDL) HNUMSIG, HNUMDIR, HFRLOW, HFRHIGH
       IF ( HMNP .NE. NP_TOTAL .OR. HMNE .NE. NE_TOTAL .OR.          &
-     &     HMSC .NE. MSC      .OR. HFRLOW .NE. FRLOW .OR.           &
+     &     HNUMSIG .NE. NUMSIG      .OR. HFRLOW .NE. FRLOW .OR.           &
      &    HFRHIGH .NE. FRHIGH ) THEN
         CALL WWM_ABORT('THE HOTFILE GEOMETRY DOES NOT FIT THE INPUT FILE')
       ENDIF
@@ -142,7 +142,7 @@ MODULE wwm_hotfile_mod
       integer :: iret, ncid, mnp_dims
 #endif
       INTEGER :: HMNP, HMNE
-      INTEGER :: HMSC, HMDC
+      INTEGER :: HNUMSIG, HNUMDIR
       INTEGER, allocatable :: IPLGin(:)
 #ifdef NCDF
       INTEGER :: iplg_id
@@ -155,9 +155,9 @@ MODULE wwm_hotfile_mod
       IF (HOTSTYLE.eq.1) THEN
         OPEN(HOTIN%FHNDL, FILE = TRIM(FILERET), STATUS = 'OLD', FORM = 'UNFORMATTED')
         READ(HOTIN%FHNDL) HMNP, HMNE
-        READ(HOTIN%FHNDL) HMSC, HMDC, HFRLOW, HFRHIGH
+        READ(HOTIN%FHNDL) HNUMSIG, HNUMDIR, HFRLOW, HFRHIGH
         IF ( HMNP .NE. NP_TOTAL .OR. HMNE .NE. NE_TOTAL .OR.            &
-     &       HMSC .NE. MSC      .OR. HFRLOW .NE. FRLOW .OR.             &
+     &       HNUMSIG .NE. NUMSIG      .OR. HFRLOW .NE. FRLOW .OR.             &
      &       HFRHIGH .NE. FRHIGH ) THEN
           CALL WWM_ABORT('THE HOTFILE GEOMETRY DOES NOT FIT THE INPUT FILE')
         ENDIF
@@ -412,10 +412,10 @@ MODULE wwm_hotfile_mod
           IF (istat/=0) CALL WWM_ABORT('error in IOBPtotal allocate')
           DO IP=1,MNPloc
             IP_glob=ListIPLG(IP+ListFirst(iProc))
-            dspl_ac(IP)=MSC*MDC*(IP_glob-1)
+            dspl_ac(IP)=NUMSIG*NUMDIR*(IP_glob-1)
             dspl_var_oned(IP)=nbOned*(IP_glob-1)
           END DO
-          call mpi_type_create_indexed_block(MNPloc,MSC*MDC,dspl_ac,rtype,ac2_hot_type(iProc-1), ierr)
+          call mpi_type_create_indexed_block(MNPloc,NUMSIG*NUMDIR,dspl_ac,rtype,ac2_hot_type(iProc-1), ierr)
           call mpi_type_commit(ac2_hot_type(iProc-1), ierr)
           call mpi_type_create_indexed_block(MNPloc,nbOned,dspl_var_oned,rtype,var_oned_hot_type(iProc-1), ierr)
           call mpi_type_commit(var_oned_hot_type(iProc-1), ierr)
@@ -428,13 +428,11 @@ MODULE wwm_hotfile_mod
 !*                                                                    *
 !**********************************************************************
       SUBROUTINE SETUP_RETURN_AC_VARONED
-      USE DATAPOOL, ONLY: WRITESTATFLAG
       IMPLICIT NONE
 #if defined NCDF && defined MPI_PARALL_GRID
       integer iProc, IP, IPglob
       IF (myrank .eq. 0) THEN
-        IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL, *) 'Before allocation of ACreturn'
-        allocate(ACreturn(MSC,MDC,np_global), stat=istat)
+        allocate(ACreturn(NUMSIG,NUMDIR,np_global), stat=istat)
         IF (istat/=0) CALL WWM_ABORT('wwm_hotfile, allocate error 16')
         DO iProc=2,nproc
           call mpi_irecv(ACreturn,1,ac2_hot_type(iProc-1),iProc-1,8123,comm,ac2_hot_rqst(iProc-1),ierr)
@@ -447,10 +445,9 @@ MODULE wwm_hotfile_mod
           call mpi_waitall(nproc-1, ac2_hot_rqst, ac2_hot_stat,ierr)
         END IF
       ELSE
-        CALL MPI_SEND(AC2, MSC*MDC*NP_RES, rtype, 0, 8123, comm, ierr)
+        CALL MPI_SEND(AC2, NUMSIG*NUMDIR*NP_RES, rtype, 0, 8123, comm, ierr)
       END IF
       IF (myrank .eq. 0) THEN
-        IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL, *) 'Before allocation of VAR_ONEDreturnn'
         allocate(VAR_ONEDreturn(nbOned,np_global), stat=istat)
         IF (istat/=0) CALL WWM_ABORT('wwm_hotfile, allocate error 16')
         DO iProc=2,nproc
@@ -526,18 +523,18 @@ MODULE wwm_hotfile_mod
 #endif
       IF (HOTSTYLE_OUT == 1) THEN
         CALL OUTPUT_HOTFILE_BINARY
-#ifdef NCDF
       ELSE IF (HOTSTYLE_OUT == 2) THEN
+#ifdef NCDF
         CALL OUTPUT_HOTFILE_NETCDF
+#else
+        CALL WWM_ABORT('Select NetCDF for HOTSTYLE_OUT = 2')
 #endif
       ELSE
         CALL WWM_ABORT('Wrong choice of HOTSTYLE_OUT')
       END IF
 #ifdef MPI_PARALL_GRID
       IF ((MULTIPLEOUT_HOT.eq.0).and.(myrank.eq.0)) THEN
-        IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL, *) 'Before deallocation of ACreturn'
         deallocate(ACreturn)
-        IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL, *) 'Before deallocation of VAR_ONEDreturn'
         deallocate(VAR_ONEDreturn)
       END IF
 #endif
@@ -559,7 +556,7 @@ MODULE wwm_hotfile_mod
 #endif
       IF (MULTIPLEIN_HOT.eq.0) THEN
 #ifdef MPI_PARALL_GRID
-        ALLOCATE(ACinB(MSC,MDC,NP_GLOBAL), VAR_ONED_B(nbOned, NP_GLOBAL), stat=istat)
+        ALLOCATE(ACinB(NUMSIG,NUMDIR,NP_GLOBAL), VAR_ONED_B(nbOned, NP_GLOBAL), stat=istat)
         IF (istat/=0) CALL WWM_ABORT('wwm_hotfile, allocate error 11')
         CALL READ_AC_SIMPLE(HOTIN%FNAME, NP_GLOBAL, ACinB, VAR_ONED_B)
         DO IP=1,MNP
@@ -581,7 +578,7 @@ MODULE wwm_hotfile_mod
             nbF=eRecons % ListSubset(iProc) % nbNeedEntries
             NPLOC=eRecons % ListSubset(iProc) % NPLOC
             CALL PRE_CREATE_LOCAL_HOTNAME(HOTIN%FNAME, FILERET, MULTIPLEIN_HOT, HOTSTYLE_IN, eRank)
-            allocate(ACinB(MSC, MDC,NPLOC), VAR_ONED_B(nbOned, NPLOC), stat=istat)
+            allocate(ACinB(NUMSIG, NUMDIR,NPLOC), VAR_ONED_B(nbOned, NPLOC), stat=istat)
             IF (istat/=0) CALL WWM_ABORT('wwm_hotfile, allocate error 12')
             CALL READ_AC_SIMPLE(FILERET, NPLOC, ACinB, VAR_ONED_B)
             DO I=1,nbF
@@ -601,18 +598,11 @@ MODULE wwm_hotfile_mod
 !**********************************************************************
       SUBROUTINE OUTPUT_HOTFILE_BINARY
       IMPLICIT NONE
-#ifdef MPI_PARALL_GRID
-      include 'mpif.h'
-#endif
       CHARACTER(len=140) :: FILERET
-#ifdef MPI_PARALL_GRID
-      integer IP, IS, ID, istat
-      REAL(rkind), allocatable :: VALB(:), VALB_SUM(:)
-#endif
       CALL CREATE_LOCAL_HOTNAME(HOTOUT%FNAME, FILERET, MULTIPLEOUT_HOT, HOTSTYLE_OUT)
       OPEN(HOTOUT%FHNDL, FILE = TRIM(FILERET), STATUS = 'UNKNOWN',  FORM = 'UNFORMATTED')
       WRITE(HOTOUT%FHNDL) NP_TOTAL, NE_TOTAL
-      WRITE(HOTOUT%FHNDL) MSC, MDC, FRLOW, FRHIGH
+      WRITE(HOTOUT%FHNDL) NUMSIG, NUMDIR, FRLOW, FRHIGH
 #ifndef MPI_PARALL_GRID
       WRITE(HOTOUT%FHNDL) AC2
       WRITE(HOTOUT%FHNDL) VAR_ONED
@@ -637,8 +627,8 @@ MODULE wwm_hotfile_mod
       USE NETCDF
       IMPLICIT NONE
 # ifdef MPI_PARALL_GRID
-      INTEGER :: IP, ID
-      REAL(rkind) :: ACLOC(MSC,MDC)
+      INTEGER :: IP
+      REAL(rkind) :: WALOC(NUMSIG,NUMDIR)
       REAL(rkind) :: VARLOC(nbOned)
 # endif
       INTEGER :: NPLOC, eRank, I
@@ -650,6 +640,65 @@ MODULE wwm_hotfile_mod
       INTEGER :: iret, ncid, ac_id, var_oned_id
       INTEGER :: nbF, iProc, idxFil, idxMem
       integer istat
+      REAL(rkind), allocatable :: ListTimeRead(:)
+      integer nbTimeHotfile
+      integer IHOTREAD
+      REAL(rkind), parameter :: TolDay  = 0.0001_rkind
+      real(rkind) :: ConvertToDay, eTime, eTimeStart
+      character (len=100) :: eStrUnitTime
+      integer iTime, varid, dimids(2)
+      !
+      ! Reading the time.
+      !
+      ISTAT = nf90_open(TRIM(HOTIN%FNAME), nf90_nowrite, ncid)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 1, ISTAT)
+
+      ISTAT = nf90_inq_varid(ncid, "ocean_time", varid)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 5, ISTAT)
+
+      ISTAT = nf90_inquire_variable(ncid, varid, dimids=dimids)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 8, ISTAT)
+
+      ISTAT = nf90_inquire_dimension(ncid, dimids(1), len=nbTimeHotfile)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 9, ISTAT)
+
+      ISTAT = nf90_get_att(ncid, varid, "units", eStrUnitTime)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 7, ISTAT)
+      CALL CF_EXTRACT_TIME(eStrUnitTime, ConvertToDay, eTimeStart)
+      
+      allocate(ListTimeRead(nbtimeHotfile), stat=istat)
+      IF (istat/=0) CALL WWM_ABORT('wwm_wind, allocate error 48')
+
+      ISTAT = nf90_get_var(ncid, varid, ListTimeRead)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 10, ISTAT)
+
+      IHOTREAD = -1
+      DO iTime=1,nbTimeHotfile
+        eTime=ListTimeRead(iTime)*ConvertToDay + eTimeStart
+        IF (ABS(eTime - MAIN % BMJD) .le. TolDay) THEN
+          IHOTREAD = iTime
+        END IF
+      END DO
+      deallocate(ListTimeRead)
+      
+      ISTAT = nf90_close(ncid)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 11, ISTAT)
+
+      !
+      ! Now for the operations
+      !
+      IF (IHOTREAD .eq. -1) THEN
+        CALL WWM_ABORT('We did not find a matching entry in the hotfile')
+      END IF
+
+      
+      IF (IHOTREAD .ne. IHOTPOS_IN) THEN
+        WRITE(DBG%FHNDL,*) 'Remark: We have inconsistency in the data reading'
+        WRITE(DBG%FHNDL,*) 'IHOTREAD   = ', IHOTREAD
+        WRITE(DBG%FHNDL,*) 'IHOTPOS_IN = ', IHOTPOS_IN
+        WRITE(DBG%FHNDL,*) 'We use IHOTREAD later on'
+      END IF
+      
       IF (MULTIPLEIN_HOT.eq.0) THEN
 # ifdef MPI_PARALL_GRID
         iret=nf90_open(TRIM(HOTIN%FNAME), nf90_nowrite, ncid)
@@ -659,13 +708,13 @@ MODULE wwm_hotfile_mod
         iret=nf90_inq_varid(ncid, "var_oned", var_oned_id)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 3, iret)
         DO IP=1,MNP
-          iret=nf90_get_var(ncid,ac_id,ACLOC, start=(/1,1,iplg(IP),IHOTPOS_IN/), count = (/MSC, MDC, 1, 1 /))
+          iret=nf90_get_var(ncid,ac_id,WALOC, start=(/1,1,iplg(IP),IHOTREAD/), count = (/NUMSIG, NUMDIR, 1, 1 /))
           IF (iret /= 0) THEN
             Print *, 'This time send direcly your bug to Mathieu.Dutour@gmail.com'
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 4, iret)
           END IF
-          AC2(:,:,IP)=ACLOC
-          iret=nf90_get_var(ncid,var_oned_id,VARLOC, start=(/1,iplg(IP),IHOTPOS_IN/), count = (/nbOned, 1, 1 /))
+          AC2(:,:,IP)=WALOC
+          iret=nf90_get_var(ncid,var_oned_id,VARLOC, start=(/1,iplg(IP),IHOTREAD/), count = (/nbOned, 1, 1 /))
           IF (iret /= 0) THEN
             Print *, 'Same story. Send direcly your bug to Mathieu.Dutour@gmail.com'
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 4, iret)
@@ -681,9 +730,9 @@ MODULE wwm_hotfile_mod
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 7, iret)
         iret=nf90_inq_varid(ncid, "var_oned", var_oned_id)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 8, iret)
-        iret=nf90_get_var(ncid,ac_id,AC2, start=(/1,1,1,IHOTPOS_IN/), count=(/MSC,MDC,MNP,1/))
+        iret=nf90_get_var(ncid,ac_id,AC2, start=(/1,1,1,IHOTREAD/), count=(/NUMSIG,NUMDIR,MNP,1/))
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 9, iret)
-        iret=nf90_get_var(ncid,var_oned_id,VAR_ONED, start=(/1,1,IHOTPOS_IN/), count=(/nbOned, MNP, 1/))
+        iret=nf90_get_var(ncid,ac_id,VAR_ONED, start=(/1,1,IHOTREAD/), count=(/nbOned, MNP, 1/))
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 10, iret)
         iret=nf90_close(ncid)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 11, iret)
@@ -698,12 +747,10 @@ MODULE wwm_hotfile_mod
           CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 13, iret)
           iret=nf90_inq_varid(ncid, "var_oned", var_oned_id)
           CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 14, iret)
-          iret=nf90_get_var(ncid,ac_id,AC2, start=(/1,1,1,IHOTPOS_IN/),  count = (/MSC, MDC, MNP, 1 /))
+          iret=nf90_get_var(ncid,ac_id,AC2, start=(/1,1,1,IHOTREAD/),  count = (/NUMSIG, NUMDIR, MNP, 1 /))
           CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 15, iret)
-          iret=nf90_get_var(ncid,var_oned_id,VAR_ONED, start=(/1,1,IHOTPOS_IN/), count=(/nbOned, MNP, 1/))
-          CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 16, iret)
           iret=nf90_close(ncid)
-          CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 17, iret)
+          CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 16, iret)
         ELSE
           DO iProc=1,eRecons % nbNeedProc
             eRank=eRecons % ListSubset(iProc) % eRankProc
@@ -712,15 +759,15 @@ MODULE wwm_hotfile_mod
             CALL PRE_CREATE_LOCAL_HOTNAME(HOTIN%FNAME, FILERET, MULTIPLEIN_HOT, HOTSTYLE_IN, eRank)
             iret=nf90_open(TRIM(FILERET), nf90_nowrite, ncid)
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 17, iret)
-            allocate(ACinB(MSC,MDC,NPLOC), VAR_ONED_B(nbOned, NPLOC), stat=istat)
+            allocate(ACinB(NUMSIG,NUMDIR,NPLOC), VAR_ONED_B(nbOned, NPLOC), stat=istat)
             IF (istat/=0) CALL WWM_ABORT('wwm_hotfile, allocate error 15')
             iret=nf90_inq_varid(ncid, "ac", ac_id)
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 18, iret)
             iret=nf90_inq_varid(ncid, "var_oned", var_oned_id)
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 19, iret)
-            iret=nf90_get_var(ncid,ac_id,ACinB, start=(/1,1,1,IHOTPOS_IN/), count=(/MSC, MDC, NPLOC, 1 /))
+            iret=nf90_get_var(ncid,ac_id,ACinB, start=(/1,1,1,IHOTREAD/), count=(/NUMSIG, NUMDIR, NPLOC, 1 /))
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 20, iret)
-            iret=nf90_get_var(ncid,var_oned_id,VAR_ONED_B, start=(/1,1,IHOTPOS_IN/), count=(/nbOned, NPLOC, 1 /))
+            iret=nf90_get_var(ncid,var_oned_id,VAR_ONED_B, start=(/1,1,IHOTREAD/), count=(/nbOned, NPLOC, 1 /))
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 21, iret)
             iret=nf90_close(ncid)
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 22, iret)
@@ -739,24 +786,24 @@ MODULE wwm_hotfile_mod
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE WRITE_HOTFILE_PART_1(FILERET, nbTime, MULTIPLEOUT_W, GRIDWRITE_W, IOBPD_HISTORY_W, np_write, ne_write)
+      SUBROUTINE WRITE_HOTFILE_PART_1(FILERET, nbTime, MULTIPLEOUT_W, GRIDWRITE_W, IOBPD_HISTORY_W, CG_HISTORY_W, np_write, ne_write)
       USE DATAPOOL
       USE NETCDF
       IMPLICIT NONE
       character(len=140), intent(in) :: FILERET
-      integer, intent(in) :: nbTime, MULTIPLEOUT_W
-      logical, intent(in) :: GRIDWRITE_W, IOBPD_HISTORY_W
-      integer, intent(in) :: np_write, ne_write
-      !
+      integer, intent(in) :: nbTime
+      logical, intent(in) :: GRIDWRITE_W, IOBPD_HISTORY_W, CG_HISTORY_W
+      integer, intent(in) :: np_write, ne_write, MULTIPLEOUT_W
       character (len = *), parameter :: CallFct="WRITE_HOTFILE_PART_1"
       character (len = *), parameter :: UNITS = "units"
       integer iret, ncid
       integer nboned_dims, nfreq_dims, ndir_dims, ntime_dims, mnp_dims
       integer ac_id
+!
       iret = nf90_create(FILERET, NF90_CLOBBER, ncid)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 1, iret)
 
-      CALL WRITE_NETCDF_HEADERS_1(ncid, nbTime, MULTIPLEOUT_W, GRIDWRITE_W, IOBPD_HISTORY_W, np_write, ne_write)
+      CALL WRITE_NETCDF_HEADERS_1(ncid, nbTime, MULTIPLEOUT_W, GRIDWRITE_W, IOBPD_HISTORY_W, CG_HISTORY_W, np_write, ne_write)
 
       iret=nf90_def_dim(ncid, "nboned", nbOned, nboned_dims)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 2, iret)
@@ -795,7 +842,7 @@ MODULE wwm_hotfile_mod
       character(len=140), intent(in) :: FILERET
       real(rkind), intent(in) :: eTimeDay
       integer, intent(in) :: POS, np_write
-      real(rkind), intent(in) :: ACwrite(MSC,MDC,np_write), VAR_ONEDwrite(nbOned, np_write)
+      real(rkind), intent(in) :: ACwrite(NUMSIG,NUMDIR,np_write), VAR_ONEDwrite(nbOned, np_write)
       character (len = *), parameter :: CallFct="WRITE_HOTFILE_PART_2"
       integer iret, ncid, var_oned_id, ac_id
       iret=nf90_open(FILERET, nf90_write, ncid)
@@ -805,7 +852,7 @@ MODULE wwm_hotfile_mod
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 2, iret)
       iret=nf90_inq_varid(ncid, "var_oned", var_oned_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 3, iret)
-      iret=nf90_put_var(ncid,ac_id,ACwrite,start=(/1, 1, 1, POS/), count=(/ MSC, MDC, np_write, 1 /))
+      iret=nf90_put_var(ncid,ac_id,ACwrite,start=(/1, 1, 1, POS/), count=(/ NUMSIG, NUMDIR, np_write, 1 /))
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 4, iret)
       iret=nf90_put_var(ncid,var_oned_id,VAR_ONEDwrite,start=(/1, 1, POS/), count=(/ nbOned, np_write, 1 /))
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 5, iret)
@@ -819,21 +866,12 @@ MODULE wwm_hotfile_mod
       USE DATAPOOL
       USE NETCDF
       IMPLICIT NONE
-!# ifdef MPI_PARALL_GRID
-!      include 'mpif.h'
-!# endif
       character (len = *), parameter :: CallFct="OUTPUT_HOTFILE_NETCDF"
-      INTEGER :: POS
-      integer :: iret, ncid, ntime_dims, mnp_dims, nfreq_dims, ndir_dims
-      integer :: ac_id, nboned_dims, var_oned_id
-      integer :: nbTime
+      INTEGER :: POS, nbTime, np_write, ne_write
       REAL(rkind)  :: eTimeDay
       character(len=140) :: FILERET
-      integer np_write, ne_write
-#ifdef MPI_PARALL_GRID
-      integer ID, IS, IP !, ISTAT
-#endif
-#ifdef MPI_PARALL_GRID
+      logical :: CG_HISTORY_W = .FALSE.
+# ifdef MPI_PARALL_GRID
       IF (MULTIPLEOUT_HOT.eq.0) THEN
         np_write=np_global
         ne_write=ne_global
@@ -841,10 +879,10 @@ MODULE wwm_hotfile_mod
         np_write=MNP
         ne_write=MNE
       ENDIF
-#else
-      np_write=np_global
-      ne_write=ne_global
-#endif
+# else
+      np_write=MNP
+      ne_write=MNE
+# endif
       CALL CREATE_LOCAL_HOTNAME(HOTOUT%FNAME, FILERET, MULTIPLEOUT_HOT, HOTSTYLE_OUT)
       IF (IDXHOTOUT.eq.0) THEN
 !$OMP MASTER
@@ -854,7 +892,7 @@ MODULE wwm_hotfile_mod
           nbTime=-1
         END IF
         IF (WriteOutputProcess_hot) THEN
-          CALL WRITE_HOTFILE_PART_1(FILERET, nbTime, MULTIPLEOUT_HOT, GRIDWRITE, IOBPD_HISTORY, np_write, ne_write)
+          CALL WRITE_HOTFILE_PART_1(FILERET, nbTime, MULTIPLEOUT_HOT, GRIDWRITE, IOBPD_HISTORY, CG_HISTORY_W, np_write, ne_write)
         END IF
         CALL WRITE_NETCDF_HEADERS_2(FILERET, MULTIPLEOUT_HOT, WriteOutputProcess_hot, GRIDWRITE, np_write, ne_write)
 !$OMP END MASTER
@@ -867,15 +905,15 @@ MODULE wwm_hotfile_mod
         END IF
         eTimeDay=MAIN%TMJD
         !
-#ifdef MPI_PARALL_GRID
+# ifdef MPI_PARALL_GRID
         IF (MULTIPLEOUT_HOT.eq.0) THEN
           CALL WRITE_HOTFILE_PART_2(FILERET, eTimeDay, POS, np_global, ACreturn, VAR_ONEDreturn)
         ELSE
           CALL WRITE_HOTFILE_PART_2(FILERET, eTimeDay, POS, MNP, AC2, VAR_ONED)
         ENDIF
-#else
-        CALL WRITE_HOTFILE_PART_2(FILERET, eTimeDay, POS, np_global, AC2, VAR_ONED)
-#endif
+# else
+        CALL WRITE_HOTFILE_PART_2(FILERET, eTimeDay, POS, MNP, AC2, VAR_ONED)
+# endif
       ENDIF
       IDXHOTOUT=IDXHOTOUT+1
       END SUBROUTINE

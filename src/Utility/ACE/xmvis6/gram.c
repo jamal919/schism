@@ -1,37 +1,30 @@
-/* A Bison parser, made by GNU Bison 2.7.  */
+/* A Bison parser, made by GNU Bison 2.1.  */
 
-/* Bison implementation for Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
-   This program is free software: you can redistribute it and/or modify
+/* Skeleton parser for Yacc-like parsing with Bison,
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-   
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
-/* As a special exception, you may create a larger work that contains
-   part or all of the Bison parser skeleton and distribute that work
-   under terms of your choice, so long as that work isn't itself a
-   parser generator using the skeleton or a modified version thereof
-   as a parser skeleton.  Alternatively, if you modify or redistribute
-   the parser skeleton itself, you may (at your option) remove this
-   special exception, which will cause the skeleton and the resulting
-   Bison output files to be licensed under the GNU General Public
-   License without this special exception.
-   
-   This special exception was added by the Free Software Foundation in
-   version 2.2 of Bison.  */
+/* As a special exception, when this file is copied by Bison into a
+   Bison output file, you may use that output file without restriction.
+   This special exception was added by the Free Software Foundation
+   in version 1.24 of Bison.  */
 
-/* C LALR(1) parser skeleton written by Richard Stallman, by
-   simplifying the original so-called "semantic" parser.  */
+/* Written by Richard Stallman by simplifying the original so called
+   ``semantic'' parser.  */
 
 /* All symbols defined below should begin with yy or YY, to avoid
    infringing on user name space.  This should be done even for local
@@ -44,7 +37,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.7"
+#define YYBISON_VERSION "2.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -52,149 +45,10 @@
 /* Pure parsers.  */
 #define YYPURE 0
 
-/* Push parsers.  */
-#define YYPUSH 0
-
-/* Pull parsers.  */
-#define YYPULL 1
+/* Using locations.  */
+#define YYLSP_NEEDED 0
 
 
-
-
-/* Copy the first part of user declarations.  */
-/* Line 371 of yacc.c  */
-#line 11 "gram.y"
-
-/*
- * 
- * evaluate expressions, commands, parameter files
- * 
- */
-
-#define GRAMMAR
-
-#ifndef lint
-static char RCSid[] = "$Id: gram.y,v 1.31 2008/04/10 18:29:08 pturner Exp $";
-#endif
-
-#include <stdio.h>
-#include <math.h>
-#include <ctype.h>
-
-#include "defines.h"
-#include "globals.h"
-
-typedef struct _symtab_entry {
-    char *s;
-    int type;
-} symtab_entry;
-
-#ifndef M_PI
-#     define M_PI  3.14159265358979323846
-#endif
-
-#ifndef TRUE
-#     define TRUE 1
-#endif
-
-#ifndef FALSE
-#     define FALSE 0
-#endif
-/* for LINUX
-char *gettxt(char *t, char *s) { return *s; }
-*/
-
-int elcirc_maxlevels;
-int elcirc_gridno;
-int elcirc_flowno;
-int elcircmarker = 0;
-int curg = 0;
-
-int maxboxes = MAXBOXES;
-int maxlines = MAXLINES;
-int maxstring = MAXSTR;
-
-double result, resx, resy;	/* return value if expression */
-double nonl_parms[10];
-
-double drand48(void);
-long lrand48(void);
-
-double rnorm(double mean, double sdev), fx(double x), normp(double b, double *s);
-void yyerror(char *s);
-
-static int interr;
-
-static double *freelist[100]; 	/* temporary vectors */
-static int fcnt;		/* number allocated */
-
-int naxis = 0;	/* current axis */
-int curline, curbox, curstring, curleg, curobject;
-
-int gotbatch, gotparams, gotread; /* these guys attempt to avoid reentrancy problems */
-int readtype, readsrc;
-extern char batchfile[];
-char paramfile[256], readfile[256];
-
-static char f_string[512];	/* buffer for string to parse */
-static int pos = 0;
-static double *aa, *bb, *cc, *dd, *xx, *yy;
-static int setindex, lxy, ls;
-static int setsetno;
-static int whichgraph;
-static int whichset;
-
-extern int change_gno;
-extern int change_type;
-
-int checkptr(void *ptr, char *buf);
-static Isolparms *setisol = NULL; /* pointer to current Isolparms struct */
-static DisplayFlow *setflow = NULL; /* pointer to current Isolparms struct */
-static Props *setprops = NULL; /* pointer to current Isolparms struct */
-static Zoom_box *setzoombox = NULL;
-static Hist_marker *sethistbox = NULL;
-static DisplaySlice *setslice = NULL;
-static Elevmarker *setelevmarker = NULL;
-static DisplayGrid *setgrid = NULL;
-static Transect *settrans = NULL;
-static ADCIRC3D *setadc3d = NULL;
-static Display3dFlow *setflow3d = NULL;
-static DisplayParticles *setdrogs = NULL;
-
-/* may add these later TODO
-*/
-
-
-/* Line 371 of yacc.c  */
-#line 170 "y.tab.c"
-
-# ifndef YY_NULL
-#  if defined __cplusplus && 201103L <= __cplusplus
-#   define YY_NULL nullptr
-#  else
-#   define YY_NULL 0
-#  endif
-# endif
-
-/* Enabling verbose error messages.  */
-#ifdef YYERROR_VERBOSE
-# undef YYERROR_VERBOSE
-# define YYERROR_VERBOSE 1
-#else
-# define YYERROR_VERBOSE 0
-#endif
-
-/* In a future release of Bison, this section will be replaced
-   by #include "y.tab.h".  */
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
-/* Enabling traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -1226,136 +1080,181 @@ extern int yydebug;
 
 
 
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-{
-/* Line 387 of yacc.c  */
-#line 113 "gram.y"
 
+/* Copy the first part of user declarations.  */
+#line 11 "gram.y"
+
+/*
+ * 
+ * evaluate expressions, commands, parameter files
+ * 
+ */
+
+#define GRAMMAR
+
+#ifndef lint
+static char RCSid[] = "$Id: gram.y,v 1.31 2008/04/10 18:29:08 pturner Exp $";
+#endif
+
+#include <stdio.h>
+#include <math.h>
+#include <ctype.h>
+
+#include "defines.h"
+#include "globals.h"
+
+typedef struct _symtab_entry {
+    char *s;
+    int type;
+} symtab_entry;
+
+#ifndef M_PI
+#     define M_PI  3.14159265358979323846
+#endif
+
+#ifndef TRUE
+#     define TRUE 1
+#endif
+
+#ifndef FALSE
+#     define FALSE 0
+#endif
+/* for LINUX
+char *gettxt(char *t, char *s) { return *s; }
+*/
+
+int elcirc_maxlevels;
+int elcirc_gridno;
+int elcirc_flowno;
+int elcircmarker = 0;
+int curg = 0;
+
+int maxboxes = MAXBOXES;
+int maxlines = MAXLINES;
+int maxstring = MAXSTR;
+
+double result, resx, resy;	/* return value if expression */
+double nonl_parms[10];
+
+double drand48(void);
+long lrand48(void);
+
+double rnorm(double mean, double sdev), fx(double x), normp(double b, double *s);
+void yyerror(char *s);
+
+static int interr;
+
+static double *freelist[100]; 	/* temporary vectors */
+static int fcnt;		/* number allocated */
+
+int naxis = 0;	/* current axis */
+int curline, curbox, curstring, curleg, curobject;
+
+int gotbatch, gotparams, gotread; /* these guys attempt to avoid reentrancy problems */
+int readtype, readsrc;
+extern char batchfile[];
+char paramfile[256], readfile[256];
+
+static char f_string[512];	/* buffer for string to parse */
+static int pos = 0;
+static double *aa, *bb, *cc, *dd, *xx, *yy;
+static int setindex, lxy, ls;
+static int setsetno;
+static int whichgraph;
+static int whichset;
+
+extern int change_gno;
+extern int change_type;
+
+int checkptr(void *ptr, char *buf);
+static Isolparms *setisol = NULL; /* pointer to current Isolparms struct */
+static DisplayFlow *setflow = NULL; /* pointer to current Isolparms struct */
+static Props *setprops = NULL; /* pointer to current Isolparms struct */
+static Zoom_box *setzoombox = NULL;
+static Hist_marker *sethistbox = NULL;
+static DisplaySlice *setslice = NULL;
+static Elevmarker *setelevmarker = NULL;
+static DisplayGrid *setgrid = NULL;
+static Transect *settrans = NULL;
+static ADCIRC3D *setadc3d = NULL;
+static Display3dFlow *setflow3d = NULL;
+static DisplayParticles *setdrogs = NULL;
+
+/* may add these later TODO
+*/
+
+
+
+/* Enabling traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+
+/* Enabling verbose error messages.  */
+#ifdef YYERROR_VERBOSE
+# undef YYERROR_VERBOSE
+# define YYERROR_VERBOSE 1
+#else
+# define YYERROR_VERBOSE 0
+#endif
+
+/* Enabling the token table.  */
+#ifndef YYTOKEN_TABLE
+# define YYTOKEN_TABLE 0
+#endif
+
+#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
+#line 113 "gram.y"
+typedef union YYSTYPE {
     double val;
     int ival;
     double *ptr;
     int func;
     int pset;
     char *str;
-
-
-/* Line 387 of yacc.c  */
-#line 1245 "y.tab.c"
 } YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
+/* Line 196 of yacc.c.  */
+#line 1218 "y.tab.c"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
-extern YYSTYPE yylval;
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
-
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-/* Line 390 of yacc.c  */
-#line 1273 "y.tab.c"
 
-#ifdef short
-# undef short
+/* Line 219 of yacc.c.  */
+#line 1230 "y.tab.c"
+
+#if ! defined (YYSIZE_T) && defined (__SIZE_TYPE__)
+# define YYSIZE_T __SIZE_TYPE__
 #endif
-
-#ifdef YYTYPE_UINT8
-typedef YYTYPE_UINT8 yytype_uint8;
-#else
-typedef unsigned char yytype_uint8;
+#if ! defined (YYSIZE_T) && defined (size_t)
+# define YYSIZE_T size_t
 #endif
-
-#ifdef YYTYPE_INT8
-typedef YYTYPE_INT8 yytype_int8;
-#elif (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-typedef signed char yytype_int8;
-#else
-typedef short int yytype_int8;
+#if ! defined (YYSIZE_T) && (defined (__STDC__) || defined (__cplusplus))
+# include <stddef.h> /* INFRINGES ON USER NAME SPACE */
+# define YYSIZE_T size_t
 #endif
-
-#ifdef YYTYPE_UINT16
-typedef YYTYPE_UINT16 yytype_uint16;
-#else
-typedef unsigned short int yytype_uint16;
+#if ! defined (YYSIZE_T)
+# define YYSIZE_T unsigned int
 #endif
-
-#ifdef YYTYPE_INT16
-typedef YYTYPE_INT16 yytype_int16;
-#else
-typedef short int yytype_int16;
-#endif
-
-#ifndef YYSIZE_T
-# ifdef __SIZE_TYPE__
-#  define YYSIZE_T __SIZE_TYPE__
-# elif defined size_t
-#  define YYSIZE_T size_t
-# elif ! defined YYSIZE_T && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-#  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
-#  define YYSIZE_T size_t
-# else
-#  define YYSIZE_T unsigned int
-# endif
-#endif
-
-#define YYSIZE_MAXIMUM ((YYSIZE_T) -1)
 
 #ifndef YY_
-# if defined YYENABLE_NLS && YYENABLE_NLS
+# if YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
-#   define YY_(Msgid) dgettext ("bison-runtime", Msgid)
+#   define YY_(msgid) dgettext ("bison-runtime", msgid)
 #  endif
 # endif
 # ifndef YY_
-#  define YY_(Msgid) Msgid
+#  define YY_(msgid) msgid
 # endif
 #endif
 
-/* Suppress unused-variable warnings by "using" E.  */
-#if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
-#else
-# define YYUSE(E) /* empty */
-#endif
-
-/* Identity function, used to suppress warnings about constant conditions.  */
-#ifndef lint
-# define YYID(N) (N)
-#else
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-static int
-YYID (int yyi)
-#else
-static int
-YYID (yyi)
-    int yyi;
-#endif
-{
-  return yyi;
-}
-#endif
-
-#if ! defined yyoverflow || YYERROR_VERBOSE
+#if ! defined (yyoverflow) || YYERROR_VERBOSE
 
 /* The parser invokes alloca or malloc; define the necessary symbols.  */
 
@@ -1363,79 +1262,66 @@ YYID (yyi)
 #  if YYSTACK_USE_ALLOCA
 #   ifdef __GNUC__
 #    define YYSTACK_ALLOC __builtin_alloca
-#   elif defined __BUILTIN_VA_ARG_INCR
-#    include <alloca.h> /* INFRINGES ON USER NAME SPACE */
-#   elif defined _AIX
-#    define YYSTACK_ALLOC __alloca
-#   elif defined _MSC_VER
-#    include <malloc.h> /* INFRINGES ON USER NAME SPACE */
-#    define alloca _alloca
 #   else
 #    define YYSTACK_ALLOC alloca
-#    if ! defined _ALLOCA_H && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#    if defined (__STDC__) || defined (__cplusplus)
 #     include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-      /* Use EXIT_SUCCESS as a witness for stdlib.h.  */
-#     ifndef EXIT_SUCCESS
-#      define EXIT_SUCCESS 0
-#     endif
+#     define YYINCLUDED_STDLIB_H
 #    endif
 #   endif
 #  endif
 # endif
 
 # ifdef YYSTACK_ALLOC
-   /* Pacify GCC's `empty if-body' warning.  */
-#  define YYSTACK_FREE(Ptr) do { /* empty */; } while (YYID (0))
+   /* Pacify GCC's `empty if-body' warning. */
+#  define YYSTACK_FREE(Ptr) do { /* empty */; } while (0)
 #  ifndef YYSTACK_ALLOC_MAXIMUM
     /* The OS might guarantee only one guard page at the bottom of the stack,
        and a page size can be as small as 4096 bytes.  So we cannot safely
        invoke alloca (N) if N exceeds 4096.  Use a slightly smaller number
        to allow for a few compiler-allocated temporary stack slots.  */
-#   define YYSTACK_ALLOC_MAXIMUM 4032 /* reasonable circa 2006 */
+#   define YYSTACK_ALLOC_MAXIMUM 4032 /* reasonable circa 2005 */
 #  endif
 # else
 #  define YYSTACK_ALLOC YYMALLOC
 #  define YYSTACK_FREE YYFREE
 #  ifndef YYSTACK_ALLOC_MAXIMUM
-#   define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
+#   define YYSTACK_ALLOC_MAXIMUM ((YYSIZE_T) -1)
 #  endif
-#  if (defined __cplusplus && ! defined EXIT_SUCCESS \
-       && ! ((defined YYMALLOC || defined malloc) \
-	     && (defined YYFREE || defined free)))
-#   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#   ifndef EXIT_SUCCESS
-#    define EXIT_SUCCESS 0
-#   endif
+#  ifdef __cplusplus
+extern "C" {
 #  endif
 #  ifndef YYMALLOC
 #   define YYMALLOC malloc
-#   if ! defined malloc && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#   if (! defined (malloc) && ! defined (YYINCLUDED_STDLIB_H) \
+	&& (defined (__STDC__) || defined (__cplusplus)))
 void *malloc (YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 #  ifndef YYFREE
 #   define YYFREE free
-#   if ! defined free && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#   if (! defined (free) && ! defined (YYINCLUDED_STDLIB_H) \
+	&& (defined (__STDC__) || defined (__cplusplus)))
 void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
+#  ifdef __cplusplus
+}
+#  endif
 # endif
-#endif /* ! defined yyoverflow || YYERROR_VERBOSE */
+#endif /* ! defined (yyoverflow) || YYERROR_VERBOSE */
 
 
-#if (! defined yyoverflow \
-     && (! defined __cplusplus \
-	 || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
+#if (! defined (yyoverflow) \
+     && (! defined (__cplusplus) \
+	 || (defined (YYSTYPE_IS_TRIVIAL) && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
-  yytype_int16 yyss_alloc;
-  YYSTYPE yyvs_alloc;
-};
+  short int yyss;
+  YYSTYPE yyvs;
+  };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
@@ -1443,61 +1329,63 @@ union yyalloc
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 # define YYSTACK_BYTES(N) \
-     ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE)) \
+     ((N) * (sizeof (short int) + sizeof (YYSTYPE))			\
       + YYSTACK_GAP_MAXIMUM)
 
-# define YYCOPY_NEEDED 1
+/* Copy COUNT objects from FROM to TO.  The source and destination do
+   not overlap.  */
+# ifndef YYCOPY
+#  if defined (__GNUC__) && 1 < __GNUC__
+#   define YYCOPY(To, From, Count) \
+      __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
+#  else
+#   define YYCOPY(To, From, Count)		\
+      do					\
+	{					\
+	  YYSIZE_T yyi;				\
+	  for (yyi = 0; yyi < (Count); yyi++)	\
+	    (To)[yyi] = (From)[yyi];		\
+	}					\
+      while (0)
+#  endif
+# endif
 
 /* Relocate STACK from its old location to the new one.  The
    local variables YYSIZE and YYSTACKSIZE give the old and new number of
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
+# define YYSTACK_RELOCATE(Stack)					\
     do									\
       {									\
 	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
-	Stack = &yyptr->Stack_alloc;					\
+	YYCOPY (&yyptr->Stack, Stack, yysize);				\
+	Stack = &yyptr->Stack;						\
 	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
 	yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
-    while (YYID (0))
+    while (0)
 
 #endif
 
-#if defined YYCOPY_NEEDED && YYCOPY_NEEDED
-/* Copy COUNT objects from SRC to DST.  The source and destination do
-   not overlap.  */
-# ifndef YYCOPY
-#  if defined __GNUC__ && 1 < __GNUC__
-#   define YYCOPY(Dst, Src, Count) \
-      __builtin_memcpy (Dst, Src, (Count) * sizeof (*(Src)))
-#  else
-#   define YYCOPY(Dst, Src, Count)              \
-      do                                        \
-        {                                       \
-          YYSIZE_T yyi;                         \
-          for (yyi = 0; yyi < (Count); yyi++)   \
-            (Dst)[yyi] = (Src)[yyi];            \
-        }                                       \
-      while (YYID (0))
-#  endif
-# endif
-#endif /* !YYCOPY_NEEDED */
+#if defined (__STDC__) || defined (__cplusplus)
+   typedef signed char yysigned_char;
+#else
+   typedef short int yysigned_char;
+#endif
 
-/* YYFINAL -- State number of the termination state.  */
+/* YYFINAL -- State number of the termination state. */
 #define YYFINAL  522
 /* YYLAST -- Last index in YYTABLE.  */
 #define YYLAST   6977
 
-/* YYNTOKENS -- Number of terminals.  */
+/* YYNTOKENS -- Number of terminals. */
 #define YYNTOKENS  526
-/* YYNNTS -- Number of nonterminals.  */
+/* YYNNTS -- Number of nonterminals. */
 #define YYNNTS  72
-/* YYNRULES -- Number of rules.  */
+/* YYNRULES -- Number of rules. */
 #define YYNRULES  797
-/* YYNRULES -- Number of states.  */
+/* YYNRULES -- Number of states. */
 #define YYNSTATES  1798
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
@@ -1508,7 +1396,7 @@ union yyalloc
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
-static const yytype_uint16 yytranslate[] =
+static const unsigned short int yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      519,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1592,7 +1480,7 @@ static const yytype_uint16 yytranslate[] =
 #if YYDEBUG
 /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
    YYRHS.  */
-static const yytype_uint16 yyprhs[] =
+static const unsigned short int yyprhs[] =
 {
        0,     0,     3,     4,     7,    10,    13,    16,    19,    22,
       25,    28,    31,    34,    37,    40,    43,    46,    49,    52,
@@ -1676,8 +1564,8 @@ static const yytype_uint16 yyprhs[] =
     3225,  3229,  3233,  3237,  3241,  3245,  3248,  3252
 };
 
-/* YYRHS -- A `-1'-separated list of the rules' RHS.  */
-static const yytype_int16 yyrhs[] =
+/* YYRHS -- A `-1'-separated list of the rules' RHS. */
+static const short int yyrhs[] =
 {
      527,     0,    -1,    -1,   594,   519,    -1,   595,   519,    -1,
      597,   519,    -1,   596,   519,    -1,   529,   519,    -1,   528,
@@ -2008,7 +1896,7 @@ static const yytype_int16 yyrhs[] =
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint16 yyrline[] =
+static const unsigned short int yyrline[] =
 {
        0,   668,   668,   669,   670,   671,   672,   673,   674,   675,
      676,   677,   678,   679,   680,   681,   682,   683,   684,   685,
@@ -2093,9 +1981,9 @@ static const yytype_uint16 yyrline[] =
 };
 #endif
 
-#if YYDEBUG || YYERROR_VERBOSE || 0
+#if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
-   First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
+   First, the terminals, then, starting at YYNTOKENS, nonterminals. */
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "VAR", "X", "Y", "CHRSTR", "FITPARM",
@@ -2169,24 +2057,24 @@ static const char *const yytname[] =
   "YMAX", "YMIN", "ZEROXAXIS", "ZEROYAXIS", "ZOOM", "ZOOMBOX", "'='", "OR",
   "AND", "NE", "EQ", "GE", "LE", "LT", "GT", "'+'", "'-'", "'*'", "'/'",
   "'%'", "'^'", "NOT", "UMINUS", "'\\n'", "','", "'['", "']'", "'('",
-  "')'", "'.'", "$accept", "list", "annotation", "animation", "misc",
-  "$@1", "$@2", "models", "$@3", "$@4", "$@5", "$@6", "$@7", "flowprops",
-  "$@8", "$@9", "$@10", "$@11", "$@12", "elevmarker", "$@13", "grid",
-  "$@14", "$@15", "$@16", "drogues", "$@17", "isolines", "$@18", "$@19",
-  "histboxes", "$@20", "zoomboxes", "$@21", "wscale", "vscale", "mapscale",
-  "tidalclock", "timeinfo", "timeline", "slice", "$@22", "props", "graph",
-  "setaxis", "axis", "allaxes", "axesprops", "axisfeature", "tickattr",
+  "')'", "'.'", "$accept", "list", "annotation", "animation", "misc", "@1",
+  "@2", "models", "@3", "@4", "@5", "@6", "@7", "flowprops", "@8", "@9",
+  "@10", "@11", "@12", "elevmarker", "@13", "grid", "@14", "@15", "@16",
+  "drogues", "@17", "isolines", "@18", "@19", "histboxes", "@20",
+  "zoomboxes", "@21", "wscale", "vscale", "mapscale", "tidalclock",
+  "timeinfo", "timeline", "slice", "@22", "props", "graph", "setaxis",
+  "axis", "allaxes", "axesprops", "axisfeature", "tickattr",
   "ticklabeldesc", "ticklabelattr", "axislabeldesc", "axisbardesc",
   "sourcetype", "justchoice", "graphtype", "inoutchoice", "signchoice",
   "formatchoice", "horv", "flowonoff", "onoff", "worldview", "torf",
-  "filltype", "opchoice", "units", "asgn", "vasgn", "vexpr", "expr", YY_NULL
+  "filltype", "opchoice", "units", "asgn", "vasgn", "vexpr", "expr", 0
 };
 #endif
 
 # ifdef YYPRINT
 /* YYTOKNUM[YYLEX-NUM] -- Internal token number corresponding to
    token YYLEX-NUM.  */
-static const yytype_uint16 yytoknum[] =
+static const unsigned short int yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
@@ -2245,7 +2133,7 @@ static const yytype_uint16 yytoknum[] =
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
-static const yytype_uint16 yyr1[] =
+static const unsigned short int yyr1[] =
 {
        0,   526,   527,   527,   527,   527,   527,   527,   527,   527,
      527,   527,   527,   527,   527,   527,   527,   527,   527,   527,
@@ -2330,7 +2218,7 @@ static const yytype_uint16 yyr1[] =
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
-static const yytype_uint8 yyr2[] =
+static const unsigned char yyr2[] =
 {
        0,     2,     0,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -2414,10 +2302,10 @@ static const yytype_uint8 yyr2[] =
        3,     3,     3,     3,     3,     2,     3,     2
 };
 
-/* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
-   Performed when YYTABLE doesn't specify something else to do.  Zero
+/* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
+   STATE-NUM when YYTABLE doesn't specify something else to do.  Zero
    means the default is an error.  */
-static const yytype_uint16 yydefact[] =
+static const unsigned short int yydefact[] =
 {
        0,     0,   653,   726,   725,     0,     0,     0,     0,     0,
        0,     0,   683,   684,   685,     0,     0,     0,     0,     0,
@@ -2601,8 +2489,8 @@ static const yytype_uint16 yydefact[] =
      172,   130,     0,   173,     0,     0,     0,   436
 };
 
-/* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int16 yydefgoto[] =
+/* YYDEFGOTO[NTERM-NUM]. */
+static const short int yydefgoto[] =
 {
       -1,   130,   131,   132,   133,   379,   356,   134,   748,  1238,
     1236,  1233,   732,   197,   647,  1168,   635,   652,  1171,   135,
@@ -2617,7 +2505,7 @@ static const yytype_int16 yydefgoto[] =
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
 #define YYPACT_NINF -954
-static const yytype_int16 yypact[] =
+static const short int yypact[] =
 {
     1797,  -452,  -423,  -954,  -954,  -448,  -443,  -431,  -427,  -415,
     -407,  -401,  -402,  -379,  -375,  -372,  -368,  -319,  -312,  -310,
@@ -2802,7 +2690,7 @@ static const yytype_int16 yypact[] =
 };
 
 /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int16 yypgoto[] =
+static const short int yypgoto[] =
 {
     -954,  -954,  -954,  -954,  -954,  -954,  -954,  -954,  -954,  -954,
     -954,  -954,  -954,    17,  -954,  -954,  -954,  -954,  -954,  -954,
@@ -2816,9 +2704,10 @@ static const yytype_int16 yypgoto[] =
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
-   number is the opposite.  If YYTABLE_NINF, syntax error.  */
+   number is the opposite.  If zero, do what YYDEFACT says.
+   If YYTABLE_NINF, syntax error.  */
 #define YYTABLE_NINF -798
-static const yytype_int16 yytable[] =
+static const short int yytable[] =
 {
      155,   772,   851,   398,  1525,    41,    42,   842,  1509,  1346,
      963,  1387,  1431,  1360,  1364,  1165,  1309,   412,   763,  1565,
@@ -3520,13 +3409,7 @@ static const yytype_int16 yytable[] =
      570,   571,   572,   573,   574,   575,   576,   577
 };
 
-#define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-954)))
-
-#define yytable_value_is_error(Yytable_value) \
-  (!!((Yytable_value) == (-798)))
-
-static const yytype_int16 yycheck[] =
+static const short int yycheck[] =
 {
        0,   298,   356,     8,     6,    56,    57,     8,   153,     8,
        8,    47,     8,     8,     6,   260,   100,     6,   169,   100,
@@ -4230,7 +4113,7 @@ static const yytype_int16 yycheck[] =
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
-static const yytype_uint16 yystos[] =
+static const unsigned short int yystos[] =
 {
        0,     1,     3,     7,     8,     9,    10,    11,    12,    13,
       14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
@@ -4426,50 +4309,78 @@ static const yytype_uint16 yystos[] =
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
-   Once GCC version 2 has supplanted version 1, this can go.  However,
-   YYFAIL appears to be in use.  Nevertheless, it is formally deprecated
-   in Bison 2.4.2's NEWS entry, where a plan to phase it out is
-   discussed.  */
+   Once GCC version 2 has supplanted version 1, this can go.  */
 
 #define YYFAIL		goto yyerrlab
-#if defined YYFAIL
-  /* This is here to suppress warnings from the GCC cpp's
-     -Wunused-macros.  Normally we don't worry about that warning, but
-     some users do, and we want to make it easy for users to remove
-     YYFAIL uses, which will produce warnings from Bison 2.5.  */
-#endif
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)                                  \
-do                                                              \
-  if (yychar == YYEMPTY)                                        \
-    {                                                           \
-      yychar = (Token);                                         \
-      yylval = (Value);                                         \
-      YYPOPSTACK (yylen);                                       \
-      yystate = *yyssp;                                         \
-      goto yybackup;                                            \
-    }                                                           \
-  else                                                          \
-    {                                                           \
+#define YYBACKUP(Token, Value)					\
+do								\
+  if (yychar == YYEMPTY && yylen == 1)				\
+    {								\
+      yychar = (Token);						\
+      yylval = (Value);						\
+      yytoken = YYTRANSLATE (yychar);				\
+      YYPOPSTACK;						\
+      goto yybackup;						\
+    }								\
+  else								\
+    {								\
       yyerror (YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
-while (YYID (0))
+while (0)
 
-/* Error token number */
+
 #define YYTERROR	1
 #define YYERRCODE	256
 
 
-/* This macro is provided for backward compatibility. */
+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
+   If N is 0, then set CURRENT to the empty location which ends
+   the previous symbol: RHS[0] (always defined).  */
+
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
+#ifndef YYLLOC_DEFAULT
+# define YYLLOC_DEFAULT(Current, Rhs, N)				\
+    do									\
+      if (N)								\
+	{								\
+	  (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;	\
+	  (Current).first_column = YYRHSLOC (Rhs, 1).first_column;	\
+	  (Current).last_line    = YYRHSLOC (Rhs, N).last_line;		\
+	  (Current).last_column  = YYRHSLOC (Rhs, N).last_column;	\
+	}								\
+      else								\
+	{								\
+	  (Current).first_line   = (Current).last_line   =		\
+	    YYRHSLOC (Rhs, 0).last_line;				\
+	  (Current).first_column = (Current).last_column =		\
+	    YYRHSLOC (Rhs, 0).last_column;				\
+	}								\
+    while (0)
+#endif
+
+
+/* YY_LOCATION_PRINT -- Print the location on the stream.
+   This macro was not mandated originally: define only if we know
+   we won't break user code: when these are the locations we know.  */
+
 #ifndef YY_LOCATION_PRINT
-# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# if YYLTYPE_IS_TRIVIAL
+#  define YY_LOCATION_PRINT(File, Loc)			\
+     fprintf (File, "%d.%d-%d.%d",			\
+              (Loc).first_line, (Loc).first_column,	\
+              (Loc).last_line,  (Loc).last_column)
+# else
+#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# endif
 #endif
 
 
 /* YYLEX -- calling `yylex' with the right arguments.  */
+
 #ifdef YYLEX_PARAM
 # define YYLEX yylex (YYLEX_PARAM)
 #else
@@ -4488,102 +4399,37 @@ while (YYID (0))
 do {						\
   if (yydebug)					\
     YYFPRINTF Args;				\
-} while (YYID (0))
+} while (0)
 
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)			  \
-do {									  \
-  if (yydebug)								  \
-    {									  \
-      YYFPRINTF (stderr, "%s ", Title);					  \
-      yy_symbol_print (stderr,						  \
-		  Type, Value); \
-      YYFPRINTF (stderr, "\n");						  \
-    }									  \
-} while (YYID (0))
-
-
-/*--------------------------------.
-| Print this symbol on YYOUTPUT.  |
-`--------------------------------*/
-
-/*ARGSUSED*/
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
-#else
-static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep)
-    FILE *yyoutput;
-    int yytype;
-    YYSTYPE const * const yyvaluep;
-#endif
-{
-  FILE *yyo = yyoutput;
-  YYUSE (yyo);
-  if (!yyvaluep)
-    return;
-# ifdef YYPRINT
-  if (yytype < YYNTOKENS)
-    YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
-# else
-  YYUSE (yyoutput);
-# endif
-  switch (yytype)
-    {
-      default:
-        break;
-    }
-}
-
-
-/*--------------------------------.
-| Print this symbol on YYOUTPUT.  |
-`--------------------------------*/
-
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
-#else
-static void
-yy_symbol_print (yyoutput, yytype, yyvaluep)
-    FILE *yyoutput;
-    int yytype;
-    YYSTYPE const * const yyvaluep;
-#endif
-{
-  if (yytype < YYNTOKENS)
-    YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
-  else
-    YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
-
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep);
-  YYFPRINTF (yyoutput, ")");
-}
+# define YY_SYMBOL_PRINT(Title, Type, Value, Location)		\
+do {								\
+  if (yydebug)							\
+    {								\
+      YYFPRINTF (stderr, "%s ", Title);				\
+      yysymprint (stderr,					\
+                  Type, Value);	\
+      YYFPRINTF (stderr, "\n");					\
+    }								\
+} while (0)
 
 /*------------------------------------------------------------------.
 | yy_stack_print -- Print the state stack from its BOTTOM up to its |
 | TOP (included).                                                   |
 `------------------------------------------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#if defined (__STDC__) || defined (__cplusplus)
 static void
-yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
+yy_stack_print (short int *bottom, short int *top)
 #else
 static void
-yy_stack_print (yybottom, yytop)
-    yytype_int16 *yybottom;
-    yytype_int16 *yytop;
+yy_stack_print (bottom, top)
+    short int *bottom;
+    short int *top;
 #endif
 {
   YYFPRINTF (stderr, "Stack now");
-  for (; yybottom <= yytop; yybottom++)
-    {
-      int yybot = *yybottom;
-      YYFPRINTF (stderr, " %d", yybot);
-    }
+  for (/* Nothing. */; bottom <= top; ++bottom)
+    YYFPRINTF (stderr, " %d", *bottom);
   YYFPRINTF (stderr, "\n");
 }
 
@@ -4591,45 +4437,37 @@ yy_stack_print (yybottom, yytop)
 do {								\
   if (yydebug)							\
     yy_stack_print ((Bottom), (Top));				\
-} while (YYID (0))
+} while (0)
 
 
 /*------------------------------------------------.
 | Report that the YYRULE is going to be reduced.  |
 `------------------------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#if defined (__STDC__) || defined (__cplusplus)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule)
+yy_reduce_print (int yyrule)
 #else
 static void
-yy_reduce_print (yyvsp, yyrule)
-    YYSTYPE *yyvsp;
+yy_reduce_print (yyrule)
     int yyrule;
 #endif
 {
-  int yynrhs = yyr2[yyrule];
   int yyi;
   unsigned long int yylno = yyrline[yyrule];
-  YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
-	     yyrule - 1, yylno);
-  /* The symbols being reduced.  */
-  for (yyi = 0; yyi < yynrhs; yyi++)
-    {
-      YYFPRINTF (stderr, "   $%d = ", yyi + 1);
-      yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
-		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       );
-      YYFPRINTF (stderr, "\n");
-    }
+  YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu), ",
+             yyrule - 1, yylno);
+  /* Print the symbols being reduced, and their result.  */
+  for (yyi = yyprhs[yyrule]; 0 <= yyrhs[yyi]; yyi++)
+    YYFPRINTF (stderr, "%s ", yytname[yyrhs[yyi]]);
+  YYFPRINTF (stderr, "-> %s\n", yytname[yyr1[yyrule]]);
 }
 
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule); \
-} while (YYID (0))
+    yy_reduce_print (Rule);		\
+} while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
@@ -4658,48 +4496,47 @@ int yydebug;
 # define YYMAXDEPTH 10000
 #endif
 
+
 
 #if YYERROR_VERBOSE
 
 # ifndef yystrlen
-#  if defined __GLIBC__ && defined _STRING_H
+#  if defined (__GLIBC__) && defined (_STRING_H)
 #   define yystrlen strlen
 #  else
 /* Return the length of YYSTR.  */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static YYSIZE_T
+#   if defined (__STDC__) || defined (__cplusplus)
 yystrlen (const char *yystr)
-#else
-static YYSIZE_T
+#   else
 yystrlen (yystr)
-    const char *yystr;
-#endif
+     const char *yystr;
+#   endif
 {
-  YYSIZE_T yylen;
-  for (yylen = 0; yystr[yylen]; yylen++)
+  const char *yys = yystr;
+
+  while (*yys++ != '\0')
     continue;
-  return yylen;
+
+  return yys - yystr - 1;
 }
 #  endif
 # endif
 
 # ifndef yystpcpy
-#  if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
+#  if defined (__GLIBC__) && defined (_STRING_H) && defined (_GNU_SOURCE)
 #   define yystpcpy stpcpy
 #  else
 /* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
    YYDEST.  */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static char *
+#   if defined (__STDC__) || defined (__cplusplus)
 yystpcpy (char *yydest, const char *yysrc)
-#else
-static char *
+#   else
 yystpcpy (yydest, yysrc)
-    char *yydest;
-    const char *yysrc;
-#endif
+     char *yydest;
+     const char *yysrc;
+#   endif
 {
   char *yyd = yydest;
   const char *yys = yysrc;
@@ -4725,7 +4562,7 @@ yytnamerr (char *yyres, const char *yystr)
 {
   if (*yystr == '"')
     {
-      YYSIZE_T yyn = 0;
+      size_t yyn = 0;
       char const *yyp = yystr;
 
       for (;;)
@@ -4760,153 +4597,53 @@ yytnamerr (char *yyres, const char *yystr)
 }
 # endif
 
-/* Copy into *YYMSG, which is of size *YYMSG_ALLOC, an error message
-   about the unexpected token YYTOKEN for the state stack whose top is
-   YYSSP.
-
-   Return 0 if *YYMSG was successfully written.  Return 1 if *YYMSG is
-   not large enough to hold the message.  In that case, also set
-   *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
-   required number of bytes is too large to store.  */
-static int
-yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
-                yytype_int16 *yyssp, int yytoken)
-{
-  YYSIZE_T yysize0 = yytnamerr (YY_NULL, yytname[yytoken]);
-  YYSIZE_T yysize = yysize0;
-  enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
-  /* Internationalized format string. */
-  const char *yyformat = YY_NULL;
-  /* Arguments of yyformat. */
-  char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-  /* Number of reported tokens (one for the "unexpected", one per
-     "expected"). */
-  int yycount = 0;
-
-  /* There are many possibilities here to consider:
-     - Assume YYFAIL is not used.  It's too flawed to consider.  See
-       <http://lists.gnu.org/archive/html/bison-patches/2009-12/msg00024.html>
-       for details.  YYERROR is fine as it does not invoke this
-       function.
-     - If this state is a consistent state with a default action, then
-       the only way this function was invoked is if the default action
-       is an error action.  In that case, don't check for expected
-       tokens because there are none.
-     - The only way there can be no lookahead present (in yychar) is if
-       this state is a consistent state with a default action.  Thus,
-       detecting the absence of a lookahead is sufficient to determine
-       that there is no unexpected or expected token to report.  In that
-       case, just report a simple "syntax error".
-     - Don't assume there isn't a lookahead just because this state is a
-       consistent state with a default action.  There might have been a
-       previous inconsistent state, consistent state with a non-default
-       action, or user semantic action that manipulated yychar.
-     - Of course, the expected token list depends on states to have
-       correct lookahead information, and it depends on the parser not
-       to perform extra reductions after fetching a lookahead from the
-       scanner and before detecting a syntax error.  Thus, state merging
-       (from LALR or IELR) and default reductions corrupt the expected
-       token list.  However, the list is correct for canonical LR with
-       one exception: it will still contain any token that will not be
-       accepted due to an error action in a later state.
-  */
-  if (yytoken != YYEMPTY)
-    {
-      int yyn = yypact[*yyssp];
-      yyarg[yycount++] = yytname[yytoken];
-      if (!yypact_value_is_default (yyn))
-        {
-          /* Start YYX at -YYN if negative to avoid negative indexes in
-             YYCHECK.  In other words, skip the first -YYN actions for
-             this state because they are default actions.  */
-          int yyxbegin = yyn < 0 ? -yyn : 0;
-          /* Stay within bounds of both yycheck and yytname.  */
-          int yychecklim = YYLAST - yyn + 1;
-          int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-          int yyx;
-
-          for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-            if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR
-                && !yytable_value_is_error (yytable[yyx + yyn]))
-              {
-                if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-                  {
-                    yycount = 1;
-                    yysize = yysize0;
-                    break;
-                  }
-                yyarg[yycount++] = yytname[yyx];
-                {
-                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULL, yytname[yyx]);
-                  if (! (yysize <= yysize1
-                         && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
-                    return 2;
-                  yysize = yysize1;
-                }
-              }
-        }
-    }
-
-  switch (yycount)
-    {
-# define YYCASE_(N, S)                      \
-      case N:                               \
-        yyformat = S;                       \
-      break
-      YYCASE_(0, YY_("syntax error"));
-      YYCASE_(1, YY_("syntax error, unexpected %s"));
-      YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
-      YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
-      YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
-      YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
-# undef YYCASE_
-    }
-
-  {
-    YYSIZE_T yysize1 = yysize + yystrlen (yyformat);
-    if (! (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
-      return 2;
-    yysize = yysize1;
-  }
-
-  if (*yymsg_alloc < yysize)
-    {
-      *yymsg_alloc = 2 * yysize;
-      if (! (yysize <= *yymsg_alloc
-             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
-        *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
-      return 1;
-    }
-
-  /* Avoid sprintf, as that infringes on the user's name space.
-     Don't have undefined behavior even if the translation
-     produced a string with the wrong number of "%s"s.  */
-  {
-    char *yyp = *yymsg;
-    int yyi = 0;
-    while ((*yyp = *yyformat) != '\0')
-      if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
-        {
-          yyp += yytnamerr (yyp, yyarg[yyi++]);
-          yyformat += 2;
-        }
-      else
-        {
-          yyp++;
-          yyformat++;
-        }
-  }
-  return 0;
-}
 #endif /* YYERROR_VERBOSE */
 
+
+
+#if YYDEBUG
+/*--------------------------------.
+| Print this symbol on YYOUTPUT.  |
+`--------------------------------*/
+
+#if defined (__STDC__) || defined (__cplusplus)
+static void
+yysymprint (FILE *yyoutput, int yytype, YYSTYPE *yyvaluep)
+#else
+static void
+yysymprint (yyoutput, yytype, yyvaluep)
+    FILE *yyoutput;
+    int yytype;
+    YYSTYPE *yyvaluep;
+#endif
+{
+  /* Pacify ``unused variable'' warnings.  */
+  (void) yyvaluep;
+
+  if (yytype < YYNTOKENS)
+    YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
+  else
+    YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
+
+
+# ifdef YYPRINT
+  if (yytype < YYNTOKENS)
+    YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
+# endif
+  switch (yytype)
+    {
+      default:
+        break;
+    }
+  YYFPRINTF (yyoutput, ")");
+}
+
+#endif /* ! YYDEBUG */
 /*-----------------------------------------------.
 | Release the memory associated to this symbol.  |
 `-----------------------------------------------*/
 
-/*ARGSUSED*/
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#if defined (__STDC__) || defined (__cplusplus)
 static void
 yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
 #else
@@ -4917,7 +4654,8 @@ yydestruct (yymsg, yytype, yyvaluep)
     YYSTYPE *yyvaluep;
 #endif
 {
-  YYUSE (yyvaluep);
+  /* Pacify ``unused variable'' warnings.  */
+  (void) yyvaluep;
 
   if (!yymsg)
     yymsg = "Deleting";
@@ -4930,27 +4668,35 @@ yydestruct (yymsg, yytype, yyvaluep)
         break;
     }
 }
+
+
+/* Prevent warnings from -Wmissing-prototypes.  */
+
+#ifdef YYPARSE_PARAM
+# if defined (__STDC__) || defined (__cplusplus)
+int yyparse (void *YYPARSE_PARAM);
+# else
+int yyparse ();
+# endif
+#else /* ! YYPARSE_PARAM */
+#if defined (__STDC__) || defined (__cplusplus)
+int yyparse (void);
+#else
+int yyparse ();
+#endif
+#endif /* ! YYPARSE_PARAM */
 
 
 
-
-/* The lookahead symbol.  */
+/* The look-ahead symbol.  */
 int yychar;
 
-
-#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-# define YY_IGNORE_MAYBE_UNINITIALIZED_END
-#endif
-#ifndef YY_INITIAL_VALUE
-# define YY_INITIAL_VALUE(Value) /* Nothing. */
-#endif
-
-/* The semantic value of the lookahead symbol.  */
-YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
+/* The semantic value of the look-ahead symbol.  */
+YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
 int yynerrs;
+
 
 
 /*----------.
@@ -4958,81 +4704,80 @@ int yynerrs;
 `----------*/
 
 #ifdef YYPARSE_PARAM
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-int
-yyparse (void *YYPARSE_PARAM)
-#else
-int
-yyparse (YYPARSE_PARAM)
-    void *YYPARSE_PARAM;
-#endif
+# if defined (__STDC__) || defined (__cplusplus)
+int yyparse (void *YYPARSE_PARAM)
+# else
+int yyparse (YYPARSE_PARAM)
+  void *YYPARSE_PARAM;
+# endif
 #else /* ! YYPARSE_PARAM */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#if defined (__STDC__) || defined (__cplusplus)
 int
 yyparse (void)
 #else
 int
 yyparse ()
-
+    ;
 #endif
 #endif
 {
-    int yystate;
-    /* Number of tokens to shift before error messages enabled.  */
-    int yyerrstatus;
-
-    /* The stacks and their tools:
-       `yyss': related to states.
-       `yyvs': related to semantic values.
-
-       Refer to the stacks through separate pointers, to allow yyoverflow
-       to reallocate them elsewhere.  */
-
-    /* The state stack.  */
-    yytype_int16 yyssa[YYINITDEPTH];
-    yytype_int16 *yyss;
-    yytype_int16 *yyssp;
-
-    /* The semantic value stack.  */
-    YYSTYPE yyvsa[YYINITDEPTH];
-    YYSTYPE *yyvs;
-    YYSTYPE *yyvsp;
-
-    YYSIZE_T yystacksize;
-
+  
+  int yystate;
   int yyn;
   int yyresult;
-  /* Lookahead token as an internal (translated) token number.  */
+  /* Number of tokens to shift before error messages enabled.  */
+  int yyerrstatus;
+  /* Look-ahead token as an internal (translated) token number.  */
   int yytoken = 0;
+
+  /* Three stacks and their tools:
+     `yyss': related to states,
+     `yyvs': related to semantic values,
+     `yyls': related to locations.
+
+     Refer to the stacks thru separate pointers, to allow yyoverflow
+     to reallocate them elsewhere.  */
+
+  /* The state stack.  */
+  short int yyssa[YYINITDEPTH];
+  short int *yyss = yyssa;
+  short int *yyssp;
+
+  /* The semantic value stack.  */
+  YYSTYPE yyvsa[YYINITDEPTH];
+  YYSTYPE *yyvs = yyvsa;
+  YYSTYPE *yyvsp;
+
+
+
+#define YYPOPSTACK   (yyvsp--, yyssp--)
+
+  YYSIZE_T yystacksize = YYINITDEPTH;
+
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
 
-#if YYERROR_VERBOSE
-  /* Buffer for error messages, and its allocated size.  */
-  char yymsgbuf[128];
-  char *yymsg = yymsgbuf;
-  YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
-#endif
 
-#define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
-
-  /* The number of symbols on the RHS of the reduced rule.
-     Keep to zero when no symbol should be popped.  */
-  int yylen = 0;
-
-  yyssp = yyss = yyssa;
-  yyvsp = yyvs = yyvsa;
-  yystacksize = YYINITDEPTH;
+  /* When reducing, the number of symbols on the RHS of the reduced
+     rule.  */
+  int yylen;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY; /* Cause a token to be read.  */
+  yychar = YYEMPTY;		/* Cause a token to be read.  */
+
+  /* Initialize stack pointers.
+     Waste one element of value and location stack
+     so that they stay on the same level as the state stack.
+     The wasted elements are never initialized.  */
+
+  yyssp = yyss;
+  yyvsp = yyvs;
+
   goto yysetstate;
 
 /*------------------------------------------------------------.
@@ -5040,7 +4785,8 @@ yyparse ()
 `------------------------------------------------------------*/
  yynewstate:
   /* In all cases, when you get here, the value and location stacks
-     have just been pushed.  So pushing a state here evens the stacks.  */
+     have just been pushed. so pushing a state here evens the stacks.
+     */
   yyssp++;
 
  yysetstate:
@@ -5053,11 +4799,12 @@ yyparse ()
 
 #ifdef yyoverflow
       {
-	/* Give user a chance to reallocate the stack.  Use copies of
+	/* Give user a chance to reallocate the stack. Use copies of
 	   these so that the &'s don't force the real ones into
 	   memory.  */
 	YYSTYPE *yyvs1 = yyvs;
-	yytype_int16 *yyss1 = yyss;
+	short int *yyss1 = yyss;
+
 
 	/* Each stack pointer address is followed by the size of the
 	   data in use in that stack, in bytes.  This used to be a
@@ -5066,6 +4813,7 @@ yyparse ()
 	yyoverflow (YY_("memory exhausted"),
 		    &yyss1, yysize * sizeof (*yyssp),
 		    &yyvs1, yysize * sizeof (*yyvsp),
+
 		    &yystacksize);
 
 	yyss = yyss1;
@@ -5083,13 +4831,14 @@ yyparse ()
 	yystacksize = YYMAXDEPTH;
 
       {
-	yytype_int16 *yyss1 = yyss;
+	short int *yyss1 = yyss;
 	union yyalloc *yyptr =
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
 	if (! yyptr)
 	  goto yyexhaustedlab;
-	YYSTACK_RELOCATE (yyss_alloc, yyss);
-	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
+	YYSTACK_RELOCATE (yyss);
+	YYSTACK_RELOCATE (yyvs);
+
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
@@ -5100,6 +4849,7 @@ yyparse ()
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
+
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
@@ -5109,9 +4859,6 @@ yyparse ()
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
-  if (yystate == YYFINAL)
-    YYACCEPT;
-
   goto yybackup;
 
 /*-----------.
@@ -5119,17 +4866,19 @@ yyparse ()
 `-----------*/
 yybackup:
 
-  /* Do appropriate processing given the current state.  Read a
-     lookahead token if we need one and don't already have one.  */
+/* Do appropriate processing given the current state.  */
+/* Read a look-ahead token if we need one and don't already have one.  */
+/* yyresume: */
 
-  /* First try to decide what to do without reference to lookahead token.  */
+  /* First try to decide what to do without reference to look-ahead token.  */
+
   yyn = yypact[yystate];
-  if (yypact_value_is_default (yyn))
+  if (yyn == YYPACT_NINF)
     goto yydefault;
 
-  /* Not known => get a lookahead token if don't already have one.  */
+  /* Not known => get a look-ahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
+  /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
@@ -5155,28 +4904,31 @@ yybackup:
   yyn = yytable[yyn];
   if (yyn <= 0)
     {
-      if (yytable_value_is_error (yyn))
-        goto yyerrlab;
+      if (yyn == 0 || yyn == YYTABLE_NINF)
+	goto yyerrlab;
       yyn = -yyn;
       goto yyreduce;
     }
+
+  if (yyn == YYFINAL)
+    YYACCEPT;
+
+  /* Shift the look-ahead token.  */
+  YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
+
+  /* Discard the token being shifted unless it is eof.  */
+  if (yychar != YYEOF)
+    yychar = YYEMPTY;
+
+  *++yyvsp = yylval;
+
 
   /* Count tokens shifted since error; after three, turn off error
      status.  */
   if (yyerrstatus)
     yyerrstatus--;
 
-  /* Shift the lookahead token.  */
-  YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
-
-  /* Discard the shifted token.  */
-  yychar = YYEMPTY;
-
   yystate = yyn;
-  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-  *++yyvsp = yylval;
-  YY_IGNORE_MAYBE_UNINITIALIZED_END
-
   goto yynewstate;
 
 
@@ -5212,128 +4964,108 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-/* Line 1792 of yacc.c  */
 #line 669 "gram.y"
     {}
     break;
 
   case 4:
-/* Line 1792 of yacc.c  */
 #line 670 "gram.y"
     {}
     break;
 
   case 5:
-/* Line 1792 of yacc.c  */
 #line 671 "gram.y"
-    { result = (yyvsp[(1) - (2)].val); }
+    { result = (yyvsp[-1].val); }
     break;
 
   case 6:
-/* Line 1792 of yacc.c  */
 #line 672 "gram.y"
-    { result = *(yyvsp[(1) - (2)].ptr); }
+    { result = *(yyvsp[-1].ptr); }
     break;
 
   case 18:
-/* Line 1792 of yacc.c  */
 #line 684 "gram.y"
     { }
     break;
 
   case 26:
-/* Line 1792 of yacc.c  */
 #line 692 "gram.y"
     { return 1; }
     break;
 
   case 28:
-/* Line 1792 of yacc.c  */
 #line 696 "gram.y"
     { do_clear_boxes(); }
     break;
 
   case 29:
-/* Line 1792 of yacc.c  */
 #line 697 "gram.y"
     { curbox = next_box(); }
     break;
 
   case 30:
-/* Line 1792 of yacc.c  */
 #line 698 "gram.y"
-    { curbox = (int) (yyvsp[(3) - (3)].val); }
+    { curbox = (int) (yyvsp[0].val); }
     break;
 
   case 31:
-/* Line 1792 of yacc.c  */
 #line 699 "gram.y"
-    { boxes[curbox].active = (yyvsp[(2) - (2)].pset); }
+    { boxes[curbox].active = (yyvsp[0].pset); }
     break;
 
   case 32:
-/* Line 1792 of yacc.c  */
 #line 700 "gram.y"
-    { boxes[curbox].gno = (yyvsp[(2) - (2)].pset); }
+    { boxes[curbox].gno = (yyvsp[0].pset); }
     break;
 
   case 33:
-/* Line 1792 of yacc.c  */
 #line 702 "gram.y"
     {
 	    if (curbox >= 0 && curbox < maxboxes) {
-		boxes[curbox].x1 = (yyvsp[(2) - (8)].val);
-		boxes[curbox].y1 = (yyvsp[(4) - (8)].val);
-		boxes[curbox].x2 = (yyvsp[(6) - (8)].val);
-		boxes[curbox].y2 = (yyvsp[(8) - (8)].val);
+		boxes[curbox].x1 = (yyvsp[-6].val);
+		boxes[curbox].y1 = (yyvsp[-4].val);
+		boxes[curbox].x2 = (yyvsp[-2].val);
+		boxes[curbox].y2 = (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 34:
-/* Line 1792 of yacc.c  */
 #line 710 "gram.y"
-    { sysbox.loctype = (yyvsp[(3) - (3)].pset); }
+    { sysbox.loctype = (yyvsp[0].pset); }
     break;
 
   case 35:
-/* Line 1792 of yacc.c  */
 #line 711 "gram.y"
-    { sysbox.lines = (int) (yyvsp[(3) - (3)].val); }
+    { sysbox.lines = (int) (yyvsp[0].val); }
     break;
 
   case 36:
-/* Line 1792 of yacc.c  */
 #line 712 "gram.y"
-    { sysbox.linew = (int) (yyvsp[(3) - (3)].val); }
+    { sysbox.linew = (int) (yyvsp[0].val); }
     break;
 
   case 37:
-/* Line 1792 of yacc.c  */
 #line 713 "gram.y"
-    { sysbox.color = (int) (yyvsp[(3) - (3)].val); }
+    { sysbox.color = (int) (yyvsp[0].val); }
     break;
 
   case 38:
-/* Line 1792 of yacc.c  */
 #line 714 "gram.y"
-    { sysbox.fill = (yyvsp[(3) - (3)].pset); }
+    { sysbox.fill = (yyvsp[0].pset); }
     break;
 
   case 39:
-/* Line 1792 of yacc.c  */
 #line 715 "gram.y"
-    { sysbox.fillcolor = (int) (yyvsp[(4) - (4)].val); }
+    { sysbox.fillcolor = (int) (yyvsp[0].val); }
     break;
 
   case 40:
-/* Line 1792 of yacc.c  */
 #line 716 "gram.y"
-    { sysbox.fillpattern = (int) (yyvsp[(4) - (4)].val); }
+    { sysbox.fillpattern = (int) (yyvsp[0].val); }
     break;
 
   case 41:
-/* Line 1792 of yacc.c  */
 #line 718 "gram.y"
     {
 	    if (curbox >= 0 && curbox < maxboxes) {
@@ -5349,90 +5081,76 @@ yyreduce:
     break;
 
   case 42:
-/* Line 1792 of yacc.c  */
 #line 729 "gram.y"
     { curline = next_line(); }
     break;
 
   case 43:
-/* Line 1792 of yacc.c  */
 #line 730 "gram.y"
-    { curline = (int) (yyvsp[(3) - (3)].val); }
+    { curline = (int) (yyvsp[0].val); }
     break;
 
   case 44:
-/* Line 1792 of yacc.c  */
 #line 731 "gram.y"
     { do_clear_lines(); }
     break;
 
   case 45:
-/* Line 1792 of yacc.c  */
 #line 732 "gram.y"
-    { lines[curline].active = (yyvsp[(2) - (2)].pset); }
+    { lines[curline].active = (yyvsp[0].pset); }
     break;
 
   case 46:
-/* Line 1792 of yacc.c  */
 #line 733 "gram.y"
-    { lines[curline].gno = (yyvsp[(2) - (2)].pset); }
+    { lines[curline].gno = (yyvsp[0].pset); }
     break;
 
   case 47:
-/* Line 1792 of yacc.c  */
 #line 735 "gram.y"
     {
-	    lines[curline].x1 = (yyvsp[(2) - (8)].val);
-	    lines[curline].y1 = (yyvsp[(4) - (8)].val);
-	    lines[curline].x2 = (yyvsp[(6) - (8)].val);
-	    lines[curline].y2 = (yyvsp[(8) - (8)].val);
+	    lines[curline].x1 = (yyvsp[-6].val);
+	    lines[curline].y1 = (yyvsp[-4].val);
+	    lines[curline].x2 = (yyvsp[-2].val);
+	    lines[curline].y2 = (yyvsp[0].val);
 	}
     break;
 
   case 48:
-/* Line 1792 of yacc.c  */
 #line 741 "gram.y"
-    { sysline.loctype = (yyvsp[(3) - (3)].pset); }
+    { sysline.loctype = (yyvsp[0].pset); }
     break;
 
   case 49:
-/* Line 1792 of yacc.c  */
 #line 742 "gram.y"
-    { sysline.linew = (int) (yyvsp[(3) - (3)].val); }
+    { sysline.linew = (int) (yyvsp[0].val); }
     break;
 
   case 50:
-/* Line 1792 of yacc.c  */
 #line 743 "gram.y"
-    { sysline.lines = (int) (yyvsp[(3) - (3)].val); }
+    { sysline.lines = (int) (yyvsp[0].val); }
     break;
 
   case 51:
-/* Line 1792 of yacc.c  */
 #line 744 "gram.y"
-    { sysline.color = (int) (yyvsp[(3) - (3)].val); }
+    { sysline.color = (int) (yyvsp[0].val); }
     break;
 
   case 52:
-/* Line 1792 of yacc.c  */
 #line 745 "gram.y"
-    { sysline.arrow = (int) (yyvsp[(3) - (3)].val); }
+    { sysline.arrow = (int) (yyvsp[0].val); }
     break;
 
   case 53:
-/* Line 1792 of yacc.c  */
 #line 746 "gram.y"
-    { sysline.asize = (yyvsp[(4) - (4)].val); }
+    { sysline.asize = (yyvsp[0].val); }
     break;
 
   case 54:
-/* Line 1792 of yacc.c  */
 #line 747 "gram.y"
-    { sysline.atype = (int) (yyvsp[(4) - (4)].val); }
+    { sysline.atype = (int) (yyvsp[0].val); }
     break;
 
   case 55:
-/* Line 1792 of yacc.c  */
 #line 749 "gram.y"
     {
 	    if (curline >= 0 && curline < maxlines) {
@@ -5448,121 +5166,102 @@ yyreduce:
     break;
 
   case 56:
-/* Line 1792 of yacc.c  */
 #line 760 "gram.y"
     { do_clear_text(); }
     break;
 
   case 57:
-/* Line 1792 of yacc.c  */
 #line 761 "gram.y"
     { curstring = next_string(); }
     break;
 
   case 58:
-/* Line 1792 of yacc.c  */
 #line 762 "gram.y"
-    { curstring = (int) (yyvsp[(3) - (3)].val); }
+    { curstring = (int) (yyvsp[0].val); }
     break;
 
   case 59:
-/* Line 1792 of yacc.c  */
 #line 763 "gram.y"
-    { pstr[curstring].active = (yyvsp[(2) - (2)].pset); }
+    { pstr[curstring].active = (yyvsp[0].pset); }
     break;
 
   case 60:
-/* Line 1792 of yacc.c  */
 #line 764 "gram.y"
-    { pstr[curstring].gno = (yyvsp[(2) - (2)].pset); }
+    { pstr[curstring].gno = (yyvsp[0].pset); }
     break;
 
   case 61:
-/* Line 1792 of yacc.c  */
 #line 766 "gram.y"
     {
-	    pstr[curstring].x = (yyvsp[(2) - (4)].val);
-	    pstr[curstring].y = (yyvsp[(4) - (4)].val);
+	    pstr[curstring].x = (yyvsp[-2].val);
+	    pstr[curstring].y = (yyvsp[0].val);
 	}
     break;
 
   case 62:
-/* Line 1792 of yacc.c  */
 #line 770 "gram.y"
-    { sysstr.loctype = (yyvsp[(3) - (3)].pset); }
+    { sysstr.loctype = (yyvsp[0].pset); }
     break;
 
   case 63:
-/* Line 1792 of yacc.c  */
 #line 771 "gram.y"
-    { sysstr.linew = (int) (yyvsp[(3) - (3)].val); }
+    { sysstr.linew = (int) (yyvsp[0].val); }
     break;
 
   case 64:
-/* Line 1792 of yacc.c  */
 #line 772 "gram.y"
-    { sysstr.color = (int) (yyvsp[(3) - (3)].val); }
+    { sysstr.color = (int) (yyvsp[0].val); }
     break;
 
   case 65:
-/* Line 1792 of yacc.c  */
 #line 773 "gram.y"
-    { sysstr.rot = (int) (yyvsp[(3) - (3)].val); }
+    { sysstr.rot = (int) (yyvsp[0].val); }
     break;
 
   case 66:
-/* Line 1792 of yacc.c  */
 #line 774 "gram.y"
-    { sysstr.font = (int) (yyvsp[(3) - (3)].val); }
+    { sysstr.font = (int) (yyvsp[0].val); }
     break;
 
   case 67:
-/* Line 1792 of yacc.c  */
 #line 775 "gram.y"
-    { sysstr.just = (int) (yyvsp[(3) - (3)].val); }
+    { sysstr.just = (int) (yyvsp[0].val); }
     break;
 
   case 68:
-/* Line 1792 of yacc.c  */
 #line 776 "gram.y"
-    { sysstr.sym = (int) (yyvsp[(3) - (3)].val); }
+    { sysstr.sym = (int) (yyvsp[0].val); }
     break;
 
   case 69:
-/* Line 1792 of yacc.c  */
 #line 777 "gram.y"
-    { sysstr.symloc = (int) (yyvsp[(4) - (4)].pset); }
+    { sysstr.symloc = (int) (yyvsp[0].pset); }
     break;
 
   case 70:
-/* Line 1792 of yacc.c  */
 #line 778 "gram.y"
-    { sysstr.symsize = (double) (yyvsp[(4) - (4)].val); }
+    { sysstr.symsize = (double) (yyvsp[0].val); }
     break;
 
   case 71:
-/* Line 1792 of yacc.c  */
 #line 779 "gram.y"
-    { sysstr.symfill = (int) (yyvsp[(4) - (4)].val); }
+    { sysstr.symfill = (int) (yyvsp[0].val); }
     break;
 
   case 72:
-/* Line 1792 of yacc.c  */
 #line 780 "gram.y"
-    { sysstr.symcolor = (int) (yyvsp[(4) - (4)].val); }
+    { sysstr.symcolor = (int) (yyvsp[0].val); }
     break;
 
   case 73:
-/* Line 1792 of yacc.c  */
 #line 781 "gram.y"
-    { sysstr.charsize = (double) (yyvsp[(4) - (4)].val); }
+    { sysstr.charsize = (double) (yyvsp[0].val); }
     break;
 
   case 74:
-/* Line 1792 of yacc.c  */
 #line 783 "gram.y"
     {
-	    strcpy(pstr[curstring].s, (char *) (yyvsp[(3) - (3)].str));
+	    strcpy(pstr[curstring].s, (char *) (yyvsp[0].str));
 	    pstr[curstring].linew = sysstr.linew;
 	    pstr[curstring].color = sysstr.color;
 	    pstr[curstring].font = sysstr.font;
@@ -5580,204 +5279,173 @@ yyreduce:
     break;
 
   case 75:
-/* Line 1792 of yacc.c  */
 #line 802 "gram.y"
     { setistep(); }
     break;
 
   case 76:
-/* Line 1792 of yacc.c  */
 #line 803 "gram.y"
     { setreverse(); }
     break;
 
   case 77:
-/* Line 1792 of yacc.c  */
 #line 804 "gram.y"
     { setrewind(); }
     break;
 
   case 78:
-/* Line 1792 of yacc.c  */
 #line 805 "gram.y"
     { setforward(); }
     break;
 
   case 79:
-/* Line 1792 of yacc.c  */
 #line 806 "gram.y"
-    { set_wrap((yyvsp[(2) - (2)].pset) == ON); }
+    { set_wrap((yyvsp[0].pset) == ON); }
     break;
 
   case 80:
-/* Line 1792 of yacc.c  */
 #line 807 "gram.y"
-    { goto_step((int) (yyvsp[(2) - (2)].val) - 1); }
+    { goto_step((int) (yyvsp[0].val) - 1); }
     break;
 
   case 81:
-/* Line 1792 of yacc.c  */
 #line 808 "gram.y"
     { setirun(); }
     break;
 
   case 82:
-/* Line 1792 of yacc.c  */
 #line 809 "gram.y"
-    { runsteps((int) (yyvsp[(2) - (4)].val), (int) (yyvsp[(4) - (4)].val)); }
+    { runsteps((int) (yyvsp[-2].val), (int) (yyvsp[0].val)); }
     break;
 
   case 83:
-/* Line 1792 of yacc.c  */
 #line 810 "gram.y"
-    { batchrunsteps((int) (yyvsp[(3) - (5)].val), (int) (yyvsp[(5) - (5)].val), 1); }
+    { batchrunsteps((int) (yyvsp[-2].val), (int) (yyvsp[0].val), 1); }
     break;
 
   case 84:
-/* Line 1792 of yacc.c  */
 #line 811 "gram.y"
-    { batchrunsteps((int) (yyvsp[(3) - (7)].val), (int) (yyvsp[(5) - (7)].val), (int) (yyvsp[(7) - (7)].val)); }
+    { batchrunsteps((int) (yyvsp[-4].val), (int) (yyvsp[-2].val), (int) (yyvsp[0].val)); }
     break;
 
   case 85:
-/* Line 1792 of yacc.c  */
 #line 812 "gram.y"
-    { strcpy(batchprefix, (char *) (yyvsp[(3) - (3)].str)); }
+    { strcpy(batchprefix, (char *) (yyvsp[0].str)); }
     break;
 
   case 86:
-/* Line 1792 of yacc.c  */
 #line 813 "gram.y"
     { setistop(); }
     break;
 
   case 87:
-/* Line 1792 of yacc.c  */
 #line 817 "gram.y"
-    { system((yyvsp[(2) - (2)].str)); }
+    { system((yyvsp[0].str)); }
     break;
 
   case 88:
-/* Line 1792 of yacc.c  */
 #line 819 "gram.y"
     {
 	    gotbatch = 1;
 	    batchfile[0] = 0;
-	    strcpy(batchfile, (yyvsp[(3) - (3)].str));
+	    strcpy(batchfile, (yyvsp[0].str));
 	}
     break;
 
   case 89:
-/* Line 1792 of yacc.c  */
 #line 824 "gram.y"
     {
-		if (chdir((char *) (yyvsp[(2) - (2)].str)) < 0) {
-			sprintf(buf, "chdir() to %s failed", (char *) (yyvsp[(2) - (2)].str));
+		if (chdir((char *) (yyvsp[0].str)) < 0) {
+			sprintf(buf, "chdir() to %s failed", (char *) (yyvsp[0].str));
 			errwin(buf);
 		}
 	}
     break;
 
   case 90:
-/* Line 1792 of yacc.c  */
 #line 830 "gram.y"
     { setreset_world(); }
     break;
 
   case 91:
-/* Line 1792 of yacc.c  */
 #line 831 "gram.y"
     { setredraw_world(); }
     break;
 
   case 92:
-/* Line 1792 of yacc.c  */
 #line 832 "gram.y"
-    { sleep((int) (yyvsp[(2) - (2)].val)); }
+    { sleep((int) (yyvsp[0].val)); }
     break;
 
   case 93:
-/* Line 1792 of yacc.c  */
 #line 833 "gram.y"
     { exit(0); }
     break;
 
   case 94:
-/* Line 1792 of yacc.c  */
 #line 834 "gram.y"
-    { my_blowup((yyvsp[(2) - (8)].val), (yyvsp[(4) - (8)].val), (yyvsp[(6) - (8)].val), (yyvsp[(8) - (8)].val)); }
+    { my_blowup((yyvsp[-6].val), (yyvsp[-4].val), (yyvsp[-2].val), (yyvsp[0].val)); }
     break;
 
   case 95:
-/* Line 1792 of yacc.c  */
 #line 835 "gram.y"
     { page(page_per, 4); }
     break;
 
   case 96:
-/* Line 1792 of yacc.c  */
 #line 836 "gram.y"
     { page(page_per, 5); }
     break;
 
   case 97:
-/* Line 1792 of yacc.c  */
 #line 837 "gram.y"
     { page(page_per, 0); }
     break;
 
   case 98:
-/* Line 1792 of yacc.c  */
 #line 838 "gram.y"
     { page(page_per, 1); }
     break;
 
   case 99:
-/* Line 1792 of yacc.c  */
 #line 839 "gram.y"
     { page(page_per, 2); }
     break;
 
   case 100:
-/* Line 1792 of yacc.c  */
 #line 840 "gram.y"
     { page(page_per, 3); }
     break;
 
   case 101:
-/* Line 1792 of yacc.c  */
 #line 841 "gram.y"
-    { page_per = (yyvsp[(2) - (2)].val); }
+    { page_per = (yyvsp[0].val); }
     break;
 
   case 102:
-/* Line 1792 of yacc.c  */
 #line 842 "gram.y"
-    { scrollinout_proc((int) (yyvsp[(3) - (3)].val)); }
+    { scrollinout_proc((int) (yyvsp[0].val)); }
     break;
 
   case 103:
-/* Line 1792 of yacc.c  */
 #line 843 "gram.y"
-    { scrolling_islinked = (yyvsp[(3) - (3)].pset) == ON; }
+    { scrolling_islinked = (yyvsp[0].pset) == ON; }
     break;
 
   case 104:
-/* Line 1792 of yacc.c  */
 #line 845 "gram.y"
     {
-	    if ((logfp = fopen((yyvsp[(2) - (2)].str), "w")) != NULL) {
+	    if ((logfp = fopen((yyvsp[0].str), "w")) != NULL) {
 		logfile = 1;
-		printf("Opened logfile %s\n", (yyvsp[(2) - (2)].str));
+		printf("Opened logfile %s\n", (yyvsp[0].str));
 	    } else {
 		logfile = 0;
-		printf("Failed to open logfile %s\n", (yyvsp[(2) - (2)].str));
+		printf("Failed to open logfile %s\n", (yyvsp[0].str));
 	    }
 	}
     break;
 
   case 105:
-/* Line 1792 of yacc.c  */
 #line 855 "gram.y"
     {
 	    if (logfp != NULL) {
@@ -5790,97 +5458,83 @@ yyreduce:
     break;
 
   case 106:
-/* Line 1792 of yacc.c  */
 #line 863 "gram.y"
     { }
     break;
 
   case 107:
-/* Line 1792 of yacc.c  */
 #line 864 "gram.y"
     { batchrunstep(0); }
     break;
 
   case 108:
-/* Line 1792 of yacc.c  */
 #line 865 "gram.y"
     {
-	    if (inwin) { set_left_footer((yyvsp[(2) - (2)].str)); }
-	    else { printf("%s\n", (yyvsp[(2) - (2)].str)); }
+	    if (inwin) { set_left_footer((yyvsp[0].str)); }
+	    else { printf("%s\n", (yyvsp[0].str)); }
 	}
     break;
 
   case 109:
-/* Line 1792 of yacc.c  */
 #line 870 "gram.y"
-    { set_colormapdata((int) (yyvsp[(2) - (8)].val), (int) (yyvsp[(4) - (8)].val), (int) (yyvsp[(6) - (8)].val), (int) (yyvsp[(8) - (8)].val)); }
+    { set_colormapdata((int) (yyvsp[-6].val), (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), (int) (yyvsp[0].val)); }
     break;
 
   case 110:
-/* Line 1792 of yacc.c  */
 #line 872 "gram.y"
-    { set_colormapdata((int) (yyvsp[(2) - (8)].val), (int) (yyvsp[(4) - (8)].val), (int) (yyvsp[(6) - (8)].val), (int) (yyvsp[(8) - (8)].val)); }
+    { set_colormapdata((int) (yyvsp[-6].val), (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), (int) (yyvsp[0].val)); }
     break;
 
   case 111:
-/* Line 1792 of yacc.c  */
 #line 874 "gram.y"
-    { set_colormapdata((int) (yyvsp[(2) - (8)].val), (int) (yyvsp[(4) - (8)].val), (int) (yyvsp[(6) - (8)].val), (int) (yyvsp[(8) - (8)].val)); }
+    { set_colormapdata((int) (yyvsp[-6].val), (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), (int) (yyvsp[0].val)); }
     break;
 
   case 112:
-/* Line 1792 of yacc.c  */
 #line 875 "gram.y"
     { setisol = &(g[curg].salip); }
     break;
 
   case 114:
-/* Line 1792 of yacc.c  */
 #line 876 "gram.y"
     { setisol = &(g[curg].velmagip); }
     break;
 
   case 116:
-/* Line 1792 of yacc.c  */
 #line 880 "gram.y"
     { 
-		setflow = &g[curg].flowf[(int) (yyvsp[(3) - (3)].val)]; 
+		setflow = &g[curg].flowf[(int) (yyvsp[0].val)]; 
 	}
     break;
 
   case 117:
-/* Line 1792 of yacc.c  */
 #line 883 "gram.y"
     { }
     break;
 
   case 118:
-/* Line 1792 of yacc.c  */
 #line 884 "gram.y"
     {}
     break;
 
   case 119:
-/* Line 1792 of yacc.c  */
 #line 885 "gram.y"
     { 
-		setflow = &g[curg].flowt[(int) (yyvsp[(3) - (3)].val)]; 
-                elcirc_flowno = (int) (yyvsp[(3) - (3)].val);
+		setflow = &g[curg].flowt[(int) (yyvsp[0].val)]; 
+                elcirc_flowno = (int) (yyvsp[0].val);
 	}
     break;
 
   case 120:
-/* Line 1792 of yacc.c  */
 #line 889 "gram.y"
     {}
     break;
 
   case 121:
-/* Line 1792 of yacc.c  */
 #line 891 "gram.y"
     {
-	      int fno = (int) (yyvsp[(4) - (7)].val);
-              readbin_adcirc_elev(fno, (char *) (yyvsp[(6) - (7)].str), (char *) (yyvsp[(7) - (7)].str));
+	      int fno = (int) (yyvsp[-3].val);
+              readbin_adcirc_elev(fno, (char *) (yyvsp[-1].str), (char *) (yyvsp[0].str));
               set_clock(0, flowt[fno].start, 
 				flowt[fno].stop, flowt[fno].step,
                                   flowt[fno].nsteps);
@@ -5889,49 +5543,43 @@ yyreduce:
     break;
 
   case 122:
-/* Line 1792 of yacc.c  */
 #line 899 "gram.y"
     { 
-		setflow = &g[curg].flowt[(int) (yyvsp[(3) - (3)].val)]; 
-                elcirc_flowno = (int) (yyvsp[(3) - (3)].val);
-		g[curg].curadc3d = (int) (yyvsp[(3) - (3)].val); 
+		setflow = &g[curg].flowt[(int) (yyvsp[0].val)]; 
+                elcirc_flowno = (int) (yyvsp[0].val);
+		g[curg].curadc3d = (int) (yyvsp[0].val); 
 	}
     break;
 
   case 123:
-/* Line 1792 of yacc.c  */
 #line 904 "gram.y"
     {}
     break;
 
   case 124:
-/* Line 1792 of yacc.c  */
 #line 905 "gram.y"
-    { curadc3d = (int) (yyvsp[(3) - (3)].val); }
+    { curadc3d = (int) (yyvsp[0].val); }
     break;
 
   case 125:
-/* Line 1792 of yacc.c  */
 #line 907 "gram.y"
     {
-		ReplaceElcircGrid((int) (yyvsp[(3) - (4)].val), (char *) (yyvsp[(4) - (4)].str));
+		ReplaceElcircGrid((int) (yyvsp[-1].val), (char *) (yyvsp[0].str));
 	}
     break;
 
   case 126:
-/* Line 1792 of yacc.c  */
 #line 911 "gram.y"
     { 
-		ReadElcircRegionFile((int) (yyvsp[(3) - (5)].val), (char *) (yyvsp[(5) - (5)].str));
+		ReadElcircRegionFile((int) (yyvsp[-2].val), (char *) (yyvsp[0].str));
 	}
     break;
 
   case 127:
-/* Line 1792 of yacc.c  */
 #line 915 "gram.y"
     {
-		ReadElcirc((int) (yyvsp[(3) - (12)].val), (char *) (yyvsp[(4) - (12)].str), (int) (yyvsp[(12) - (12)].val) - 1, (int) (yyvsp[(6) - (12)].val), (int) (yyvsp[(8) - (12)].val), (int) (yyvsp[(10) - (12)].val), 0, 0, 0);
-                elcirc_flowno = (int) (yyvsp[(3) - (12)].val);
+		ReadElcirc((int) (yyvsp[-9].val), (char *) (yyvsp[-8].str), (int) (yyvsp[0].val) - 1, (int) (yyvsp[-6].val), (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), 0, 0, 0);
+                elcirc_flowno = (int) (yyvsp[-9].val);
                 set_clock(0, flowt[elcirc_flowno].start, 
 				flowt[elcirc_flowno].stop, flowt[elcirc_flowno].step,
                                   flowt[elcirc_flowno].nsteps);
@@ -5940,11 +5588,10 @@ yyreduce:
     break;
 
   case 128:
-/* Line 1792 of yacc.c  */
 #line 924 "gram.y"
     {
-		ReadElcirc((int) (yyvsp[(3) - (13)].val), (char *) (yyvsp[(4) - (13)].str), (int) (yyvsp[(12) - (13)].val) - 1, (int) (yyvsp[(6) - (13)].val), (int) (yyvsp[(8) - (13)].val), (int) (yyvsp[(10) - (13)].val), 0, 0, 1);
-                elcirc_flowno = (int) (yyvsp[(3) - (13)].val);
+		ReadElcirc((int) (yyvsp[-10].val), (char *) (yyvsp[-9].str), (int) (yyvsp[-1].val) - 1, (int) (yyvsp[-7].val), (int) (yyvsp[-5].val), (int) (yyvsp[-3].val), 0, 0, 1);
+                elcirc_flowno = (int) (yyvsp[-10].val);
                 set_clock(0, flowt[elcirc_flowno].start, 
 				flowt[elcirc_flowno].stop, flowt[elcirc_flowno].step,
                                   flowt[elcirc_flowno].nsteps);
@@ -5953,11 +5600,10 @@ yyreduce:
     break;
 
   case 129:
-/* Line 1792 of yacc.c  */
 #line 933 "gram.y"
     {
-		ReadElcircDepth((int) (yyvsp[(3) - (12)].val), (char *) (yyvsp[(4) - (12)].str), (char *) NULL, (double) (yyvsp[(12) - (12)].val), (int) (yyvsp[(6) - (12)].val), (int) (yyvsp[(8) - (12)].val), (int) (yyvsp[(10) - (12)].val), 0, 0, 0);
-                elcirc_flowno = (int) (yyvsp[(3) - (12)].val);
+		ReadElcircDepth((int) (yyvsp[-9].val), (char *) (yyvsp[-8].str), (char *) NULL, (double) (yyvsp[0].val), (int) (yyvsp[-6].val), (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), 0, 0, 0);
+                elcirc_flowno = (int) (yyvsp[-9].val);
                 set_clock(0, flowt[elcirc_flowno].start, 
 				flowt[elcirc_flowno].stop, flowt[elcirc_flowno].step,
                                   flowt[elcirc_flowno].nsteps);
@@ -5966,12 +5612,11 @@ yyreduce:
     break;
 
   case 130:
-/* Line 1792 of yacc.c  */
 #line 942 "gram.y"
     {
 /* read at a given depth relative to the free surface */
-		ReadElcircDepthFromFreeSurface((int) (yyvsp[(4) - (13)].val), (char *) (yyvsp[(5) - (13)].str), (char *) NULL, (double) (yyvsp[(13) - (13)].val), (int) (yyvsp[(7) - (13)].val), (int) (yyvsp[(9) - (13)].val), (int) (yyvsp[(11) - (13)].val), 0, 0, 0);
-                elcirc_flowno = (int) (yyvsp[(4) - (13)].val);
+		ReadElcircDepthFromFreeSurface((int) (yyvsp[-9].val), (char *) (yyvsp[-8].str), (char *) NULL, (double) (yyvsp[0].val), (int) (yyvsp[-6].val), (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), 0, 0, 0);
+                elcirc_flowno = (int) (yyvsp[-9].val);
                 set_clock(0, flowt[elcirc_flowno].start, 
 				flowt[elcirc_flowno].stop, flowt[elcirc_flowno].step,
                                   flowt[elcirc_flowno].nsteps);
@@ -5980,11 +5625,10 @@ yyreduce:
     break;
 
   case 131:
-/* Line 1792 of yacc.c  */
 #line 952 "gram.y"
     {
-		ReadElcircSurf((int) (yyvsp[(4) - (11)].val), (char *) (yyvsp[(5) - (11)].str), 0, (int) (yyvsp[(7) - (11)].val), (int) (yyvsp[(9) - (11)].val), (int) (yyvsp[(11) - (11)].val), 0, 0.0, 0);
-                elcirc_flowno = (int) (yyvsp[(4) - (11)].val);
+		ReadElcircSurf((int) (yyvsp[-7].val), (char *) (yyvsp[-6].str), 0, (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), (int) (yyvsp[0].val), 0, 0.0, 0);
+                elcirc_flowno = (int) (yyvsp[-7].val);
                 set_clock(0, flowt[elcirc_flowno].start, 
 				flowt[elcirc_flowno].stop, flowt[elcirc_flowno].step,
                                   flowt[elcirc_flowno].nsteps);
@@ -5993,11 +5637,10 @@ yyreduce:
     break;
 
   case 132:
-/* Line 1792 of yacc.c  */
 #line 961 "gram.y"
     {
-		ReadElcircSurf((int) (yyvsp[(4) - (12)].val), (char *) (yyvsp[(5) - (12)].str), 0, (int) (yyvsp[(7) - (12)].val), (int) (yyvsp[(9) - (12)].val), (int) (yyvsp[(11) - (12)].val), 0, 0.0, 1);
-                elcirc_flowno = (int) (yyvsp[(4) - (12)].val);
+		ReadElcircSurf((int) (yyvsp[-8].val), (char *) (yyvsp[-7].str), 0, (int) (yyvsp[-5].val), (int) (yyvsp[-3].val), (int) (yyvsp[-1].val), 0, 0.0, 1);
+                elcirc_flowno = (int) (yyvsp[-8].val);
                 set_clock(0, flowt[elcirc_flowno].start, 
 				flowt[elcirc_flowno].stop, flowt[elcirc_flowno].step,
                                   flowt[elcirc_flowno].nsteps);
@@ -6006,11 +5649,10 @@ yyreduce:
     break;
 
   case 133:
-/* Line 1792 of yacc.c  */
 #line 970 "gram.y"
     {
-		ReadElcircSurf((int) (yyvsp[(4) - (11)].val), (char *) (yyvsp[(5) - (11)].str), 1, (int) (yyvsp[(7) - (11)].val), (int) (yyvsp[(9) - (11)].val), (int) (yyvsp[(11) - (11)].val), 0, 0.0, 0);
-                elcirc_flowno = (int) (yyvsp[(4) - (11)].val);
+		ReadElcircSurf((int) (yyvsp[-7].val), (char *) (yyvsp[-6].str), 1, (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), (int) (yyvsp[0].val), 0, 0.0, 0);
+                elcirc_flowno = (int) (yyvsp[-7].val);
                 set_clock(0, flowt[elcirc_flowno].start, 
 				flowt[elcirc_flowno].stop, flowt[elcirc_flowno].step,
                                   flowt[elcirc_flowno].nsteps);
@@ -6019,11 +5661,10 @@ yyreduce:
     break;
 
   case 134:
-/* Line 1792 of yacc.c  */
 #line 979 "gram.y"
     {
-		ReadElcircSurf((int) (yyvsp[(4) - (12)].val), (char *) (yyvsp[(5) - (12)].str), 1, (int) (yyvsp[(7) - (12)].val), (int) (yyvsp[(9) - (12)].val), (int) (yyvsp[(11) - (12)].val), 0, 0.0, 1);
-                elcirc_flowno = (int) (yyvsp[(4) - (12)].val);
+		ReadElcircSurf((int) (yyvsp[-8].val), (char *) (yyvsp[-7].str), 1, (int) (yyvsp[-5].val), (int) (yyvsp[-3].val), (int) (yyvsp[-1].val), 0, 0.0, 1);
+                elcirc_flowno = (int) (yyvsp[-8].val);
                 set_clock(0, flowt[elcirc_flowno].start, 
 				flowt[elcirc_flowno].stop, flowt[elcirc_flowno].step,
                                   flowt[elcirc_flowno].nsteps);
@@ -6032,150 +5673,128 @@ yyreduce:
     break;
 
   case 135:
-/* Line 1792 of yacc.c  */
 #line 987 "gram.y"
     { 
-			curtrans = (int) (yyvsp[(4) - (4)].val); 
+			curtrans = (int) (yyvsp[0].val); 
 			settrans = &(trans[curtrans]); 
 	}
     break;
 
   case 136:
-/* Line 1792 of yacc.c  */
 #line 991 "gram.y"
-    { curtrans = (int) (yyvsp[(4) - (4)].val); }
+    { curtrans = (int) (yyvsp[0].val); }
     break;
 
   case 137:
-/* Line 1792 of yacc.c  */
 #line 992 "gram.y"
     { setisol = &(g[curg].trans[curtrans].ip); }
     break;
 
   case 139:
-/* Line 1792 of yacc.c  */
 #line 993 "gram.y"
-    {strcpy(settrans->uvname, (char *) (yyvsp[(4) - (4)].str));}
+    {strcpy(settrans->uvname, (char *) (yyvsp[0].str));}
     break;
 
   case 140:
-/* Line 1792 of yacc.c  */
 #line 994 "gram.y"
-    {strcpy(settrans->vvname, (char *) (yyvsp[(5) - (5)].str));}
+    {strcpy(settrans->vvname, (char *) (yyvsp[0].str));}
     break;
 
   case 141:
-/* Line 1792 of yacc.c  */
 #line 995 "gram.y"
-    { settrans->flowno = (int) (yyvsp[(4) - (4)].val);}
+    { settrans->flowno = (int) (yyvsp[0].val);}
     break;
 
   case 142:
-/* Line 1792 of yacc.c  */
 #line 996 "gram.y"
-    {strcpy(settrans->salname, (char *) (yyvsp[(4) - (4)].str));}
+    {strcpy(settrans->salname, (char *) (yyvsp[0].str));}
     break;
 
   case 143:
-/* Line 1792 of yacc.c  */
 #line 997 "gram.y"
-    {strcpy(settrans->elevname, (char *) (yyvsp[(4) - (4)].str));}
+    {strcpy(settrans->elevname, (char *) (yyvsp[0].str));}
     break;
 
   case 144:
-/* Line 1792 of yacc.c  */
 #line 998 "gram.y"
-    { settrans->gno = (int) (yyvsp[(4) - (4)].val);}
+    { settrans->gno = (int) (yyvsp[0].val);}
     break;
 
   case 145:
-/* Line 1792 of yacc.c  */
 #line 999 "gram.y"
-    { settrans->transgno = (int) (yyvsp[(5) - (5)].val);}
+    { settrans->transgno = (int) (yyvsp[0].val);}
     break;
 
   case 146:
-/* Line 1792 of yacc.c  */
 #line 1000 "gram.y"
-    { settrans->display = (int) (yyvsp[(5) - (5)].pset);}
+    { settrans->display = (int) (yyvsp[0].pset);}
     break;
 
   case 147:
-/* Line 1792 of yacc.c  */
 #line 1001 "gram.y"
-    { g[curg].trans[curtrans].display = (int) (yyvsp[(4) - (4)].pset);}
+    { g[curg].trans[curtrans].display = (int) (yyvsp[0].pset);}
     break;
 
   case 148:
-/* Line 1792 of yacc.c  */
 #line 1002 "gram.y"
-    { g[curg].trans[curtrans].display_mag = (int) (yyvsp[(5) - (5)].pset);}
+    { g[curg].trans[curtrans].display_mag = (int) (yyvsp[0].pset);}
     break;
 
   case 149:
-/* Line 1792 of yacc.c  */
 #line 1003 "gram.y"
     { }
     break;
 
   case 150:
-/* Line 1792 of yacc.c  */
 #line 1005 "gram.y"
     {
-		settrans->start = (int) (yyvsp[(4) - (8)].val);
-		settrans->stop = (int) (yyvsp[(6) - (8)].val);
-		settrans->skip = (int) (yyvsp[(8) - (8)].val);
+		settrans->start = (int) (yyvsp[-4].val);
+		settrans->stop = (int) (yyvsp[-2].val);
+		settrans->skip = (int) (yyvsp[0].val);
 	}
     break;
 
   case 151:
-/* Line 1792 of yacc.c  */
 #line 1010 "gram.y"
-    { settrans->npts = (int) (yyvsp[(4) - (4)].val); }
+    { settrans->npts = (int) (yyvsp[0].val); }
     break;
 
   case 152:
-/* Line 1792 of yacc.c  */
 #line 1011 "gram.y"
-    { settrans->transtype = (int) (yyvsp[(4) - (4)].val); }
+    { settrans->transtype = (int) (yyvsp[0].val); }
     break;
 
   case 153:
-/* Line 1792 of yacc.c  */
 #line 1012 "gram.y"
-    { AddTransNXY(settrans, (int) (yyvsp[(3) - (7)].val), (double) (yyvsp[(5) - (7)].val), (double) (yyvsp[(7) - (7)].val)); }
+    { AddTransNXY(settrans, (int) (yyvsp[-4].val), (double) (yyvsp[-2].val), (double) (yyvsp[0].val)); }
     break;
 
   case 154:
-/* Line 1792 of yacc.c  */
 #line 1013 "gram.y"
-    { AddTransNode(settrans, (int) (yyvsp[(4) - (6)].val), (int) (yyvsp[(6) - (6)].val)); }
+    { AddTransNode(settrans, (int) (yyvsp[-2].val), (int) (yyvsp[0].val)); }
     break;
 
   case 155:
-/* Line 1792 of yacc.c  */
 #line 1015 "gram.y"
     {
 		settrans->transtype = 0;
-		strcpy(settrans->transname, (char *) (yyvsp[(5) - (5)].str));
+		strcpy(settrans->transname, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 156:
-/* Line 1792 of yacc.c  */
 #line 1020 "gram.y"
     {
 		settrans->transtype = 1;
-		settrans->npts = (int) (yyvsp[(4) - (12)].val);
-		settrans->x1 = (double) (yyvsp[(6) - (12)].val);
-		settrans->y1 = (double) (yyvsp[(8) - (12)].val);
-		settrans->x2 = (double) (yyvsp[(10) - (12)].val);
-		settrans->y2 = (double) (yyvsp[(12) - (12)].val);
+		settrans->npts = (int) (yyvsp[-8].val);
+		settrans->x1 = (double) (yyvsp[-6].val);
+		settrans->y1 = (double) (yyvsp[-4].val);
+		settrans->x2 = (double) (yyvsp[-2].val);
+		settrans->y2 = (double) (yyvsp[0].val);
 	}
     break;
 
   case 157:
-/* Line 1792 of yacc.c  */
 #line 1029 "gram.y"
     { 
 		settrans->type = VECTOR;
@@ -6187,7 +5806,6 @@ yyreduce:
     break;
 
   case 158:
-/* Line 1792 of yacc.c  */
 #line 1037 "gram.y"
     { 
 		settrans->type = VECTOR;
@@ -6199,7 +5817,6 @@ yyreduce:
     break;
 
   case 159:
-/* Line 1792 of yacc.c  */
 #line 1045 "gram.y"
     { 
 		settrans->type = VECTOR;
@@ -6211,7 +5828,6 @@ yyreduce:
     break;
 
   case 160:
-/* Line 1792 of yacc.c  */
 #line 1053 "gram.y"
     { 
 		settrans->type = VECTOR;
@@ -6223,7 +5839,6 @@ yyreduce:
     break;
 
   case 161:
-/* Line 1792 of yacc.c  */
 #line 1061 "gram.y"
     { 
 		settrans->type = SCALAR;
@@ -6235,7 +5850,6 @@ yyreduce:
     break;
 
   case 162:
-/* Line 1792 of yacc.c  */
 #line 1069 "gram.y"
     { 
 		settrans->type = SCALAR;
@@ -6247,569 +5861,485 @@ yyreduce:
     break;
 
   case 163:
-/* Line 1792 of yacc.c  */
 #line 1077 "gram.y"
     {
-		elcircmarker = (int) (yyvsp[(4) - (4)].val);
-		setadc3d = &adc3d[(int) (yyvsp[(4) - (4)].val)];
-		setflow3d = &g[curg].flow3d[(int) (yyvsp[(4) - (4)].val)];
+		elcircmarker = (int) (yyvsp[0].val);
+		setadc3d = &adc3d[(int) (yyvsp[0].val)];
+		setflow3d = &g[curg].flow3d[(int) (yyvsp[0].val)];
 	}
     break;
 
   case 164:
-/* Line 1792 of yacc.c  */
 #line 1083 "gram.y"
     {
-		strcpy(setadc3d->datafile, (char *) (yyvsp[(4) - (4)].str));
+		strcpy(setadc3d->datafile, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 165:
-/* Line 1792 of yacc.c  */
 #line 1087 "gram.y"
     {
-		strcpy(setadc3d->datafile, (char *) (yyvsp[(4) - (4)].str));
+		strcpy(setadc3d->datafile, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 166:
-/* Line 1792 of yacc.c  */
 #line 1091 "gram.y"
     {
-		strcpy(setadc3d->datafile, (char *) (yyvsp[(4) - (4)].str));
+		strcpy(setadc3d->datafile, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 167:
-/* Line 1792 of yacc.c  */
 #line 1095 "gram.y"
     {
-		strcpy(setadc3d->datafile, (char *) (yyvsp[(4) - (4)].str));
+		strcpy(setadc3d->datafile, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 168:
-/* Line 1792 of yacc.c  */
 #line 1099 "gram.y"
     {
-		strcpy(setadc3d->datafile, (char *) (yyvsp[(4) - (4)].str));
+		strcpy(setadc3d->datafile, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 169:
-/* Line 1792 of yacc.c  */
 #line 1103 "gram.y"
     {
-		strcpy(setadc3d->elevfile, (char *) (yyvsp[(4) - (4)].str));
+		strcpy(setadc3d->elevfile, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 170:
-/* Line 1792 of yacc.c  */
 #line 1107 "gram.y"
     {
 		setadc3d->loctype = NODE;
 		setadc3d->loctype = 1;
-		setadc3d->node = (int) (yyvsp[(5) - (11)].val);
-		ReadNodeDataNew(elcircmarker, (int) (yyvsp[(7) - (11)].val), (int) (yyvsp[(9) - (11)].val), 0);
+		setadc3d->node = (int) (yyvsp[-6].val);
+		ReadNodeDataNew(elcircmarker, (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), 0);
 	}
     break;
 
   case 171:
-/* Line 1792 of yacc.c  */
 #line 1114 "gram.y"
     {
 		setadc3d->loctype = NODE;
 		setadc3d->loctype = 1;
-		setadc3d->node = (int) (yyvsp[(5) - (12)].val);
-		ReadNodeDataNew(elcircmarker, (int) (yyvsp[(7) - (12)].val), (int) (yyvsp[(9) - (12)].val), 1);
+		setadc3d->node = (int) (yyvsp[-7].val);
+		ReadNodeDataNew(elcircmarker, (int) (yyvsp[-5].val), (int) (yyvsp[-3].val), 1);
 	}
     break;
 
   case 172:
-/* Line 1792 of yacc.c  */
 #line 1121 "gram.y"
     {
 		setadc3d->loctype = XY;
 		setadc3d->loctype = 0;
-		setadc3d->x = (double) (yyvsp[(5) - (13)].val);
-		setadc3d->y = (double) (yyvsp[(7) - (13)].val);
-		ReadXYDataNew(elcircmarker, (int) (yyvsp[(9) - (13)].val), (int) (yyvsp[(11) - (13)].val), 0);
+		setadc3d->x = (double) (yyvsp[-8].val);
+		setadc3d->y = (double) (yyvsp[-6].val);
+		ReadXYDataNew(elcircmarker, (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), 0);
 	}
     break;
 
   case 173:
-/* Line 1792 of yacc.c  */
 #line 1129 "gram.y"
     {
 		setadc3d->loctype = XY;
 		setadc3d->loctype = 0;
-		setadc3d->x = (double) (yyvsp[(5) - (14)].val);
-		setadc3d->y = (double) (yyvsp[(7) - (14)].val);
-		ReadXYDataNew(elcircmarker, (int) (yyvsp[(9) - (14)].val), (int) (yyvsp[(11) - (14)].val), 1);
+		setadc3d->x = (double) (yyvsp[-9].val);
+		setadc3d->y = (double) (yyvsp[-7].val);
+		ReadXYDataNew(elcircmarker, (int) (yyvsp[-5].val), (int) (yyvsp[-3].val), 1);
 	}
     break;
 
   case 174:
-/* Line 1792 of yacc.c  */
 #line 1136 "gram.y"
     { setisol = &(g[curg].salip); }
     break;
 
   case 176:
-/* Line 1792 of yacc.c  */
 #line 1137 "gram.y"
     { setisol = &(g[curg].salip); }
     break;
 
   case 178:
-/* Line 1792 of yacc.c  */
 #line 1138 "gram.y"
     { setisol = &(g[curg].velmagip); }
     break;
 
   case 180:
-/* Line 1792 of yacc.c  */
 #line 1139 "gram.y"
     { setprops = &(setflow3d->p); }
     break;
 
   case 182:
-/* Line 1792 of yacc.c  */
 #line 1141 "gram.y"
     {
-		setflow3d->precx = (int) (yyvsp[(4) - (6)].val);
-		setflow3d->precy = (int) (yyvsp[(6) - (6)].val);
+		setflow3d->precx = (int) (yyvsp[-2].val);
+		setflow3d->precy = (int) (yyvsp[0].val);
 	}
     break;
 
   case 183:
-/* Line 1792 of yacc.c  */
 #line 1145 "gram.y"
-    { setflow3d->attach = (int) (yyvsp[(4) - (4)].val); }
+    { setflow3d->attach = (int) (yyvsp[0].val); }
     break;
 
   case 184:
-/* Line 1792 of yacc.c  */
 #line 1146 "gram.y"
-    { setflow3d->loctype = (int) (yyvsp[(4) - (4)].pset); }
+    { setflow3d->loctype = (int) (yyvsp[0].pset); }
     break;
 
   case 185:
-/* Line 1792 of yacc.c  */
 #line 1147 "gram.y"
-    { setflow3d->display_marker = (int) (yyvsp[(5) - (5)].pset); }
+    { setflow3d->display_marker = (int) (yyvsp[0].pset); }
     break;
 
   case 186:
-/* Line 1792 of yacc.c  */
 #line 1148 "gram.y"
-    { setflow3d->display = (int) (yyvsp[(4) - (4)].pset); }
+    { setflow3d->display = (int) (yyvsp[0].pset); }
     break;
 
   case 187:
-/* Line 1792 of yacc.c  */
 #line 1149 "gram.y"
-    { setflow3d->p.color = (yyvsp[(4) - (4)].val); }
+    { setflow3d->p.color = (yyvsp[0].val); }
     break;
 
   case 188:
-/* Line 1792 of yacc.c  */
 #line 1150 "gram.y"
-    { setflow3d->p.linew = (yyvsp[(4) - (4)].val); }
+    { setflow3d->p.linew = (yyvsp[0].val); }
     break;
 
   case 189:
-/* Line 1792 of yacc.c  */
 #line 1151 "gram.y"
-    { setflow3d->p.fillcol = (yyvsp[(5) - (5)].val); }
+    { setflow3d->p.fillcol = (yyvsp[0].val); }
     break;
 
   case 190:
-/* Line 1792 of yacc.c  */
 #line 1153 "gram.y"
     { 
-		setflow3d->wx1 = (double) (yyvsp[(4) - (10)].val); 
-		setflow3d->wy1 = (double) (yyvsp[(6) - (10)].val); 
-		setflow3d->wx2 = (double) (yyvsp[(8) - (10)].val); 
-		setflow3d->wy2 = (double) (yyvsp[(10) - (10)].val); 
+		setflow3d->wx1 = (double) (yyvsp[-6].val); 
+		setflow3d->wy1 = (double) (yyvsp[-4].val); 
+		setflow3d->wx2 = (double) (yyvsp[-2].val); 
+		setflow3d->wy2 = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 191:
-/* Line 1792 of yacc.c  */
 #line 1160 "gram.y"
     { 
-		setflow3d->vx = (double) (yyvsp[(4) - (6)].val); 
-		setflow3d->vy = (double) (yyvsp[(6) - (6)].val); 
+		setflow3d->vx = (double) (yyvsp[-2].val); 
+		setflow3d->vy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 192:
-/* Line 1792 of yacc.c  */
 #line 1165 "gram.y"
     { 
-		setflow3d->locx = (double) (yyvsp[(4) - (6)].val); 
-		setflow3d->locy = (double) (yyvsp[(6) - (6)].val); 
+		setflow3d->locx = (double) (yyvsp[-2].val); 
+		setflow3d->locy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 193:
-/* Line 1792 of yacc.c  */
 #line 1170 "gram.y"
     { 
-		setflow3d->x = (double) (yyvsp[(4) - (6)].val); 
-		setflow3d->y = (double) (yyvsp[(6) - (6)].val); 
+		setflow3d->x = (double) (yyvsp[-2].val); 
+		setflow3d->y = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 194:
-/* Line 1792 of yacc.c  */
 #line 1177 "gram.y"
-    { setflow->display = (yyvsp[(2) - (2)].pset);  }
+    { setflow->display = (yyvsp[0].pset);  }
     break;
 
   case 195:
-/* Line 1792 of yacc.c  */
 #line 1178 "gram.y"
-    { setflow->display_elev = (yyvsp[(3) - (3)].pset); }
+    { setflow->display_elev = (yyvsp[0].pset); }
     break;
 
   case 196:
-/* Line 1792 of yacc.c  */
 #line 1179 "gram.y"
-    { setflow->display_elevdepth = (yyvsp[(4) - (4)].pset); }
+    { setflow->display_elevdepth = (yyvsp[0].pset); }
     break;
 
   case 197:
-/* Line 1792 of yacc.c  */
 #line 1180 "gram.y"
-    { setflow->display_maxelevval = (yyvsp[(4) - (4)].pset); }
+    { setflow->display_maxelevval = (yyvsp[0].pset); }
     break;
 
   case 198:
-/* Line 1792 of yacc.c  */
 #line 1181 "gram.y"
-    { setflow->display_maxelev = (yyvsp[(4) - (4)].pset); }
+    { setflow->display_maxelev = (yyvsp[0].pset); }
     break;
 
   case 199:
-/* Line 1792 of yacc.c  */
 #line 1182 "gram.y"
-    { setflow->display_amp = (yyvsp[(4) - (4)].pset); }
+    { setflow->display_amp = (yyvsp[0].pset); }
     break;
 
   case 200:
-/* Line 1792 of yacc.c  */
 #line 1183 "gram.y"
-    { setflow->display_phase = (yyvsp[(4) - (4)].pset); }
+    { setflow->display_phase = (yyvsp[0].pset); }
     break;
 
   case 201:
-/* Line 1792 of yacc.c  */
 #line 1184 "gram.y"
-    { setflow->display_elevmarkers = (yyvsp[(4) - (4)].pset); }
+    { setflow->display_elevmarkers = (yyvsp[0].pset); }
     break;
 
   case 202:
-/* Line 1792 of yacc.c  */
 #line 1185 "gram.y"
-    { setflow->display_mag = (yyvsp[(4) - (4)].pset); }
+    { setflow->display_mag = (yyvsp[0].pset); }
     break;
 
   case 203:
-/* Line 1792 of yacc.c  */
 #line 1186 "gram.y"
-    { setflow->display_wind = (yyvsp[(4) - (4)].pset); }
+    { setflow->display_wind = (yyvsp[0].pset); }
     break;
 
   case 204:
-/* Line 1792 of yacc.c  */
 #line 1187 "gram.y"
-    { setflow->display_inun = (yyvsp[(2) - (3)].pset); }
+    { setflow->display_inun = (yyvsp[-1].pset); }
     break;
 
   case 205:
-/* Line 1792 of yacc.c  */
 #line 1188 "gram.y"
-    { setflow->p.color = (yyvsp[(2) - (2)].val); }
+    { setflow->p.color = (yyvsp[0].val); }
     break;
 
   case 206:
-/* Line 1792 of yacc.c  */
 #line 1189 "gram.y"
     { setisol = &(setflow->elevip); }
     break;
 
   case 208:
-/* Line 1792 of yacc.c  */
 #line 1190 "gram.y"
     { setisol = &(setflow->maxelevip); }
     break;
 
   case 210:
-/* Line 1792 of yacc.c  */
 #line 1191 "gram.y"
     { setisol = &(setflow->ampip); }
     break;
 
   case 212:
-/* Line 1792 of yacc.c  */
 #line 1192 "gram.y"
     { setisol = &(setflow->phaseip); }
     break;
 
   case 214:
-/* Line 1792 of yacc.c  */
 #line 1193 "gram.y"
     { setisol = &(setflow->magip); }
     break;
 
   case 216:
-/* Line 1792 of yacc.c  */
 #line 1194 "gram.y"
-    { setflow->flowfreq = (yyvsp[(3) - (3)].val); }
+    { setflow->flowfreq = (yyvsp[0].val); }
     break;
 
   case 217:
-/* Line 1792 of yacc.c  */
 #line 1195 "gram.y"
-    { setflow->freq = (yyvsp[(2) - (2)].val); }
+    { setflow->freq = (yyvsp[0].val); }
     break;
 
   case 218:
-/* Line 1792 of yacc.c  */
 #line 1196 "gram.y"
-    { setelevmarker = &(setflow->em[(int) (yyvsp[(2) - (2)].val)]); }
+    { setelevmarker = &(setflow->em[(int) (yyvsp[0].val)]); }
     break;
 
   case 219:
-/* Line 1792 of yacc.c  */
 #line 1197 "gram.y"
-    { setflow->sample = (int) (yyvsp[(3) - (3)].pset); }
+    { setflow->sample = (int) (yyvsp[0].pset); }
     break;
 
   case 220:
-/* Line 1792 of yacc.c  */
 #line 1198 "gram.y"
-    { ReadSampleFlow(setflow, (char *) (yyvsp[(4) - (4)].str)); }
+    { ReadSampleFlow(setflow, (char *) (yyvsp[0].str)); }
     break;
 
   case 221:
-/* Line 1792 of yacc.c  */
 #line 1199 "gram.y"
-    { SetMinSampleFlow(elcirc_flowno, (double) (yyvsp[(4) - (4)].val)); }
+    { SetMinSampleFlow(elcirc_flowno, (double) (yyvsp[0].val)); }
     break;
 
   case 222:
-/* Line 1792 of yacc.c  */
 #line 1200 "gram.y"
-    { ReadSampleFlowXY(setflow, (char *) (yyvsp[(5) - (5)].str)); }
+    { ReadSampleFlowXY(setflow, (char *) (yyvsp[0].str)); }
     break;
 
   case 223:
-/* Line 1792 of yacc.c  */
 #line 1201 "gram.y"
     { setflow->samptype = XY; }
     break;
 
   case 224:
-/* Line 1792 of yacc.c  */
 #line 1202 "gram.y"
     { setflow->samptype = NODE; }
     break;
 
   case 225:
-/* Line 1792 of yacc.c  */
 #line 1203 "gram.y"
-    { AddSampleFlowNode(setflow, (int) (yyvsp[(4) - (4)].val) - 1); }
+    { AddSampleFlowNode(setflow, (int) (yyvsp[0].val) - 1); }
     break;
 
   case 226:
-/* Line 1792 of yacc.c  */
 #line 1204 "gram.y"
-    { AddSampleFlowElem(setflow, (int) (yyvsp[(4) - (4)].val) - 1); }
+    { AddSampleFlowElem(setflow, (int) (yyvsp[0].val) - 1); }
     break;
 
   case 227:
-/* Line 1792 of yacc.c  */
 #line 1205 "gram.y"
-    { AddSampleFlowXY(setflow, (double) (yyvsp[(4) - (6)].val), (double) (yyvsp[(6) - (6)].val)); }
+    { AddSampleFlowXY(setflow, (double) (yyvsp[-2].val), (double) (yyvsp[0].val)); }
     break;
 
   case 228:
-/* Line 1792 of yacc.c  */
 #line 1206 "gram.y"
-    { DeleteSampleFlowNode(setflow, (int) (yyvsp[(5) - (5)].val) - 1); }
+    { DeleteSampleFlowNode(setflow, (int) (yyvsp[0].val) - 1); }
     break;
 
   case 229:
-/* Line 1792 of yacc.c  */
 #line 1207 "gram.y"
-    { DeleteSampleFlowElem(setflow, (int) (yyvsp[(5) - (5)].val) - 1); }
+    { DeleteSampleFlowElem(setflow, (int) (yyvsp[0].val) - 1); }
     break;
 
   case 230:
-/* Line 1792 of yacc.c  */
 #line 1208 "gram.y"
-    { DeleteSampleFlowXY(setflow, (double) (yyvsp[(5) - (7)].val), (double) (yyvsp[(7) - (7)].val)); }
+    { DeleteSampleFlowXY(setflow, (double) (yyvsp[-2].val), (double) (yyvsp[0].val)); }
     break;
 
   case 231:
-/* Line 1792 of yacc.c  */
 #line 1212 "gram.y"
-    { setelevmarker = &(setflow->em[(int) (yyvsp[(3) - (3)].val)]); }
+    { setelevmarker = &(setflow->em[(int) (yyvsp[0].val)]); }
     break;
 
   case 232:
-/* Line 1792 of yacc.c  */
 #line 1213 "gram.y"
-    { setelevmarker->active = (int) (yyvsp[(3) - (3)].pset); }
+    { setelevmarker->active = (int) (yyvsp[0].pset); }
     break;
 
   case 233:
-/* Line 1792 of yacc.c  */
 #line 1214 "gram.y"
-    { setelevmarker->type = (int) (yyvsp[(3) - (3)].pset); }
+    { setelevmarker->type = (int) (yyvsp[0].pset); }
     break;
 
   case 234:
-/* Line 1792 of yacc.c  */
 #line 1215 "gram.y"
-    { setelevmarker->display = (int) (yyvsp[(3) - (3)].pset); }
+    { setelevmarker->display = (int) (yyvsp[0].pset); }
     break;
 
   case 235:
-/* Line 1792 of yacc.c  */
 #line 1216 "gram.y"
     { setprops = &(setelevmarker->p); }
     break;
 
   case 237:
-/* Line 1792 of yacc.c  */
 #line 1217 "gram.y"
-    { setelevmarker->loctype = (int) (yyvsp[(3) - (3)].pset); }
+    { setelevmarker->loctype = (int) (yyvsp[0].pset); }
     break;
 
   case 238:
-/* Line 1792 of yacc.c  */
 #line 1218 "gram.y"
-    { setelevmarker->node = (int) (yyvsp[(3) - (3)].val); }
+    { setelevmarker->node = (int) (yyvsp[0].val); }
     break;
 
   case 239:
-/* Line 1792 of yacc.c  */
 #line 1220 "gram.y"
     { 
-		setelevmarker->locx = (double) (yyvsp[(3) - (5)].val); 
-		setelevmarker->locy = (double) (yyvsp[(5) - (5)].val); 
+		setelevmarker->locx = (double) (yyvsp[-2].val); 
+		setelevmarker->locy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 240:
-/* Line 1792 of yacc.c  */
 #line 1225 "gram.y"
     { 
-		setelevmarker->emin = (double) (yyvsp[(3) - (5)].val); 
-		setelevmarker->emax = (double) (yyvsp[(5) - (5)].val); 
+		setelevmarker->emin = (double) (yyvsp[-2].val); 
+		setelevmarker->emax = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 241:
-/* Line 1792 of yacc.c  */
 #line 1236 "gram.y"
-    { setgrid = &g[curg].grid[(int) (yyvsp[(2) - (2)].val)]; }
+    { setgrid = &g[curg].grid[(int) (yyvsp[0].val)]; }
     break;
 
   case 242:
-/* Line 1792 of yacc.c  */
 #line 1237 "gram.y"
-    { setgrid = &g[curg].grid[(int) (yyvsp[(3) - (3)].val)]; }
+    { setgrid = &g[curg].grid[(int) (yyvsp[0].val)]; }
     break;
 
   case 243:
-/* Line 1792 of yacc.c  */
 #line 1238 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display = (yyvsp[(3) - (3)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display = (yyvsp[0].pset); }
     break;
 
   case 244:
-/* Line 1792 of yacc.c  */
 #line 1239 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display_bath = (yyvsp[(4) - (4)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display_bath = (yyvsp[0].pset); }
     break;
 
   case 245:
-/* Line 1792 of yacc.c  */
 #line 1240 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display_courant = (yyvsp[(4) - (6)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display_courant = (yyvsp[-2].pset); }
     break;
 
   case 246:
-/* Line 1792 of yacc.c  */
 #line 1241 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display_courantn = (yyvsp[(5) - (7)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display_courantn = (yyvsp[-2].pset); }
     break;
 
   case 247:
-/* Line 1792 of yacc.c  */
 #line 1242 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display_boundary = (yyvsp[(4) - (4)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display_boundary = (yyvsp[0].pset); }
     break;
 
   case 248:
-/* Line 1792 of yacc.c  */
 #line 1243 "gram.y"
     { if (checkptr(setgrid, f_string)) setprops = &(setgrid->p); }
     break;
 
   case 250:
-/* Line 1792 of yacc.c  */
 #line 1244 "gram.y"
     { if (checkptr(setgrid, f_string)) setprops = &(setgrid->bp); }
     break;
 
   case 252:
-/* Line 1792 of yacc.c  */
 #line 1245 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display_nodes = (yyvsp[(4) - (4)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display_nodes = (yyvsp[0].pset); }
     break;
 
   case 253:
-/* Line 1792 of yacc.c  */
 #line 1246 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display_elements = (yyvsp[(4) - (4)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display_elements = (yyvsp[0].pset); }
     break;
 
   case 254:
-/* Line 1792 of yacc.c  */
 #line 1247 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display_depths = (yyvsp[(4) - (4)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display_depths = (yyvsp[0].pset); }
     break;
 
   case 255:
-/* Line 1792 of yacc.c  */
 #line 1248 "gram.y"
-    { if (checkptr(setgrid, f_string)) setgrid->display_gridf = (yyvsp[(3) - (3)].pset); }
+    { if (checkptr(setgrid, f_string)) setgrid->display_gridf = (yyvsp[0].pset); }
     break;
 
   case 256:
-/* Line 1792 of yacc.c  */
 #line 1249 "gram.y"
     { if (checkptr(setgrid, f_string)) setisol = &(setgrid->ip); }
     break;
 
   case 258:
-/* Line 1792 of yacc.c  */
 #line 1251 "gram.y"
     { 
-		autoscale_grid((int) (yyvsp[(1) - (2)].pset), g[(int) (yyvsp[(1) - (2)].pset)].curgrid); 
-		set_defaults((int) (yyvsp[(1) - (2)].pset));
+		autoscale_grid((int) (yyvsp[-1].pset), g[(int) (yyvsp[-1].pset)].curgrid); 
+		set_defaults((int) (yyvsp[-1].pset));
 	}
     break;
 
   case 259:
-/* Line 1792 of yacc.c  */
 #line 1256 "gram.y"
     { 
 		autoscale_grid(curg, g[curg].curgrid); 
@@ -6818,39 +6348,34 @@ yyreduce:
     break;
 
   case 260:
-/* Line 1792 of yacc.c  */
 #line 1261 "gram.y"
     {
 		extern int readgridfile;
-		readgrid((int) (yyvsp[(3) - (4)].val), (char *) (yyvsp[(4) - (4)].str));
+		readgrid((int) (yyvsp[-1].val), (char *) (yyvsp[0].str));
 		readgridfile = 1;
 	}
     break;
 
   case 261:
-/* Line 1792 of yacc.c  */
 #line 1269 "gram.y"
-    { setdrogs = &g[curg].drogues[(int) (yyvsp[(3) - (3)].val)]; }
+    { setdrogs = &g[curg].drogues[(int) (yyvsp[0].val)]; }
     break;
 
   case 262:
-/* Line 1792 of yacc.c  */
 #line 1270 "gram.y"
-    {  setdrogs->display = (int) (yyvsp[(3) - (3)].pset); }
+    {  setdrogs->display = (int) (yyvsp[0].pset); }
     break;
 
   case 263:
-/* Line 1792 of yacc.c  */
 #line 1271 "gram.y"
     { setprops = &(setdrogs->p); }
     break;
 
   case 265:
-/* Line 1792 of yacc.c  */
 #line 1273 "gram.y"
     {
-    	if (!readdrogues(curdrog, (char *) (yyvsp[(3) - (3)].str), -1, 0, 0)) {
-        	fprintf(stderr, "Error reading file %s", (char *) (yyvsp[(3) - (3)].str));
+    	if (!readdrogues(curdrog, (char *) (yyvsp[0].str), -1, 0, 0)) {
+        	fprintf(stderr, "Error reading file %s", (char *) (yyvsp[0].str));
     	} else {
         	set_clock(0, drogues[curdrog].start, drogues[curdrog].stop,
                   drogues[curdrog].step,
@@ -6861,10 +6386,9 @@ yyreduce:
     break;
 
   case 266:
-/* Line 1792 of yacc.c  */
 #line 1284 "gram.y"
     {
-		readdrogues(0, (char *) (yyvsp[(3) - (9)].str), (int) (yyvsp[(5) - (9)].val), (int) (yyvsp[(7) - (9)].val), (int) (yyvsp[(9) - (9)].val));
+		readdrogues(0, (char *) (yyvsp[-6].str), (int) (yyvsp[-4].val), (int) (yyvsp[-2].val), (int) (yyvsp[0].val));
         	set_clock(0, drogues[curdrog].start, drogues[curdrog].stop,
                   drogues[curdrog].step,
                   drogues[curdrog].nsteps);
@@ -6873,61 +6397,51 @@ yyreduce:
     break;
 
   case 267:
-/* Line 1792 of yacc.c  */
 #line 1294 "gram.y"
-    { setisol->lactive = (yyvsp[(3) - (3)].pset); }
+    { setisol->lactive = (yyvsp[0].pset); }
     break;
 
   case 268:
-/* Line 1792 of yacc.c  */
 #line 1295 "gram.y"
-    { setisol->layout = (yyvsp[(4) - (4)].pset); }
+    { setisol->layout = (yyvsp[0].pset); }
     break;
 
   case 269:
-/* Line 1792 of yacc.c  */
 #line 1296 "gram.y"
-    { setisol->llabels = (yyvsp[(3) - (4)].pset); }
+    { setisol->llabels = (yyvsp[-1].pset); }
     break;
 
   case 270:
-/* Line 1792 of yacc.c  */
 #line 1297 "gram.y"
-    { setisol->frame = (int) (yyvsp[(4) - (4)].pset); }
+    { setisol->frame = (int) (yyvsp[0].pset); }
     break;
 
   case 271:
-/* Line 1792 of yacc.c  */
 #line 1298 "gram.y"
-    { setisol->framecol = (int) (yyvsp[(5) - (5)].val); }
+    { setisol->framecol = (int) (yyvsp[0].val); }
     break;
 
   case 272:
-/* Line 1792 of yacc.c  */
 #line 1299 "gram.y"
-    { setisol->nisol = (int) (yyvsp[(2) - (2)].val); }
+    { setisol->nisol = (int) (yyvsp[0].val); }
     break;
 
   case 273:
-/* Line 1792 of yacc.c  */
 #line 1300 "gram.y"
-    { setisol->type = (int) (yyvsp[(3) - (3)].val); }
+    { setisol->type = (int) (yyvsp[0].val); }
     break;
 
   case 274:
-/* Line 1792 of yacc.c  */
 #line 1301 "gram.y"
-    { setisol->isoltype = (int) (yyvsp[(4) - (4)].val); }
+    { setisol->isoltype = (int) (yyvsp[0].val); }
     break;
 
   case 275:
-/* Line 1792 of yacc.c  */
 #line 1302 "gram.y"
-    { setisol->visflag = (int) (yyvsp[(4) - (4)].val); }
+    { setisol->visflag = (int) (yyvsp[0].val); }
     break;
 
   case 276:
-/* Line 1792 of yacc.c  */
 #line 1303 "gram.y"
     { 
 		int i;
@@ -6940,7 +6454,6 @@ yyreduce:
     break;
 
   case 277:
-/* Line 1792 of yacc.c  */
 #line 1311 "gram.y"
     { 
 		int i;
@@ -6953,7 +6466,6 @@ yyreduce:
     break;
 
   case 278:
-/* Line 1792 of yacc.c  */
 #line 1319 "gram.y"
     { 
 		int i;
@@ -6961,38 +6473,35 @@ yyreduce:
 		for (i=0;i<MAXISOLINES;i++) {
     		    setisol->writelevel[i] = 0;
 		}
-		strncpy(setisol->wname, (char *) (yyvsp[(4) - (4)].str), 1023);
+		strncpy(setisol->wname, (char *) (yyvsp[0].str), 1023);
 	}
     break;
 
   case 279:
-/* Line 1792 of yacc.c  */
 #line 1327 "gram.y"
     { 
 		int i;
 		setisol->writeflag = 1; 
-		strncpy(setisol->wname, (char *) (yyvsp[(6) - (6)].str), 1023);
+		strncpy(setisol->wname, (char *) (yyvsp[0].str), 1023);
 		for (i=0;i<MAXISOLINES;i++) {
     		    setisol->writelevel[i] = 0;
 		}
-    		setisol->writelevel[(int) (yyvsp[(4) - (6)].val)] = 1;
+    		setisol->writelevel[(int) (yyvsp[-2].val)] = 1;
 	}
     break;
 
   case 280:
-/* Line 1792 of yacc.c  */
 #line 1336 "gram.y"
     { 
-    		setisol->writelevel[(int) (yyvsp[(4) - (4)].val)] = 1;
+    		setisol->writelevel[(int) (yyvsp[0].val)] = 1;
 	}
     break;
 
   case 281:
-/* Line 1792 of yacc.c  */
 #line 1339 "gram.y"
     {
-            setisol->cis[0] = (double) (yyvsp[(3) - (5)].val);
-            setisol->cint = (double) (yyvsp[(5) - (5)].val);
+            setisol->cis[0] = (double) (yyvsp[-2].val);
+            setisol->cint = (double) (yyvsp[0].val);
 	    if (setisol->isoltype == 0) {
 		int i;
 		for (i=1;i< 16;i++) {
@@ -7003,380 +6512,325 @@ yyreduce:
     break;
 
   case 282:
-/* Line 1792 of yacc.c  */
 #line 1349 "gram.y"
-    { setisol->cmin = (yyvsp[(3) - (5)].val); setisol->cmax = (yyvsp[(5) - (5)].val); }
+    { setisol->cmin = (yyvsp[-2].val); setisol->cmax = (yyvsp[0].val); }
     break;
 
   case 283:
-/* Line 1792 of yacc.c  */
 #line 1350 "gram.y"
-    { setisol->cis[(int) (yyvsp[(2) - (4)].val)] = (yyvsp[(4) - (4)].val); }
+    { setisol->cis[(int) (yyvsp[-2].val)] = (yyvsp[0].val); }
     break;
 
   case 284:
-/* Line 1792 of yacc.c  */
 #line 1351 "gram.y"
-    { setisol->loctype = (yyvsp[(4) - (4)].pset); }
+    { setisol->loctype = (yyvsp[0].pset); }
     break;
 
   case 285:
-/* Line 1792 of yacc.c  */
 #line 1352 "gram.y"
     {
-            setisol->x = (double) (yyvsp[(3) - (5)].val);
-            setisol->y = (double) (yyvsp[(5) - (5)].val);
+            setisol->x = (double) (yyvsp[-2].val);
+            setisol->y = (double) (yyvsp[0].val);
         }
     break;
 
   case 286:
-/* Line 1792 of yacc.c  */
 #line 1356 "gram.y"
-    { setisol->color[(int) (yyvsp[(2) - (4)].val)] = (int) (yyvsp[(4) - (4)].val); }
+    { setisol->color[(int) (yyvsp[-2].val)] = (int) (yyvsp[0].val); }
     break;
 
   case 287:
-/* Line 1792 of yacc.c  */
 #line 1357 "gram.y"
-    { setisol->linew[(int) (yyvsp[(2) - (4)].val)] = (int) (yyvsp[(4) - (4)].val); }
+    { setisol->linew[(int) (yyvsp[-2].val)] = (int) (yyvsp[0].val); }
     break;
 
   case 288:
-/* Line 1792 of yacc.c  */
 #line 1358 "gram.y"
-    { setisol->lines[(int) (yyvsp[(2) - (4)].val)] = (int) (yyvsp[(4) - (4)].val); }
+    { setisol->lines[(int) (yyvsp[-2].val)] = (int) (yyvsp[0].val); }
     break;
 
   case 289:
-/* Line 1792 of yacc.c  */
 #line 1359 "gram.y"
     { setprops = &(setisol->p); }
     break;
 
   case 291:
-/* Line 1792 of yacc.c  */
 #line 1360 "gram.y"
     { setprops = &(setisol->p); }
     break;
 
   case 293:
-/* Line 1792 of yacc.c  */
 #line 1361 "gram.y"
     {
-            setisol->xlen = (yyvsp[(4) - (6)].val);
-            setisol->ylen = (yyvsp[(6) - (6)].val);
+            setisol->xlen = (yyvsp[-2].val);
+            setisol->ylen = (yyvsp[0].val);
         }
     break;
 
   case 294:
-/* Line 1792 of yacc.c  */
 #line 1365 "gram.y"
     {
-            setisol->xgap = (yyvsp[(4) - (6)].val);
-            setisol->ygap = (yyvsp[(6) - (6)].val);
+            setisol->xgap = (yyvsp[-2].val);
+            setisol->ygap = (yyvsp[0].val);
         }
     break;
 
   case 295:
-/* Line 1792 of yacc.c  */
 #line 1372 "gram.y"
-    { sethistbox = &g[curg].hbox[(int) (yyvsp[(3) - (3)].val)]; }
+    { sethistbox = &g[curg].hbox[(int) (yyvsp[0].val)]; }
     break;
 
   case 296:
-/* Line 1792 of yacc.c  */
 #line 1373 "gram.y"
     { setprops = &(sethistbox->p); }
     break;
 
   case 298:
-/* Line 1792 of yacc.c  */
 #line 1375 "gram.y"
     {
-		sethistbox->precx = (int) (yyvsp[(3) - (5)].val);
-		sethistbox->precy = (int) (yyvsp[(5) - (5)].val);
+		sethistbox->precx = (int) (yyvsp[-2].val);
+		sethistbox->precy = (int) (yyvsp[0].val);
 	}
     break;
 
   case 299:
-/* Line 1792 of yacc.c  */
 #line 1379 "gram.y"
-    { sethistbox->attach = (int) (yyvsp[(3) - (3)].val); }
+    { sethistbox->attach = (int) (yyvsp[0].val); }
     break;
 
   case 300:
-/* Line 1792 of yacc.c  */
 #line 1380 "gram.y"
-    { sethistbox->xtickm = (double ) (yyvsp[(3) - (5)].val); sethistbox->ytickm = (double ) (yyvsp[(5) - (5)].val);}
+    { sethistbox->xtickm = (double ) (yyvsp[-2].val); sethistbox->ytickm = (double ) (yyvsp[0].val);}
     break;
 
   case 301:
-/* Line 1792 of yacc.c  */
 #line 1381 "gram.y"
-    { sethistbox->loctype = (int) (yyvsp[(3) - (3)].pset); }
+    { sethistbox->loctype = (int) (yyvsp[0].pset); }
     break;
 
   case 302:
-/* Line 1792 of yacc.c  */
 #line 1382 "gram.y"
-    { sethistbox->display_marker = (int) (yyvsp[(4) - (4)].pset); }
+    { sethistbox->display_marker = (int) (yyvsp[0].pset); }
     break;
 
   case 303:
-/* Line 1792 of yacc.c  */
 #line 1383 "gram.y"
-    { sethistbox->display = (int) (yyvsp[(3) - (3)].pset); }
+    { sethistbox->display = (int) (yyvsp[0].pset); }
     break;
 
   case 304:
-/* Line 1792 of yacc.c  */
 #line 1384 "gram.y"
-    { sethistbox->adcirc[(int) (yyvsp[(4) - (5)].val)] = (int) (yyvsp[(5) - (5)].pset) == TRUEP; }
+    { sethistbox->adcirc[(int) (yyvsp[-1].val)] = (int) (yyvsp[0].pset) == TRUEP; }
     break;
 
   case 305:
-/* Line 1792 of yacc.c  */
 #line 1385 "gram.y"
-    { sethistbox->ap[(int) (yyvsp[(4) - (6)].val)].color = (int) (yyvsp[(6) - (6)].val); }
+    { sethistbox->ap[(int) (yyvsp[-2].val)].color = (int) (yyvsp[0].val); }
     break;
 
   case 306:
-/* Line 1792 of yacc.c  */
 #line 1386 "gram.y"
-    { sethistbox->p.color = (yyvsp[(3) - (3)].val); }
+    { sethistbox->p.color = (yyvsp[0].val); }
     break;
 
   case 307:
-/* Line 1792 of yacc.c  */
 #line 1387 "gram.y"
-    { sethistbox->p.linew = (yyvsp[(3) - (3)].val); }
+    { sethistbox->p.linew = (yyvsp[0].val); }
     break;
 
   case 308:
-/* Line 1792 of yacc.c  */
 #line 1388 "gram.y"
-    { sethistbox->p.fillcol = (yyvsp[(4) - (4)].val); }
+    { sethistbox->p.fillcol = (yyvsp[0].val); }
     break;
 
   case 309:
-/* Line 1792 of yacc.c  */
 #line 1389 "gram.y"
-    { read_hist((int) (yyvsp[(3) - (4)].val), TIME, (char *) (yyvsp[(4) - (4)].str)); }
+    { read_hist((int) (yyvsp[-1].val), TIME, (char *) (yyvsp[0].str)); }
     break;
 
   case 310:
-/* Line 1792 of yacc.c  */
 #line 1390 "gram.y"
-    { sethistbox->thist = (int) (yyvsp[(4) - (4)].pset) == TRUEP; }
+    { sethistbox->thist = (int) (yyvsp[0].pset) == TRUEP; }
     break;
 
   case 311:
-/* Line 1792 of yacc.c  */
 #line 1391 "gram.y"
-    { sethistbox->hp.color = (int) (yyvsp[(5) - (5)].val); }
+    { sethistbox->hp.color = (int) (yyvsp[0].val); }
     break;
 
   case 312:
-/* Line 1792 of yacc.c  */
 #line 1393 "gram.y"
     { 
-		sethistbox->wx1 = (double) (yyvsp[(3) - (9)].val); 
-		sethistbox->wy1 = (double) (yyvsp[(5) - (9)].val); 
-		sethistbox->wx2 = (double) (yyvsp[(7) - (9)].val); 
-		sethistbox->wy2 = (double) (yyvsp[(9) - (9)].val); 
+		sethistbox->wx1 = (double) (yyvsp[-6].val); 
+		sethistbox->wy1 = (double) (yyvsp[-4].val); 
+		sethistbox->wx2 = (double) (yyvsp[-2].val); 
+		sethistbox->wy2 = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 313:
-/* Line 1792 of yacc.c  */
 #line 1400 "gram.y"
     { 
-		sethistbox->vx = (double) (yyvsp[(3) - (5)].val); 
-		sethistbox->vy = (double) (yyvsp[(5) - (5)].val); 
+		sethistbox->vx = (double) (yyvsp[-2].val); 
+		sethistbox->vy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 314:
-/* Line 1792 of yacc.c  */
 #line 1405 "gram.y"
     { 
-		sethistbox->locx = (double) (yyvsp[(3) - (5)].val); 
-		sethistbox->locy = (double) (yyvsp[(5) - (5)].val); 
+		sethistbox->locx = (double) (yyvsp[-2].val); 
+		sethistbox->locy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 315:
-/* Line 1792 of yacc.c  */
 #line 1410 "gram.y"
     { 
-		sethistbox->x = (double) (yyvsp[(3) - (5)].val); 
-		sethistbox->y = (double) (yyvsp[(5) - (5)].val); 
+		sethistbox->x = (double) (yyvsp[-2].val); 
+		sethistbox->y = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 316:
-/* Line 1792 of yacc.c  */
 #line 1417 "gram.y"
-    { setzoombox = &g[curg].zbox[(int) (yyvsp[(3) - (3)].val)]; }
+    { setzoombox = &g[curg].zbox[(int) (yyvsp[0].val)]; }
     break;
 
   case 317:
-/* Line 1792 of yacc.c  */
 #line 1418 "gram.y"
     { setprops = &(setzoombox->p); }
     break;
 
   case 319:
-/* Line 1792 of yacc.c  */
 #line 1420 "gram.y"
     {
-		setzoombox->precx = (int) (yyvsp[(3) - (5)].val);
-		setzoombox->precy = (int) (yyvsp[(5) - (5)].val);
+		setzoombox->precx = (int) (yyvsp[-2].val);
+		setzoombox->precy = (int) (yyvsp[0].val);
 	}
     break;
 
   case 320:
-/* Line 1792 of yacc.c  */
 #line 1424 "gram.y"
-    { setzoombox->attach = (int) (yyvsp[(3) - (3)].val); }
+    { setzoombox->attach = (int) (yyvsp[0].val); }
     break;
 
   case 321:
-/* Line 1792 of yacc.c  */
 #line 1425 "gram.y"
-    { setzoombox->loctype = (int) (yyvsp[(3) - (3)].pset); }
+    { setzoombox->loctype = (int) (yyvsp[0].pset); }
     break;
 
   case 322:
-/* Line 1792 of yacc.c  */
 #line 1426 "gram.y"
-    { setzoombox->display_marker = (int) (yyvsp[(4) - (4)].pset); }
+    { setzoombox->display_marker = (int) (yyvsp[0].pset); }
     break;
 
   case 323:
-/* Line 1792 of yacc.c  */
 #line 1427 "gram.y"
-    { setzoombox->active = (int) (yyvsp[(2) - (2)].pset); }
+    { setzoombox->active = (int) (yyvsp[0].pset); }
     break;
 
   case 324:
-/* Line 1792 of yacc.c  */
 #line 1428 "gram.y"
-    { setzoombox->display = (int) (yyvsp[(3) - (3)].pset); }
+    { setzoombox->display = (int) (yyvsp[0].pset); }
     break;
 
   case 325:
-/* Line 1792 of yacc.c  */
 #line 1429 "gram.y"
-    { setzoombox->expand = (int) (yyvsp[(3) - (3)].val); }
+    { setzoombox->expand = (int) (yyvsp[0].val); }
     break;
 
   case 326:
-/* Line 1792 of yacc.c  */
 #line 1430 "gram.y"
-    { setzoombox->expand = (int) (yyvsp[(3) - (3)].val); }
+    { setzoombox->expand = (int) (yyvsp[0].val); }
     break;
 
   case 327:
-/* Line 1792 of yacc.c  */
 #line 1431 "gram.y"
-    { setzoombox->p.color = (yyvsp[(3) - (3)].val); }
+    { setzoombox->p.color = (yyvsp[0].val); }
     break;
 
   case 328:
-/* Line 1792 of yacc.c  */
 #line 1432 "gram.y"
-    { setzoombox->p.linew = (yyvsp[(3) - (3)].val); }
+    { setzoombox->p.linew = (yyvsp[0].val); }
     break;
 
   case 329:
-/* Line 1792 of yacc.c  */
 #line 1433 "gram.y"
-    { setzoombox->p.fillcol = (yyvsp[(4) - (4)].val); }
+    { setzoombox->p.fillcol = (yyvsp[0].val); }
     break;
 
   case 330:
-/* Line 1792 of yacc.c  */
 #line 1435 "gram.y"
     { 
-		setzoombox->wx1 = (double) (yyvsp[(3) - (9)].val); 
-		setzoombox->wy1 = (double) (yyvsp[(5) - (9)].val); 
-		setzoombox->wx2 = (double) (yyvsp[(7) - (9)].val); 
-		setzoombox->wy2 = (double) (yyvsp[(9) - (9)].val); 
+		setzoombox->wx1 = (double) (yyvsp[-6].val); 
+		setzoombox->wy1 = (double) (yyvsp[-4].val); 
+		setzoombox->wx2 = (double) (yyvsp[-2].val); 
+		setzoombox->wy2 = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 331:
-/* Line 1792 of yacc.c  */
 #line 1442 "gram.y"
     { 
-		setzoombox->vx = (double) (yyvsp[(3) - (5)].val); 
-		setzoombox->vy = (double) (yyvsp[(5) - (5)].val); 
+		setzoombox->vx = (double) (yyvsp[-2].val); 
+		setzoombox->vy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 332:
-/* Line 1792 of yacc.c  */
 #line 1447 "gram.y"
     { 
-		setzoombox->locx = (double) (yyvsp[(3) - (5)].val); 
-		setzoombox->locy = (double) (yyvsp[(5) - (5)].val); 
+		setzoombox->locx = (double) (yyvsp[-2].val); 
+		setzoombox->locy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 333:
-/* Line 1792 of yacc.c  */
 #line 1452 "gram.y"
     { 
-		setzoombox->x = (double) (yyvsp[(3) - (5)].val); 
-		setzoombox->y = (double) (yyvsp[(5) - (5)].val); 
+		setzoombox->x = (double) (yyvsp[-2].val); 
+		setzoombox->y = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 334:
-/* Line 1792 of yacc.c  */
 #line 1459 "gram.y"
-    { g[curg].wl.active = (yyvsp[(2) - (2)].pset); }
+    { g[curg].wl.active = (yyvsp[0].pset); }
     break;
 
   case 335:
-/* Line 1792 of yacc.c  */
 #line 1460 "gram.y"
-    { g[curg].wl.len = (yyvsp[(3) - (3)].val); }
+    { g[curg].wl.len = (yyvsp[0].val); }
     break;
 
   case 336:
-/* Line 1792 of yacc.c  */
 #line 1461 "gram.y"
-    { g[curg].wl.scale = (yyvsp[(3) - (3)].val); }
+    { g[curg].wl.scale = (yyvsp[0].val); }
     break;
 
   case 337:
-/* Line 1792 of yacc.c  */
 #line 1462 "gram.y"
-    { g[curg].wl.p.color = (yyvsp[(3) - (3)].val); }
+    { g[curg].wl.p.color = (yyvsp[0].val); }
     break;
 
   case 338:
-/* Line 1792 of yacc.c  */
 #line 1463 "gram.y"
-    { g[curg].wl.loctype = (yyvsp[(3) - (3)].pset); }
+    { g[curg].wl.loctype = (yyvsp[0].pset); }
     break;
 
   case 339:
-/* Line 1792 of yacc.c  */
 #line 1465 "gram.y"
     { 
-		g[curg].wl.x = (yyvsp[(3) - (5)].val);
-		g[curg].wl.y = (yyvsp[(5) - (5)].val);
+		g[curg].wl.x = (yyvsp[-2].val);
+		g[curg].wl.y = (yyvsp[0].val);
 	}
     break;
 
   case 340:
-/* Line 1792 of yacc.c  */
 #line 1470 "gram.y"
     { 
-		g[curg].wl.units = (yyvsp[(3) - (3)].pset);
+		g[curg].wl.units = (yyvsp[0].pset);
 		switch (g[curg].wl.units) {
 		case MM: g[curg].wl.unitfac = 0.001; break;
 		case CM: g[curg].wl.unitfac = 0.01; break;
@@ -7388,55 +6842,47 @@ yyreduce:
     break;
 
   case 341:
-/* Line 1792 of yacc.c  */
 #line 1480 "gram.y"
     { }
     break;
 
   case 342:
-/* Line 1792 of yacc.c  */
 #line 1485 "gram.y"
-    { g[curg].vl.active = (yyvsp[(2) - (2)].pset); }
+    { g[curg].vl.active = (yyvsp[0].pset); }
     break;
 
   case 343:
-/* Line 1792 of yacc.c  */
 #line 1486 "gram.y"
-    { g[curg].vl.len = (yyvsp[(3) - (3)].val); }
+    { g[curg].vl.len = (yyvsp[0].val); }
     break;
 
   case 344:
-/* Line 1792 of yacc.c  */
 #line 1487 "gram.y"
-    { g[curg].vl.scale = (yyvsp[(3) - (3)].val); }
+    { g[curg].vl.scale = (yyvsp[0].val); }
     break;
 
   case 345:
-/* Line 1792 of yacc.c  */
 #line 1488 "gram.y"
-    { g[curg].vl.p.color = (yyvsp[(3) - (3)].val); }
+    { g[curg].vl.p.color = (yyvsp[0].val); }
     break;
 
   case 346:
-/* Line 1792 of yacc.c  */
 #line 1489 "gram.y"
-    { g[curg].vl.loctype = (yyvsp[(3) - (3)].pset); }
+    { g[curg].vl.loctype = (yyvsp[0].pset); }
     break;
 
   case 347:
-/* Line 1792 of yacc.c  */
 #line 1491 "gram.y"
     { 
-		g[curg].vl.x = (yyvsp[(3) - (5)].val);
-		g[curg].vl.y = (yyvsp[(5) - (5)].val);
+		g[curg].vl.x = (yyvsp[-2].val);
+		g[curg].vl.y = (yyvsp[0].val);
 	}
     break;
 
   case 348:
-/* Line 1792 of yacc.c  */
 #line 1496 "gram.y"
     { 
-		g[curg].vl.units = (yyvsp[(3) - (3)].pset);
+		g[curg].vl.units = (yyvsp[0].pset);
 		switch (g[curg].vl.units) {
 		case MM: g[curg].vl.unitfac = 0.001; break;
 		case CM: g[curg].vl.unitfac = 0.01; break;
@@ -7448,55 +6894,47 @@ yyreduce:
     break;
 
   case 349:
-/* Line 1792 of yacc.c  */
 #line 1506 "gram.y"
     { }
     break;
 
   case 350:
-/* Line 1792 of yacc.c  */
 #line 1510 "gram.y"
-    { g[curg].mapscale.active = (yyvsp[(2) - (2)].pset); }
+    { g[curg].mapscale.active = (yyvsp[0].pset); }
     break;
 
   case 351:
-/* Line 1792 of yacc.c  */
 #line 1511 "gram.y"
-    { g[curg].mapscale.len = (yyvsp[(3) - (3)].val); }
+    { g[curg].mapscale.len = (yyvsp[0].val); }
     break;
 
   case 352:
-/* Line 1792 of yacc.c  */
 #line 1512 "gram.y"
-    { g[curg].mapscale.p.color = (yyvsp[(3) - (3)].val); }
+    { g[curg].mapscale.p.color = (yyvsp[0].val); }
     break;
 
   case 353:
-/* Line 1792 of yacc.c  */
 #line 1513 "gram.y"
-    { g[curg].mapscale.scale = (yyvsp[(3) - (3)].val); }
+    { g[curg].mapscale.scale = (yyvsp[0].val); }
     break;
 
   case 354:
-/* Line 1792 of yacc.c  */
 #line 1514 "gram.y"
-    { g[curg].mapscale.loctype = (yyvsp[(3) - (3)].pset); }
+    { g[curg].mapscale.loctype = (yyvsp[0].pset); }
     break;
 
   case 355:
-/* Line 1792 of yacc.c  */
 #line 1516 "gram.y"
     { 
-		g[curg].mapscale.x = (yyvsp[(3) - (5)].val);
-		g[curg].mapscale.y = (yyvsp[(5) - (5)].val);
+		g[curg].mapscale.x = (yyvsp[-2].val);
+		g[curg].mapscale.y = (yyvsp[0].val);
 	}
     break;
 
   case 356:
-/* Line 1792 of yacc.c  */
 #line 1521 "gram.y"
     { 
-		g[curg].mapscale.units = (yyvsp[(3) - (3)].pset);
+		g[curg].mapscale.units = (yyvsp[0].pset);
 		switch (g[curg].mapscale.units) {
 		case MM: g[curg].mapscale.unitfac = 0.001; break;
 		case CM: g[curg].mapscale.unitfac = 0.01; break;
@@ -7508,450 +6946,381 @@ yyreduce:
     break;
 
   case 357:
-/* Line 1792 of yacc.c  */
 #line 1531 "gram.y"
     { }
     break;
 
   case 358:
-/* Line 1792 of yacc.c  */
 #line 1535 "gram.y"
-    { g[curg].tidalclock.active = (yyvsp[(2) - (2)].pset); }
+    { g[curg].tidalclock.active = (yyvsp[0].pset); }
     break;
 
   case 359:
-/* Line 1792 of yacc.c  */
 #line 1536 "gram.y"
-    { g[curg].tidalclock.p.color = (yyvsp[(3) - (3)].val); }
+    { g[curg].tidalclock.p.color = (yyvsp[0].val); }
     break;
 
   case 360:
-/* Line 1792 of yacc.c  */
 #line 1537 "gram.y"
-    { g[curg].tidalclock.p.fillcol = (yyvsp[(4) - (4)].val); }
+    { g[curg].tidalclock.p.fillcol = (yyvsp[0].val); }
     break;
 
   case 361:
-/* Line 1792 of yacc.c  */
 #line 1538 "gram.y"
-    { g[curg].tidalclock.total_time = (yyvsp[(4) - (4)].val); }
+    { g[curg].tidalclock.total_time = (yyvsp[0].val); }
     break;
 
   case 362:
-/* Line 1792 of yacc.c  */
 #line 1539 "gram.y"
-    { g[curg].tidalclock.loctype = (yyvsp[(3) - (3)].pset); }
+    { g[curg].tidalclock.loctype = (yyvsp[0].pset); }
     break;
 
   case 363:
-/* Line 1792 of yacc.c  */
 #line 1541 "gram.y"
     { 
-		g[curg].tidalclock.x = (yyvsp[(3) - (5)].val);
-		g[curg].tidalclock.y = (yyvsp[(5) - (5)].val);
+		g[curg].tidalclock.x = (yyvsp[-2].val);
+		g[curg].tidalclock.y = (yyvsp[0].val);
 	}
     break;
 
   case 364:
-/* Line 1792 of yacc.c  */
 #line 1545 "gram.y"
     { }
     break;
 
   case 365:
-/* Line 1792 of yacc.c  */
 #line 1549 "gram.y"
-    { g[curg].timeinfo.active = (yyvsp[(2) - (2)].pset); }
+    { g[curg].timeinfo.active = (yyvsp[0].pset); }
     break;
 
   case 366:
-/* Line 1792 of yacc.c  */
 #line 1551 "gram.y"
     { 
-		strcpy(g[curg].timeinfo.start, (char *) (yyvsp[(3) - (3)].str)); 
+		strcpy(g[curg].timeinfo.start, (char *) (yyvsp[0].str)); 
 		time_info_start(curg);
 	}
     break;
 
   case 367:
-/* Line 1792 of yacc.c  */
 #line 1556 "gram.y"
     {
-	    g[curg].timeinfo.x = (yyvsp[(2) - (4)].val);
-	    g[curg].timeinfo.y = (yyvsp[(4) - (4)].val);
+	    g[curg].timeinfo.x = (yyvsp[-2].val);
+	    g[curg].timeinfo.y = (yyvsp[0].val);
 	}
     break;
 
   case 368:
-/* Line 1792 of yacc.c  */
 #line 1560 "gram.y"
-    { g[curg].timeinfo.loctype = (yyvsp[(3) - (3)].pset); }
+    { g[curg].timeinfo.loctype = (yyvsp[0].pset); }
     break;
 
   case 369:
-/* Line 1792 of yacc.c  */
 #line 1561 "gram.y"
-    { g[curg].timeinfo.linew = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeinfo.linew = (int) (yyvsp[0].val); }
     break;
 
   case 370:
-/* Line 1792 of yacc.c  */
 #line 1562 "gram.y"
-    { g[curg].timeinfo.color = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeinfo.color = (int) (yyvsp[0].val); }
     break;
 
   case 371:
-/* Line 1792 of yacc.c  */
 #line 1563 "gram.y"
-    { g[curg].timeinfo.rot = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeinfo.rot = (int) (yyvsp[0].val); }
     break;
 
   case 372:
-/* Line 1792 of yacc.c  */
 #line 1564 "gram.y"
-    { g[curg].timeinfo.font = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeinfo.font = (int) (yyvsp[0].val); }
     break;
 
   case 373:
-/* Line 1792 of yacc.c  */
 #line 1565 "gram.y"
-    { g[curg].timeinfo.just = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeinfo.just = (int) (yyvsp[0].val); }
     break;
 
   case 374:
-/* Line 1792 of yacc.c  */
 #line 1566 "gram.y"
-    { g[curg].timeinfo.charsize = (double) (yyvsp[(4) - (4)].val); }
+    { g[curg].timeinfo.charsize = (double) (yyvsp[0].val); }
     break;
 
   case 375:
-/* Line 1792 of yacc.c  */
 #line 1567 "gram.y"
-    { strcpy(g[curg].timeinfo.format, (char *) (yyvsp[(3) - (3)].str)); }
+    { strcpy(g[curg].timeinfo.format, (char *) (yyvsp[0].str)); }
     break;
 
   case 376:
-/* Line 1792 of yacc.c  */
 #line 1571 "gram.y"
-    { g[curg].timeline.active = (int) (yyvsp[(2) - (2)].pset); }
+    { g[curg].timeline.active = (int) (yyvsp[0].pset); }
     break;
 
   case 377:
-/* Line 1792 of yacc.c  */
 #line 1572 "gram.y"
-    { g[curg].timeline.len = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeline.len = (int) (yyvsp[0].val); }
     break;
 
   case 378:
-/* Line 1792 of yacc.c  */
 #line 1573 "gram.y"
-    { g[curg].timeline.width = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeline.width = (int) (yyvsp[0].val); }
     break;
 
   case 379:
-/* Line 1792 of yacc.c  */
 #line 1574 "gram.y"
-    { g[curg].timeline.start = (double) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeline.start = (double) (yyvsp[0].val); }
     break;
 
   case 380:
-/* Line 1792 of yacc.c  */
 #line 1575 "gram.y"
-    { g[curg].timeline.stop = (double) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeline.stop = (double) (yyvsp[0].val); }
     break;
 
   case 381:
-/* Line 1792 of yacc.c  */
 #line 1576 "gram.y"
-    { g[curg].timeline.step = (double) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeline.step = (double) (yyvsp[0].val); }
     break;
 
   case 382:
-/* Line 1792 of yacc.c  */
 #line 1577 "gram.y"
-    { g[curg].timeline.p.prec = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeline.p.prec = (int) (yyvsp[0].val); }
     break;
 
   case 383:
-/* Line 1792 of yacc.c  */
 #line 1578 "gram.y"
-    { g[curg].timeline.units = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeline.units = (int) (yyvsp[0].val); }
     break;
 
   case 384:
-/* Line 1792 of yacc.c  */
 #line 1579 "gram.y"
-    { g[curg].timeline.c1 = g[curg].timeline.c3 = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].timeline.c1 = g[curg].timeline.c3 = (int) (yyvsp[0].val); }
     break;
 
   case 385:
-/* Line 1792 of yacc.c  */
 #line 1580 "gram.y"
-    { g[curg].timeline.c2 = (int) (yyvsp[(4) - (4)].val); }
+    { g[curg].timeline.c2 = (int) (yyvsp[0].val); }
     break;
 
   case 386:
-/* Line 1792 of yacc.c  */
 #line 1581 "gram.y"
-    { g[curg].timeline.loctype = (int) (yyvsp[(3) - (3)].pset); }
+    { g[curg].timeline.loctype = (int) (yyvsp[0].pset); }
     break;
 
   case 387:
-/* Line 1792 of yacc.c  */
 #line 1583 "gram.y"
     { 
-		g[curg].timeline.x = (double) (yyvsp[(3) - (5)].val);
-		g[curg].timeline.y = (double) (yyvsp[(5) - (5)].val);
+		g[curg].timeline.x = (double) (yyvsp[-2].val);
+		g[curg].timeline.y = (double) (yyvsp[0].val);
 	}
     break;
 
   case 388:
-/* Line 1792 of yacc.c  */
 #line 1587 "gram.y"
     { }
     break;
 
   case 389:
-/* Line 1792 of yacc.c  */
 #line 1591 "gram.y"
-    { setslice = &g[curg].sbox[(int) (yyvsp[(3) - (3)].val)]; }
+    { setslice = &g[curg].sbox[(int) (yyvsp[0].val)]; }
     break;
 
   case 390:
-/* Line 1792 of yacc.c  */
 #line 1592 "gram.y"
     { setprops = &(setslice->p); }
     break;
 
   case 392:
-/* Line 1792 of yacc.c  */
 #line 1594 "gram.y"
     {
-		setslice->precx = (int) (yyvsp[(3) - (5)].val);
-		setslice->precy = (int) (yyvsp[(5) - (5)].val);
+		setslice->precx = (int) (yyvsp[-2].val);
+		setslice->precy = (int) (yyvsp[0].val);
 	}
     break;
 
   case 393:
-/* Line 1792 of yacc.c  */
 #line 1598 "gram.y"
-    { setslice->attach = (int) (yyvsp[(3) - (3)].val); }
+    { setslice->attach = (int) (yyvsp[0].val); }
     break;
 
   case 394:
-/* Line 1792 of yacc.c  */
 #line 1599 "gram.y"
-    { setslice->loctype = (int) (yyvsp[(3) - (3)].pset); }
+    { setslice->loctype = (int) (yyvsp[0].pset); }
     break;
 
   case 395:
-/* Line 1792 of yacc.c  */
 #line 1600 "gram.y"
-    { setslice->display_marker = (int) (yyvsp[(4) - (4)].pset); }
+    { setslice->display_marker = (int) (yyvsp[0].pset); }
     break;
 
   case 396:
-/* Line 1792 of yacc.c  */
 #line 1601 "gram.y"
-    { setslice->active = (int) (yyvsp[(2) - (2)].pset); }
+    { setslice->active = (int) (yyvsp[0].pset); }
     break;
 
   case 397:
-/* Line 1792 of yacc.c  */
 #line 1602 "gram.y"
-    { setslice->display = (int) (yyvsp[(3) - (3)].pset); }
+    { setslice->display = (int) (yyvsp[0].pset); }
     break;
 
   case 398:
-/* Line 1792 of yacc.c  */
 #line 1603 "gram.y"
-    { setslice->p.color = (yyvsp[(3) - (3)].val); }
+    { setslice->p.color = (yyvsp[0].val); }
     break;
 
   case 399:
-/* Line 1792 of yacc.c  */
 #line 1604 "gram.y"
-    { setslice->p.linew = (yyvsp[(3) - (3)].val); }
+    { setslice->p.linew = (yyvsp[0].val); }
     break;
 
   case 400:
-/* Line 1792 of yacc.c  */
 #line 1605 "gram.y"
-    { setslice->p.fillcol = (yyvsp[(4) - (4)].val); }
+    { setslice->p.fillcol = (yyvsp[0].val); }
     break;
 
   case 401:
-/* Line 1792 of yacc.c  */
 #line 1607 "gram.y"
     { 
-		setslice->wx1 = (double) (yyvsp[(3) - (9)].val); 
-		setslice->wy1 = (double) (yyvsp[(5) - (9)].val); 
-		setslice->wx2 = (double) (yyvsp[(7) - (9)].val); 
-		setslice->wy2 = (double) (yyvsp[(9) - (9)].val); 
+		setslice->wx1 = (double) (yyvsp[-6].val); 
+		setslice->wy1 = (double) (yyvsp[-4].val); 
+		setslice->wx2 = (double) (yyvsp[-2].val); 
+		setslice->wy2 = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 402:
-/* Line 1792 of yacc.c  */
 #line 1614 "gram.y"
     { 
-		setslice->vx = (double) (yyvsp[(3) - (5)].val); 
-		setslice->vy = (double) (yyvsp[(5) - (5)].val); 
+		setslice->vx = (double) (yyvsp[-2].val); 
+		setslice->vy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 403:
-/* Line 1792 of yacc.c  */
 #line 1619 "gram.y"
     { 
-		setslice->locx = (double) (yyvsp[(3) - (5)].val); 
-		setslice->locy = (double) (yyvsp[(5) - (5)].val); 
+		setslice->locx = (double) (yyvsp[-2].val); 
+		setslice->locy = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 404:
-/* Line 1792 of yacc.c  */
 #line 1624 "gram.y"
     { 
-		setslice->x = (double) (yyvsp[(3) - (5)].val); 
-		setslice->y = (double) (yyvsp[(5) - (5)].val); 
+		setslice->x = (double) (yyvsp[-2].val); 
+		setslice->y = (double) (yyvsp[0].val); 
 	}
     break;
 
   case 405:
-/* Line 1792 of yacc.c  */
 #line 1631 "gram.y"
-    { setprops->color = (yyvsp[(3) - (3)].val); }
+    { setprops->color = (yyvsp[0].val); }
     break;
 
   case 406:
-/* Line 1792 of yacc.c  */
 #line 1632 "gram.y"
-    { setprops->linew = (yyvsp[(3) - (3)].val); }
+    { setprops->linew = (yyvsp[0].val); }
     break;
 
   case 407:
-/* Line 1792 of yacc.c  */
 #line 1633 "gram.y"
-    { setprops->lines = (yyvsp[(3) - (3)].val); }
+    { setprops->lines = (yyvsp[0].val); }
     break;
 
   case 408:
-/* Line 1792 of yacc.c  */
 #line 1634 "gram.y"
-    { setprops->format = (yyvsp[(3) - (3)].pset); }
+    { setprops->format = (yyvsp[0].pset); }
     break;
 
   case 409:
-/* Line 1792 of yacc.c  */
 #line 1635 "gram.y"
-    { setprops->font = (yyvsp[(3) - (3)].val); }
+    { setprops->font = (yyvsp[0].val); }
     break;
 
   case 410:
-/* Line 1792 of yacc.c  */
 #line 1636 "gram.y"
-    { setprops->prec = (yyvsp[(3) - (3)].val); }
+    { setprops->prec = (yyvsp[0].val); }
     break;
 
   case 411:
-/* Line 1792 of yacc.c  */
 #line 1637 "gram.y"
-    { setprops->charsize = (yyvsp[(4) - (4)].val); }
+    { setprops->charsize = (yyvsp[0].val); }
     break;
 
   case 412:
-/* Line 1792 of yacc.c  */
 #line 1638 "gram.y"
-    { setprops->symbol = (yyvsp[(3) - (3)].val); }
+    { setprops->symbol = (yyvsp[0].val); }
     break;
 
   case 413:
-/* Line 1792 of yacc.c  */
 #line 1639 "gram.y"
-    { setprops->symsize = (yyvsp[(4) - (4)].val); }
+    { setprops->symsize = (yyvsp[0].val); }
     break;
 
   case 414:
-/* Line 1792 of yacc.c  */
 #line 1640 "gram.y"
-    { setprops->fill = (yyvsp[(3) - (3)].pset); }
+    { setprops->fill = (yyvsp[0].pset); }
     break;
 
   case 415:
-/* Line 1792 of yacc.c  */
 #line 1641 "gram.y"
-    { setprops->fillusing = (yyvsp[(3) - (3)].pset); }
+    { setprops->fillusing = (yyvsp[0].pset); }
     break;
 
   case 416:
-/* Line 1792 of yacc.c  */
 #line 1642 "gram.y"
-    { setprops->fillcol = (yyvsp[(4) - (4)].val); }
+    { setprops->fillcol = (yyvsp[0].val); }
     break;
 
   case 417:
-/* Line 1792 of yacc.c  */
 #line 1643 "gram.y"
-    { setprops->fillpat = (yyvsp[(4) - (4)].val); }
+    { setprops->fillpat = (yyvsp[0].val); }
     break;
 
   case 418:
-/* Line 1792 of yacc.c  */
 #line 1644 "gram.y"
-    { setprops->arrow = (yyvsp[(3) - (3)].val); }
+    { setprops->arrow = (yyvsp[0].val); }
     break;
 
   case 419:
-/* Line 1792 of yacc.c  */
 #line 1645 "gram.y"
-    { setprops->atype = (yyvsp[(4) - (4)].val); }
+    { setprops->atype = (yyvsp[0].val); }
     break;
 
   case 420:
-/* Line 1792 of yacc.c  */
 #line 1646 "gram.y"
-    { setprops->asize = (yyvsp[(4) - (4)].val); }
+    { setprops->asize = (yyvsp[0].val); }
     break;
 
   case 421:
-/* Line 1792 of yacc.c  */
 #line 1650 "gram.y"
-    { curg = (int) (yyvsp[(2) - (2)].pset); }
+    { curg = (int) (yyvsp[0].pset); }
     break;
 
   case 422:
-/* Line 1792 of yacc.c  */
 #line 1651 "gram.y"
-    { curg = (int) (yyvsp[(3) - (3)].val); }
+    { curg = (int) (yyvsp[0].val); }
     break;
 
   case 423:
-/* Line 1792 of yacc.c  */
 #line 1652 "gram.y"
-    { kill_graph((yyvsp[(2) - (2)].pset)); }
+    { kill_graph((yyvsp[0].pset)); }
     break;
 
   case 424:
-/* Line 1792 of yacc.c  */
 #line 1653 "gram.y"
     { kill_graph(maxgraph); }
     break;
 
   case 425:
-/* Line 1792 of yacc.c  */
 #line 1655 "gram.y"
     {
 	    extern int go_locateflag;
-	    go_locateflag = ((yyvsp[(2) - (2)].pset) == ON);
+	    go_locateflag = ((yyvsp[0].pset) == ON);
 	}
     break;
 
   case 426:
-/* Line 1792 of yacc.c  */
 #line 1660 "gram.y"
     {
-	    cg = curg = (int) (yyvsp[(2) - (2)].pset);
+	    cg = curg = (int) (yyvsp[0].pset);
 	    draw_focus(curg);
 	    defineworld(g[curg].w.xg1, g[curg].w.yg1, g[curg].w.xg2, g[curg].w.yg2, 
 			islogx(curg), islogy(curg));
@@ -7962,1828 +7331,1573 @@ yyreduce:
     break;
 
   case 427:
-/* Line 1792 of yacc.c  */
 #line 1669 "gram.y"
-    { draw_focus_flag = (yyvsp[(2) - (2)].pset); }
+    { draw_focus_flag = (yyvsp[0].pset); }
     break;
 
   case 428:
-/* Line 1792 of yacc.c  */
 #line 1670 "gram.y"
-    { focus_policy = (yyvsp[(2) - (2)].pset); }
+    { focus_policy = (yyvsp[0].pset); }
     break;
 
   case 429:
-/* Line 1792 of yacc.c  */
 #line 1671 "gram.y"
-    { focus_policy = (yyvsp[(2) - (2)].pset); }
+    { focus_policy = (yyvsp[0].pset); }
     break;
 
   case 430:
-/* Line 1792 of yacc.c  */
 #line 1672 "gram.y"
-    { focus_policy = (yyvsp[(2) - (2)].pset); }
+    { focus_policy = (yyvsp[0].pset); }
     break;
 
   case 431:
-/* Line 1792 of yacc.c  */
 #line 1673 "gram.y"
-    { cursource = (yyvsp[(2) - (2)].pset); }
+    { cursource = (yyvsp[0].pset); }
     break;
 
   case 432:
-/* Line 1792 of yacc.c  */
 #line 1674 "gram.y"
     { push_world(); }
     break;
 
   case 433:
-/* Line 1792 of yacc.c  */
 #line 1675 "gram.y"
     { pop_world(); }
     break;
 
   case 434:
-/* Line 1792 of yacc.c  */
 #line 1676 "gram.y"
     { cycle_world_stack(); }
     break;
 
   case 435:
-/* Line 1792 of yacc.c  */
 #line 1677 "gram.y"
     {
-	    if ((int) (yyvsp[(2) - (2)].val) > 0)
-		show_world_stack((int) (yyvsp[(2) - (2)].val) - 1);
+	    if ((int) (yyvsp[0].val) > 0)
+		show_world_stack((int) (yyvsp[0].val) - 1);
 	}
     break;
 
   case 436:
-/* Line 1792 of yacc.c  */
 #line 1682 "gram.y"
     {
-	    add_world(curg, (yyvsp[(3) - (17)].val), (yyvsp[(5) - (17)].val), (yyvsp[(7) - (17)].val), (yyvsp[(9) - (17)].val), (yyvsp[(11) - (17)].val), (yyvsp[(13) - (17)].val), (yyvsp[(15) - (17)].val), (yyvsp[(17) - (17)].val));
+	    add_world(curg, (yyvsp[-14].val), (yyvsp[-12].val), (yyvsp[-10].val), (yyvsp[-8].val), (yyvsp[-6].val), (yyvsp[-4].val), (yyvsp[-2].val), (yyvsp[0].val));
 	}
     break;
 
   case 437:
-/* Line 1792 of yacc.c  */
 #line 1685 "gram.y"
     { clear_world_stack(); }
     break;
 
   case 438:
-/* Line 1792 of yacc.c  */
 #line 1687 "gram.y"
     {
-	    g[curg].w.xg1 = (yyvsp[(2) - (8)].val);
-	    g[curg].w.yg1 = (yyvsp[(4) - (8)].val);
-	    g[curg].w.xg2 = (yyvsp[(6) - (8)].val);
-	    g[curg].w.yg2 = (yyvsp[(8) - (8)].val);
+	    g[curg].w.xg1 = (yyvsp[-6].val);
+	    g[curg].w.yg1 = (yyvsp[-4].val);
+	    g[curg].w.xg2 = (yyvsp[-2].val);
+	    g[curg].w.yg2 = (yyvsp[0].val);
 	}
     break;
 
   case 439:
-/* Line 1792 of yacc.c  */
 #line 1693 "gram.y"
-    { g[curg].w.xg1 = (yyvsp[(3) - (3)].val); }
+    { g[curg].w.xg1 = (yyvsp[0].val); }
     break;
 
   case 440:
-/* Line 1792 of yacc.c  */
 #line 1694 "gram.y"
-    { g[curg].w.xg2 = (yyvsp[(3) - (3)].val); }
+    { g[curg].w.xg2 = (yyvsp[0].val); }
     break;
 
   case 441:
-/* Line 1792 of yacc.c  */
 #line 1695 "gram.y"
-    { g[curg].w.yg1 = (yyvsp[(3) - (3)].val); }
+    { g[curg].w.yg1 = (yyvsp[0].val); }
     break;
 
   case 442:
-/* Line 1792 of yacc.c  */
 #line 1696 "gram.y"
-    { g[curg].w.yg2 = (yyvsp[(3) - (3)].val); }
+    { g[curg].w.yg2 = (yyvsp[0].val); }
     break;
 
   case 443:
-/* Line 1792 of yacc.c  */
 #line 1698 "gram.y"
     {
-	    g[curg].v.xv1 = (yyvsp[(2) - (8)].val);
-	    g[curg].v.yv1 = (yyvsp[(4) - (8)].val);
-	    g[curg].v.xv2 = (yyvsp[(6) - (8)].val);
-	    g[curg].v.yv2 = (yyvsp[(8) - (8)].val);
+	    g[curg].v.xv1 = (yyvsp[-6].val);
+	    g[curg].v.yv1 = (yyvsp[-4].val);
+	    g[curg].v.xv2 = (yyvsp[-2].val);
+	    g[curg].v.yv2 = (yyvsp[0].val);
 	}
     break;
 
   case 444:
-/* Line 1792 of yacc.c  */
 #line 1704 "gram.y"
-    { g[curg].v.xv1 = (yyvsp[(3) - (3)].val); }
+    { g[curg].v.xv1 = (yyvsp[0].val); }
     break;
 
   case 445:
-/* Line 1792 of yacc.c  */
 #line 1705 "gram.y"
-    { g[curg].v.xv2 = (yyvsp[(3) - (3)].val); }
+    { g[curg].v.xv2 = (yyvsp[0].val); }
     break;
 
   case 446:
-/* Line 1792 of yacc.c  */
 #line 1706 "gram.y"
-    { g[curg].v.yv1 = (yyvsp[(3) - (3)].val); }
+    { g[curg].v.yv1 = (yyvsp[0].val); }
     break;
 
   case 447:
-/* Line 1792 of yacc.c  */
 #line 1707 "gram.y"
-    { g[curg].v.yv2 = (yyvsp[(3) - (3)].val); }
+    { g[curg].v.yv2 = (yyvsp[0].val); }
     break;
 
   case 448:
-/* Line 1792 of yacc.c  */
 #line 1708 "gram.y"
     {
-	    set_plotstr_string(&g[curg].labs.title, (char *) (yyvsp[(2) - (2)].str));
+	    set_plotstr_string(&g[curg].labs.title, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 449:
-/* Line 1792 of yacc.c  */
 #line 1711 "gram.y"
     {
-	    g[curg].labs.title.font = checkon(FONTP, g[curg].labs.title.font, (int) (yyvsp[(3) - (3)].val));
+	    g[curg].labs.title.font = checkon(FONTP, g[curg].labs.title.font, (int) (yyvsp[0].val));
 	}
     break;
 
   case 450:
-/* Line 1792 of yacc.c  */
 #line 1714 "gram.y"
-    { g[curg].labs.title.charsize = (yyvsp[(3) - (3)].val); }
+    { g[curg].labs.title.charsize = (yyvsp[0].val); }
     break;
 
   case 451:
-/* Line 1792 of yacc.c  */
 #line 1715 "gram.y"
     {
-	    g[curg].labs.title.color = checkon(COLOR, g[curg].labs.title.color, (int) (yyvsp[(3) - (3)].val));
+	    g[curg].labs.title.color = checkon(COLOR, g[curg].labs.title.color, (int) (yyvsp[0].val));
 	}
     break;
 
   case 452:
-/* Line 1792 of yacc.c  */
 #line 1719 "gram.y"
     {
-	    g[curg].labs.title.linew = checkon(LINEWIDTH, g[curg].labs.title.linew, (int) (yyvsp[(3) - (3)].val));
+	    g[curg].labs.title.linew = checkon(LINEWIDTH, g[curg].labs.title.linew, (int) (yyvsp[0].val));
 	}
     break;
 
   case 453:
-/* Line 1792 of yacc.c  */
 #line 1722 "gram.y"
     {
-	    set_plotstr_string(&g[curg].labs.stitle, (char *) (yyvsp[(2) - (2)].str));
+	    set_plotstr_string(&g[curg].labs.stitle, (char *) (yyvsp[0].str));
 	}
     break;
 
   case 454:
-/* Line 1792 of yacc.c  */
 #line 1725 "gram.y"
     {
-	    g[curg].labs.stitle.font = checkon(FONTP, g[curg].labs.stitle.font, (int) (yyvsp[(3) - (3)].val));
+	    g[curg].labs.stitle.font = checkon(FONTP, g[curg].labs.stitle.font, (int) (yyvsp[0].val));
 	}
     break;
 
   case 455:
-/* Line 1792 of yacc.c  */
 #line 1728 "gram.y"
-    { g[curg].labs.stitle.charsize = (yyvsp[(3) - (3)].val); }
+    { g[curg].labs.stitle.charsize = (yyvsp[0].val); }
     break;
 
   case 456:
-/* Line 1792 of yacc.c  */
 #line 1730 "gram.y"
     {
-	    g[curg].labs.stitle.color = checkon(COLOR, g[curg].labs.stitle.color, (int) (yyvsp[(3) - (3)].val));
+	    g[curg].labs.stitle.color = checkon(COLOR, g[curg].labs.stitle.color, (int) (yyvsp[0].val));
 	}
     break;
 
   case 457:
-/* Line 1792 of yacc.c  */
 #line 1734 "gram.y"
     {
-	    g[curg].labs.stitle.linew = checkon(LINEWIDTH, g[curg].labs.stitle.color, (int) (yyvsp[(3) - (3)].val));
+	    g[curg].labs.stitle.linew = checkon(LINEWIDTH, g[curg].labs.stitle.color, (int) (yyvsp[0].val));
 	}
     break;
 
   case 458:
-/* Line 1792 of yacc.c  */
 #line 1737 "gram.y"
-    { g[curg].f.active = (yyvsp[(2) - (2)].pset); }
+    { g[curg].f.active = (yyvsp[0].pset); }
     break;
 
   case 459:
-/* Line 1792 of yacc.c  */
 #line 1738 "gram.y"
-    { g[curg].f.type = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].f.type = (int) (yyvsp[0].val); }
     break;
 
   case 460:
-/* Line 1792 of yacc.c  */
 #line 1739 "gram.y"
-    { g[curg].f.lines = checkon(LINESTYLE, g[curg].f.lines, (int) (yyvsp[(3) - (3)].val)); }
+    { g[curg].f.lines = checkon(LINESTYLE, g[curg].f.lines, (int) (yyvsp[0].val)); }
     break;
 
   case 461:
-/* Line 1792 of yacc.c  */
 #line 1740 "gram.y"
-    { g[curg].f.linew = checkon(LINEWIDTH, g[curg].f.linew, (int) (yyvsp[(3) - (3)].val)); }
+    { g[curg].f.linew = checkon(LINEWIDTH, g[curg].f.linew, (int) (yyvsp[0].val)); }
     break;
 
   case 462:
-/* Line 1792 of yacc.c  */
 #line 1741 "gram.y"
-    { g[curg].f.color = checkon(COLOR, g[curg].f.color, (int) (yyvsp[(3) - (3)].val)); }
+    { g[curg].f.color = checkon(COLOR, g[curg].f.color, (int) (yyvsp[0].val)); }
     break;
 
   case 463:
-/* Line 1792 of yacc.c  */
 #line 1742 "gram.y"
-    { g[curg].f.fillbg = (yyvsp[(3) - (3)].pset); }
+    { g[curg].f.fillbg = (yyvsp[0].pset); }
     break;
 
   case 464:
-/* Line 1792 of yacc.c  */
 #line 1743 "gram.y"
-    { g[curg].f.bgcolor = (int) (yyvsp[(4) - (4)].val); }
+    { g[curg].f.bgcolor = (int) (yyvsp[0].val); }
     break;
 
   case 465:
-/* Line 1792 of yacc.c  */
 #line 1744 "gram.y"
-    { g[(yyvsp[(1) - (2)].pset)].active = (yyvsp[(2) - (2)].pset); }
+    { g[(yyvsp[-1].pset)].active = (yyvsp[0].pset); }
     break;
 
   case 466:
-/* Line 1792 of yacc.c  */
 #line 1745 "gram.y"
-    { g[(yyvsp[(1) - (3)].pset)].label = (yyvsp[(3) - (3)].pset); }
+    { g[(yyvsp[-2].pset)].label = (yyvsp[0].pset); }
     break;
 
   case 467:
-/* Line 1792 of yacc.c  */
 #line 1746 "gram.y"
-    { g[(yyvsp[(1) - (4)].pset)].auto_type = (yyvsp[(4) - (4)].pset); }
+    { g[(yyvsp[-3].pset)].auto_type = (yyvsp[0].pset); }
     break;
 
   case 468:
-/* Line 1792 of yacc.c  */
 #line 1747 "gram.y"
-    { g[(yyvsp[(1) - (4)].pset)].auto_type = (yyvsp[(4) - (4)].pset); }
+    { g[(yyvsp[-3].pset)].auto_type = (yyvsp[0].pset); }
     break;
 
   case 469:
-/* Line 1792 of yacc.c  */
 #line 1748 "gram.y"
-    { g[(yyvsp[(1) - (3)].pset)].parmsread = ((yyvsp[(3) - (3)].pset) == FALSEP); }
+    { g[(yyvsp[-2].pset)].parmsread = ((yyvsp[0].pset) == FALSEP); }
     break;
 
   case 470:
-/* Line 1792 of yacc.c  */
 #line 1749 "gram.y"
-    { g[(yyvsp[(1) - (3)].pset)].hidden = ((yyvsp[(3) - (3)].pset) == TRUEP); }
+    { g[(yyvsp[-2].pset)].hidden = ((yyvsp[0].pset) == TRUEP); }
     break;
 
   case 471:
-/* Line 1792 of yacc.c  */
 #line 1750 "gram.y"
-    { g[(yyvsp[(1) - (3)].pset)].type = (yyvsp[(3) - (3)].pset); }
+    { g[(yyvsp[-2].pset)].type = (yyvsp[0].pset); }
     break;
 
   case 472:
-/* Line 1792 of yacc.c  */
 #line 1751 "gram.y"
-    { g[(yyvsp[(1) - (3)].pset)].pointset = ((yyvsp[(3) - (3)].pset) == ON); }
+    { g[(yyvsp[-2].pset)].pointset = ((yyvsp[0].pset) == ON); }
     break;
 
   case 473:
-/* Line 1792 of yacc.c  */
 #line 1753 "gram.y"
     {
-	    g[(yyvsp[(1) - (5)].pset)].fx = (yyvsp[(4) - (5)].pset);
-	    g[(yyvsp[(1) - (5)].pset)].fy = (yyvsp[(5) - (5)].pset);
+	    g[(yyvsp[-4].pset)].fx = (yyvsp[-1].pset);
+	    g[(yyvsp[-4].pset)].fy = (yyvsp[0].pset);
 	}
     break;
 
   case 474:
-/* Line 1792 of yacc.c  */
 #line 1758 "gram.y"
     {
-	    g[(yyvsp[(1) - (6)].pset)].px = (yyvsp[(4) - (6)].val);
-	    g[(yyvsp[(1) - (6)].pset)].py = (yyvsp[(6) - (6)].val);
+	    g[(yyvsp[-5].pset)].px = (yyvsp[-2].val);
+	    g[(yyvsp[-5].pset)].py = (yyvsp[0].val);
 	}
     break;
 
   case 475:
-/* Line 1792 of yacc.c  */
 #line 1763 "gram.y"
     {
-	    g[(yyvsp[(1) - (6)].pset)].dsx = (yyvsp[(4) - (6)].val);
-	    g[(yyvsp[(1) - (6)].pset)].dsy = (yyvsp[(6) - (6)].val);
+	    g[(yyvsp[-5].pset)].dsx = (yyvsp[-2].val);
+	    g[(yyvsp[-5].pset)].dsy = (yyvsp[0].val);
 	}
     break;
 
   case 476:
-/* Line 1792 of yacc.c  */
 #line 1767 "gram.y"
-    { g[(yyvsp[(1) - (4)].pset)].pt_type = (int) (yyvsp[(4) - (4)].val); }
+    { g[(yyvsp[-3].pset)].pt_type = (int) (yyvsp[0].val); }
     break;
 
   case 479:
-/* Line 1792 of yacc.c  */
 #line 1773 "gram.y"
     {}
     break;
 
   case 480:
-/* Line 1792 of yacc.c  */
 #line 1774 "gram.y"
     {}
     break;
 
   case 481:
-/* Line 1792 of yacc.c  */
 #line 1775 "gram.y"
     {}
     break;
 
   case 482:
-/* Line 1792 of yacc.c  */
 #line 1779 "gram.y"
     {}
     break;
 
   case 483:
-/* Line 1792 of yacc.c  */
 #line 1780 "gram.y"
     {}
     break;
 
   case 484:
-/* Line 1792 of yacc.c  */
 #line 1781 "gram.y"
     {}
     break;
 
   case 485:
-/* Line 1792 of yacc.c  */
 #line 1782 "gram.y"
     {}
     break;
 
   case 486:
-/* Line 1792 of yacc.c  */
 #line 1783 "gram.y"
     {}
     break;
 
   case 487:
-/* Line 1792 of yacc.c  */
 #line 1784 "gram.y"
     {}
     break;
 
   case 488:
-/* Line 1792 of yacc.c  */
 #line 1788 "gram.y"
     {}
     break;
 
   case 489:
-/* Line 1792 of yacc.c  */
 #line 1789 "gram.y"
     {}
     break;
 
   case 490:
-/* Line 1792 of yacc.c  */
 #line 1790 "gram.y"
     {}
     break;
 
   case 491:
-/* Line 1792 of yacc.c  */
 #line 1794 "gram.y"
-    { set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (1)].pset), 0.0); }
+    { set_axis_prop(whichgraph, naxis, (yyvsp[0].pset), 0.0); }
     break;
 
   case 492:
-/* Line 1792 of yacc.c  */
 #line 1795 "gram.y"
-    { set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].val)); }
+    { set_axis_prop(whichgraph, naxis, (yyvsp[-1].pset), (yyvsp[0].val)); }
     break;
 
   case 493:
-/* Line 1792 of yacc.c  */
 #line 1796 "gram.y"
-    { set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].val)); }
+    { set_axis_prop(whichgraph, naxis, (yyvsp[-1].pset), (yyvsp[0].val)); }
     break;
 
   case 494:
-/* Line 1792 of yacc.c  */
 #line 1797 "gram.y"
-    { set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].val)); }
+    { set_axis_prop(whichgraph, naxis, (yyvsp[-1].pset), (yyvsp[0].val)); }
     break;
 
   case 495:
-/* Line 1792 of yacc.c  */
 #line 1798 "gram.y"
-    { set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].val)); }
+    { set_axis_prop(whichgraph, naxis, (yyvsp[-1].pset), (yyvsp[0].val)); }
     break;
 
   case 496:
-/* Line 1792 of yacc.c  */
 #line 1799 "gram.y"
-    { set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (3)].pset), (yyvsp[(3) - (3)].val)); }
+    { set_axis_prop(whichgraph, naxis, (yyvsp[-2].pset), (yyvsp[0].val)); }
     break;
 
   case 497:
-/* Line 1792 of yacc.c  */
 #line 1800 "gram.y"
-    { set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].pset)); }
+    { set_axis_prop(whichgraph, naxis, (yyvsp[-1].pset), (yyvsp[0].pset)); }
     break;
 
   case 498:
-/* Line 1792 of yacc.c  */
 #line 1805 "gram.y"
     {}
     break;
 
   case 499:
-/* Line 1792 of yacc.c  */
 #line 1806 "gram.y"
     {}
     break;
 
   case 500:
-/* Line 1792 of yacc.c  */
 #line 1807 "gram.y"
     {}
     break;
 
   case 501:
-/* Line 1792 of yacc.c  */
 #line 1808 "gram.y"
     {}
     break;
 
   case 502:
-/* Line 1792 of yacc.c  */
 #line 1809 "gram.y"
-    { g[curg].t[naxis].active = (yyvsp[(1) - (1)].pset); }
+    { g[curg].t[naxis].active = (yyvsp[0].pset); }
     break;
 
   case 503:
-/* Line 1792 of yacc.c  */
 #line 1819 "gram.y"
     {
-	    g[curg].t[naxis].t_flag = (yyvsp[(1) - (1)].pset);
-	    g[curg].t[naxis].t_mflag = (yyvsp[(1) - (1)].pset);
+	    g[curg].t[naxis].t_flag = (yyvsp[0].pset);
+	    g[curg].t[naxis].t_mflag = (yyvsp[0].pset);
 	}
     break;
 
   case 504:
-/* Line 1792 of yacc.c  */
 #line 1823 "gram.y"
-    { g[curg].t[naxis].t_flag = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].t_flag = (yyvsp[0].pset); }
     break;
 
   case 505:
-/* Line 1792 of yacc.c  */
 #line 1824 "gram.y"
-    { g[curg].t[naxis].t_mflag = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].t_mflag = (yyvsp[0].pset); }
     break;
 
   case 506:
-/* Line 1792 of yacc.c  */
 #line 1825 "gram.y"
-    { g[curg].t[naxis].tmajor = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tmajor = (yyvsp[0].val); }
     break;
 
   case 507:
-/* Line 1792 of yacc.c  */
 #line 1826 "gram.y"
-    { g[curg].t[naxis].tminor = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tminor = (yyvsp[0].val); }
     break;
 
   case 508:
-/* Line 1792 of yacc.c  */
 #line 1827 "gram.y"
-    { g[curg].t[naxis].offsx = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].offsx = (yyvsp[0].val); }
     break;
 
   case 509:
-/* Line 1792 of yacc.c  */
 #line 1828 "gram.y"
-    { g[curg].t[naxis].offsy = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].offsy = (yyvsp[0].val); }
     break;
 
   case 510:
-/* Line 1792 of yacc.c  */
 #line 1829 "gram.y"
-    { g[curg].t[naxis].alt = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].alt = (yyvsp[0].pset); }
     break;
 
   case 511:
-/* Line 1792 of yacc.c  */
 #line 1830 "gram.y"
-    { g[curg].t[naxis].tmin = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tmin = (yyvsp[0].val); }
     break;
 
   case 512:
-/* Line 1792 of yacc.c  */
 #line 1831 "gram.y"
-    { g[curg].t[naxis].tmax = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tmax = (yyvsp[0].val); }
     break;
 
   case 513:
-/* Line 1792 of yacc.c  */
 #line 1832 "gram.y"
-    { g[curg].t[naxis].t_num = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].t_num = (int) (yyvsp[0].val); }
     break;
 
   case 514:
-/* Line 1792 of yacc.c  */
 #line 1833 "gram.y"
-    { g[curg].t[naxis].t_inout = (yyvsp[(1) - (1)].pset); }
+    { g[curg].t[naxis].t_inout = (yyvsp[0].pset); }
     break;
 
   case 515:
-/* Line 1792 of yacc.c  */
 #line 1834 "gram.y"
-    { g[curg].t[naxis].t_log = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].t_log = (yyvsp[0].pset); }
     break;
 
   case 516:
-/* Line 1792 of yacc.c  */
 #line 1835 "gram.y"
-    { g[curg].t[naxis].t_size = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].t_size = (yyvsp[0].val); }
     break;
 
   case 517:
-/* Line 1792 of yacc.c  */
 #line 1836 "gram.y"
-    { g[curg].t[naxis].t_size = (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_size = (yyvsp[0].val); }
     break;
 
   case 518:
-/* Line 1792 of yacc.c  */
 #line 1837 "gram.y"
-    { g[curg].t[naxis].t_msize = (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_msize = (yyvsp[0].val); }
     break;
 
   case 519:
-/* Line 1792 of yacc.c  */
 #line 1838 "gram.y"
-    { g[curg].t[naxis].t_color = g[curg].t[naxis].t_mcolor = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].t_color = g[curg].t[naxis].t_mcolor = (int) (yyvsp[0].val); }
     break;
 
   case 520:
-/* Line 1792 of yacc.c  */
 #line 1839 "gram.y"
-    { g[curg].t[naxis].t_linew = g[curg].t[naxis].t_mlinew = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].t_linew = g[curg].t[naxis].t_mlinew = (int) (yyvsp[0].val); }
     break;
 
   case 521:
-/* Line 1792 of yacc.c  */
 #line 1840 "gram.y"
-    { g[curg].t[naxis].t_color = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_color = (int) (yyvsp[0].val); }
     break;
 
   case 522:
-/* Line 1792 of yacc.c  */
 #line 1841 "gram.y"
-    { g[curg].t[naxis].t_mcolor = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_mcolor = (int) (yyvsp[0].val); }
     break;
 
   case 523:
-/* Line 1792 of yacc.c  */
 #line 1842 "gram.y"
-    { g[curg].t[naxis].t_linew = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_linew = (int) (yyvsp[0].val); }
     break;
 
   case 524:
-/* Line 1792 of yacc.c  */
 #line 1843 "gram.y"
-    { g[curg].t[naxis].t_mlinew = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_mlinew = (int) (yyvsp[0].val); }
     break;
 
   case 525:
-/* Line 1792 of yacc.c  */
 #line 1844 "gram.y"
-    { g[curg].t[naxis].t_lines = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_lines = (int) (yyvsp[0].val); }
     break;
 
   case 526:
-/* Line 1792 of yacc.c  */
 #line 1845 "gram.y"
-    { g[curg].t[naxis].t_mlines = (int) (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_mlines = (int) (yyvsp[0].val); }
     break;
 
   case 527:
-/* Line 1792 of yacc.c  */
 #line 1846 "gram.y"
-    { g[curg].t[naxis].t_gridflag = (yyvsp[(3) - (3)].pset); }
+    { g[curg].t[naxis].t_gridflag = (yyvsp[0].pset); }
     break;
 
   case 528:
-/* Line 1792 of yacc.c  */
 #line 1847 "gram.y"
-    { g[curg].t[naxis].t_mgridflag = (yyvsp[(3) - (3)].pset); }
+    { g[curg].t[naxis].t_mgridflag = (yyvsp[0].pset); }
     break;
 
   case 529:
-/* Line 1792 of yacc.c  */
 #line 1848 "gram.y"
-    { g[curg].t[naxis].t_op = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].t_op = (yyvsp[0].pset); }
     break;
 
   case 530:
-/* Line 1792 of yacc.c  */
 #line 1849 "gram.y"
     { g[curg].t[naxis].t_type = AUTO; }
     break;
 
   case 531:
-/* Line 1792 of yacc.c  */
 #line 1850 "gram.y"
     { g[curg].t[naxis].t_type = SPEC; }
     break;
 
   case 532:
-/* Line 1792 of yacc.c  */
 #line 1851 "gram.y"
-    { g[curg].t[naxis].t_spec = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].t_spec = (int) (yyvsp[0].val); }
     break;
 
   case 533:
-/* Line 1792 of yacc.c  */
 #line 1852 "gram.y"
-    { g[curg].t[naxis].t_specloc[(int) (yyvsp[(1) - (3)].val)] = (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].t_specloc[(int) (yyvsp[-2].val)] = (yyvsp[0].val); }
     break;
 
   case 534:
-/* Line 1792 of yacc.c  */
 #line 1856 "gram.y"
     {}
     break;
 
   case 535:
-/* Line 1792 of yacc.c  */
 #line 1857 "gram.y"
     {}
     break;
 
   case 536:
-/* Line 1792 of yacc.c  */
 #line 1861 "gram.y"
-    { g[curg].t[naxis].tl_flag = (yyvsp[(1) - (1)].pset); }
+    { g[curg].t[naxis].tl_flag = (yyvsp[0].pset); }
     break;
 
   case 537:
-/* Line 1792 of yacc.c  */
 #line 1862 "gram.y"
     { g[curg].t[naxis].tl_type = AUTO; }
     break;
 
   case 538:
-/* Line 1792 of yacc.c  */
 #line 1863 "gram.y"
     { g[curg].t[naxis].tl_type = SPEC; }
     break;
 
   case 539:
-/* Line 1792 of yacc.c  */
 #line 1864 "gram.y"
-    { g[curg].t[naxis].tl_prec = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_prec = (int) (yyvsp[0].val); }
     break;
 
   case 540:
-/* Line 1792 of yacc.c  */
 #line 1865 "gram.y"
-    { g[curg].t[naxis].tl_format = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].tl_format = (yyvsp[0].pset); }
     break;
 
   case 541:
-/* Line 1792 of yacc.c  */
 #line 1866 "gram.y"
-    { g[curg].t[naxis].tl_format = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_format = (yyvsp[0].val); }
     break;
 
   case 542:
-/* Line 1792 of yacc.c  */
 #line 1867 "gram.y"
-    { strcpy(g[curg].t[naxis].tl_appstr, (char *) (yyvsp[(2) - (2)].str)); }
+    { strcpy(g[curg].t[naxis].tl_appstr, (char *) (yyvsp[0].str)); }
     break;
 
   case 543:
-/* Line 1792 of yacc.c  */
 #line 1868 "gram.y"
-    { strcpy(g[curg].t[naxis].tl_prestr, (char *) (yyvsp[(2) - (2)].str)); }
+    { strcpy(g[curg].t[naxis].tl_prestr, (char *) (yyvsp[0].str)); }
     break;
 
   case 544:
-/* Line 1792 of yacc.c  */
 #line 1869 "gram.y"
     { g[curg].t[naxis].tl_layout = HORIZONTAL; }
     break;
 
   case 545:
-/* Line 1792 of yacc.c  */
 #line 1870 "gram.y"
     { g[curg].t[naxis].tl_layout = VERTICAL; }
     break;
 
   case 546:
-/* Line 1792 of yacc.c  */
 #line 1871 "gram.y"
     { g[curg].t[naxis].tl_layout = SPEC; }
     break;
 
   case 547:
-/* Line 1792 of yacc.c  */
 #line 1872 "gram.y"
-    { g[curg].t[naxis].tl_angle = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_angle = (int) (yyvsp[0].val); }
     break;
 
   case 548:
-/* Line 1792 of yacc.c  */
 #line 1873 "gram.y"
-    { g[curg].t[naxis].tl_just = (int) (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].tl_just = (int) (yyvsp[0].pset); }
     break;
 
   case 549:
-/* Line 1792 of yacc.c  */
 #line 1874 "gram.y"
-    { g[curg].t[naxis].tl_skip = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_skip = (int) (yyvsp[0].val); }
     break;
 
   case 550:
-/* Line 1792 of yacc.c  */
 #line 1875 "gram.y"
-    { g[curg].t[naxis].tl_staggered = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_staggered = (int) (yyvsp[0].val); }
     break;
 
   case 551:
-/* Line 1792 of yacc.c  */
 #line 1876 "gram.y"
-    { g[curg].t[naxis].tl_op = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].tl_op = (yyvsp[0].pset); }
     break;
 
   case 552:
-/* Line 1792 of yacc.c  */
 #line 1877 "gram.y"
-    { g[curg].t[naxis].tl_sign = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].tl_sign = (yyvsp[0].pset); }
     break;
 
   case 553:
-/* Line 1792 of yacc.c  */
 #line 1878 "gram.y"
-    { g[curg].t[naxis].tl_start = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_start = (yyvsp[0].val); }
     break;
 
   case 554:
-/* Line 1792 of yacc.c  */
 #line 1879 "gram.y"
-    { g[curg].t[naxis].tl_stop = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_stop = (yyvsp[0].val); }
     break;
 
   case 555:
-/* Line 1792 of yacc.c  */
 #line 1880 "gram.y"
-    { g[curg].t[naxis].tl_starttype = (int) (yyvsp[(3) - (3)].pset); }
+    { g[curg].t[naxis].tl_starttype = (int) (yyvsp[0].pset); }
     break;
 
   case 556:
-/* Line 1792 of yacc.c  */
 #line 1881 "gram.y"
-    { g[curg].t[naxis].tl_starttype = (int) (yyvsp[(3) - (3)].pset); }
+    { g[curg].t[naxis].tl_starttype = (int) (yyvsp[0].pset); }
     break;
 
   case 557:
-/* Line 1792 of yacc.c  */
 #line 1882 "gram.y"
-    { g[curg].t[naxis].tl_stoptype = (int) (yyvsp[(3) - (3)].pset); }
+    { g[curg].t[naxis].tl_stoptype = (int) (yyvsp[0].pset); }
     break;
 
   case 558:
-/* Line 1792 of yacc.c  */
 #line 1883 "gram.y"
-    { g[curg].t[naxis].tl_stoptype = (int) (yyvsp[(3) - (3)].pset); }
+    { g[curg].t[naxis].tl_stoptype = (int) (yyvsp[0].pset); }
     break;
 
   case 559:
-/* Line 1792 of yacc.c  */
 #line 1884 "gram.y"
-    { g[curg].t[naxis].tl_vgap = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_vgap = (yyvsp[0].val); }
     break;
 
   case 560:
-/* Line 1792 of yacc.c  */
 #line 1885 "gram.y"
-    { g[curg].t[naxis].tl_hgap = (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_hgap = (yyvsp[0].val); }
     break;
 
   case 561:
-/* Line 1792 of yacc.c  */
 #line 1886 "gram.y"
-    { g[curg].t[naxis].tl_charsize = (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].tl_charsize = (yyvsp[0].val); }
     break;
 
   case 562:
-/* Line 1792 of yacc.c  */
 #line 1887 "gram.y"
-    { g[curg].t[naxis].tl_font = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_font = (int) (yyvsp[0].val); }
     break;
 
   case 563:
-/* Line 1792 of yacc.c  */
 #line 1888 "gram.y"
-    { g[curg].t[naxis].tl_color = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_color = (int) (yyvsp[0].val); }
     break;
 
   case 564:
-/* Line 1792 of yacc.c  */
 #line 1889 "gram.y"
-    { g[curg].t[naxis].tl_linew = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].tl_linew = (int) (yyvsp[0].val); }
     break;
 
   case 565:
-/* Line 1792 of yacc.c  */
 #line 1890 "gram.y"
-    { set_plotstr_string(&g[curg].t[naxis].t_speclab[(int) (yyvsp[(1) - (3)].val)], (char *) (yyvsp[(3) - (3)].str)); }
+    { set_plotstr_string(&g[curg].t[naxis].t_speclab[(int) (yyvsp[-2].val)], (char *) (yyvsp[0].str)); }
     break;
 
   case 566:
-/* Line 1792 of yacc.c  */
 #line 1894 "gram.y"
-    { set_plotstr_string(&g[curg].t[naxis].label, (char *) (yyvsp[(1) - (1)].str)); }
+    { set_plotstr_string(&g[curg].t[naxis].label, (char *) (yyvsp[0].str)); }
     break;
 
   case 567:
-/* Line 1792 of yacc.c  */
 #line 1895 "gram.y"
     { g[curg].t[naxis].label_layout = PERP; }
     break;
 
   case 568:
-/* Line 1792 of yacc.c  */
 #line 1896 "gram.y"
     { g[curg].t[naxis].label_layout = PARA; }
     break;
 
   case 569:
-/* Line 1792 of yacc.c  */
 #line 1897 "gram.y"
-    { g[curg].t[naxis].label_place = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].label_place = (yyvsp[0].pset); }
     break;
 
   case 570:
-/* Line 1792 of yacc.c  */
 #line 1898 "gram.y"
-    { g[curg].t[naxis].label_place = (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].label_place = (yyvsp[0].pset); }
     break;
 
   case 571:
-/* Line 1792 of yacc.c  */
 #line 1899 "gram.y"
     {
-	    g[curg].t[naxis].label.x = (yyvsp[(2) - (4)].val);
-	    g[curg].t[naxis].label.y = (yyvsp[(4) - (4)].val);
+	    g[curg].t[naxis].label.x = (yyvsp[-2].val);
+	    g[curg].t[naxis].label.y = (yyvsp[0].val);
 	}
     break;
 
   case 572:
-/* Line 1792 of yacc.c  */
 #line 1903 "gram.y"
-    { g[curg].t[naxis].label.just = (int) (yyvsp[(2) - (2)].pset); }
+    { g[curg].t[naxis].label.just = (int) (yyvsp[0].pset); }
     break;
 
   case 573:
-/* Line 1792 of yacc.c  */
 #line 1904 "gram.y"
-    { g[curg].t[naxis].label.charsize = (yyvsp[(3) - (3)].val); }
+    { g[curg].t[naxis].label.charsize = (yyvsp[0].val); }
     break;
 
   case 574:
-/* Line 1792 of yacc.c  */
 #line 1905 "gram.y"
-    { g[curg].t[naxis].label.font = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].label.font = (int) (yyvsp[0].val); }
     break;
 
   case 575:
-/* Line 1792 of yacc.c  */
 #line 1906 "gram.y"
-    { g[curg].t[naxis].label.color = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].label.color = (int) (yyvsp[0].val); }
     break;
 
   case 576:
-/* Line 1792 of yacc.c  */
 #line 1907 "gram.y"
-    { g[curg].t[naxis].label.linew = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].label.linew = (int) (yyvsp[0].val); }
     break;
 
   case 577:
-/* Line 1792 of yacc.c  */
 #line 1911 "gram.y"
-    { g[curg].t[naxis].t_drawbar = (yyvsp[(1) - (1)].pset); }
+    { g[curg].t[naxis].t_drawbar = (yyvsp[0].pset); }
     break;
 
   case 578:
-/* Line 1792 of yacc.c  */
 #line 1912 "gram.y"
-    { g[curg].t[naxis].t_drawbarcolor = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].t_drawbarcolor = (int) (yyvsp[0].val); }
     break;
 
   case 579:
-/* Line 1792 of yacc.c  */
 #line 1913 "gram.y"
-    { g[curg].t[naxis].t_drawbarlines = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].t_drawbarlines = (int) (yyvsp[0].val); }
     break;
 
   case 580:
-/* Line 1792 of yacc.c  */
 #line 1914 "gram.y"
-    { g[curg].t[naxis].t_drawbarlinew = (int) (yyvsp[(2) - (2)].val); }
+    { g[curg].t[naxis].t_drawbarlinew = (int) (yyvsp[0].val); }
     break;
 
   case 581:
-/* Line 1792 of yacc.c  */
 #line 1926 "gram.y"
     { (yyval.pset) = DISK; }
     break;
 
   case 582:
-/* Line 1792 of yacc.c  */
 #line 1927 "gram.y"
     { (yyval.pset) = PIPE; }
     break;
 
   case 583:
-/* Line 1792 of yacc.c  */
 #line 1931 "gram.y"
     { (yyval.pset) = RIGHT; }
     break;
 
   case 584:
-/* Line 1792 of yacc.c  */
 #line 1932 "gram.y"
     { (yyval.pset) = LEFT; }
     break;
 
   case 585:
-/* Line 1792 of yacc.c  */
 #line 1933 "gram.y"
     { (yyval.pset) = CENTER; }
     break;
 
   case 586:
-/* Line 1792 of yacc.c  */
 #line 1942 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 587:
-/* Line 1792 of yacc.c  */
 #line 1943 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 588:
-/* Line 1792 of yacc.c  */
 #line 1944 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 589:
-/* Line 1792 of yacc.c  */
 #line 1945 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 590:
-/* Line 1792 of yacc.c  */
 #line 1946 "gram.y"
     { (yyval.pset) = XYFIXED; }
     break;
 
   case 591:
-/* Line 1792 of yacc.c  */
 #line 1950 "gram.y"
     { (yyval.pset) = IN; }
     break;
 
   case 592:
-/* Line 1792 of yacc.c  */
 #line 1951 "gram.y"
     { (yyval.pset) = OUT; }
     break;
 
   case 593:
-/* Line 1792 of yacc.c  */
 #line 1952 "gram.y"
     { (yyval.pset) = BOTH; }
     break;
 
   case 594:
-/* Line 1792 of yacc.c  */
 #line 1956 "gram.y"
     { (yyval.pset) = NORMAL; }
     break;
 
   case 595:
-/* Line 1792 of yacc.c  */
 #line 1957 "gram.y"
     { (yyval.pset) = ABSOLUTE; }
     break;
 
   case 596:
-/* Line 1792 of yacc.c  */
 #line 1958 "gram.y"
     { (yyval.pset) = NEGATE; }
     break;
 
   case 597:
-/* Line 1792 of yacc.c  */
 #line 1971 "gram.y"
     { (yyval.pset) = DECIMAL; }
     break;
 
   case 598:
-/* Line 1792 of yacc.c  */
 #line 1972 "gram.y"
     { (yyval.pset) = EXPONENTIAL; }
     break;
 
   case 599:
-/* Line 1792 of yacc.c  */
 #line 1973 "gram.y"
     { (yyval.pset) = POWER; }
     break;
 
   case 600:
-/* Line 1792 of yacc.c  */
 #line 1974 "gram.y"
     { (yyval.pset) = GENERAL; }
     break;
 
   case 601:
-/* Line 1792 of yacc.c  */
 #line 1975 "gram.y"
     { (yyval.pset) = DDMMYY; }
     break;
 
   case 602:
-/* Line 1792 of yacc.c  */
 #line 1976 "gram.y"
     { (yyval.pset) = MMDDYY; }
     break;
 
   case 603:
-/* Line 1792 of yacc.c  */
 #line 1977 "gram.y"
     { (yyval.pset) = MMYY; }
     break;
 
   case 604:
-/* Line 1792 of yacc.c  */
 #line 1978 "gram.y"
     { (yyval.pset) = MMDD; }
     break;
 
   case 605:
-/* Line 1792 of yacc.c  */
 #line 1979 "gram.y"
     { (yyval.pset) = MONTHDAY; }
     break;
 
   case 606:
-/* Line 1792 of yacc.c  */
 #line 1980 "gram.y"
     { (yyval.pset) = DAYMONTH; }
     break;
 
   case 607:
-/* Line 1792 of yacc.c  */
 #line 1981 "gram.y"
     { (yyval.pset) = DDMONTHSYYHHMMSS; }
     break;
 
   case 608:
-/* Line 1792 of yacc.c  */
 #line 1982 "gram.y"
     { (yyval.pset) = MONTHS; }
     break;
 
   case 609:
-/* Line 1792 of yacc.c  */
 #line 1983 "gram.y"
     { (yyval.pset) = MONTHL; }
     break;
 
   case 610:
-/* Line 1792 of yacc.c  */
 #line 1984 "gram.y"
     { (yyval.pset) = DAYOFWEEKS; }
     break;
 
   case 611:
-/* Line 1792 of yacc.c  */
 #line 1985 "gram.y"
     { (yyval.pset) = DAYOFWEEKL; }
     break;
 
   case 612:
-/* Line 1792 of yacc.c  */
 #line 1986 "gram.y"
     { (yyval.pset) = DAYOFYEAR; }
     break;
 
   case 613:
-/* Line 1792 of yacc.c  */
 #line 1987 "gram.y"
     { (yyval.pset) = HMS; }
     break;
 
   case 614:
-/* Line 1792 of yacc.c  */
 #line 1988 "gram.y"
     { (yyval.pset) = MMDDHMS; }
     break;
 
   case 615:
-/* Line 1792 of yacc.c  */
 #line 1989 "gram.y"
     { (yyval.pset) = MMDDYYHMS; }
     break;
 
   case 616:
-/* Line 1792 of yacc.c  */
 #line 1990 "gram.y"
     { (yyval.pset) = DEGREESLON; }
     break;
 
   case 617:
-/* Line 1792 of yacc.c  */
 #line 1991 "gram.y"
     { (yyval.pset) = DEGREESMMLON; }
     break;
 
   case 618:
-/* Line 1792 of yacc.c  */
 #line 1992 "gram.y"
     { (yyval.pset) = DEGREESMMSSLON; }
     break;
 
   case 619:
-/* Line 1792 of yacc.c  */
 #line 1993 "gram.y"
     { (yyval.pset) = MMSSLON; }
     break;
 
   case 620:
-/* Line 1792 of yacc.c  */
 #line 1994 "gram.y"
     { (yyval.pset) = DEGREESLAT; }
     break;
 
   case 621:
-/* Line 1792 of yacc.c  */
 #line 1995 "gram.y"
     { (yyval.pset) = DEGREESMMLAT; }
     break;
 
   case 622:
-/* Line 1792 of yacc.c  */
 #line 1996 "gram.y"
     { (yyval.pset) = DEGREESMMSSLAT; }
     break;
 
   case 623:
-/* Line 1792 of yacc.c  */
 #line 1997 "gram.y"
     { (yyval.pset) = MMSSLAT; }
     break;
 
   case 624:
-/* Line 1792 of yacc.c  */
 #line 2000 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 625:
-/* Line 1792 of yacc.c  */
 #line 2001 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 626:
-/* Line 1792 of yacc.c  */
 #line 2005 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 627:
-/* Line 1792 of yacc.c  */
 #line 2006 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 628:
-/* Line 1792 of yacc.c  */
 #line 2007 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 629:
-/* Line 1792 of yacc.c  */
 #line 2008 "gram.y"
-    { (yyval.pset) = (yyvsp[(1) - (1)].pset); }
+    { (yyval.pset) = (yyvsp[0].pset); }
     break;
 
   case 630:
-/* Line 1792 of yacc.c  */
 #line 2012 "gram.y"
     { (yyval.pset) = ON; }
     break;
 
   case 631:
-/* Line 1792 of yacc.c  */
 #line 2013 "gram.y"
     { (yyval.pset) = OFF; }
     break;
 
   case 632:
-/* Line 1792 of yacc.c  */
 #line 2016 "gram.y"
     { (yyval.pset) = WORLD; }
     break;
 
   case 633:
-/* Line 1792 of yacc.c  */
 #line 2017 "gram.y"
     { (yyval.pset) = VIEW; }
     break;
 
   case 634:
-/* Line 1792 of yacc.c  */
 #line 2028 "gram.y"
     { (yyval.pset) = TRUEP; }
     break;
 
   case 635:
-/* Line 1792 of yacc.c  */
 #line 2029 "gram.y"
     { (yyval.pset) = FALSEP; }
     break;
 
   case 636:
-/* Line 1792 of yacc.c  */
 #line 2032 "gram.y"
     { (yyval.pset) = PATTERN; }
     break;
 
   case 637:
-/* Line 1792 of yacc.c  */
 #line 2033 "gram.y"
     { (yyval.pset) = COLOR; }
     break;
 
   case 638:
-/* Line 1792 of yacc.c  */
 #line 2034 "gram.y"
     { (yyval.pset) = NONE; }
     break;
 
   case 639:
-/* Line 1792 of yacc.c  */
 #line 2037 "gram.y"
     { (yyval.pset) = ABOVE; }
     break;
 
   case 640:
-/* Line 1792 of yacc.c  */
 #line 2038 "gram.y"
     { (yyval.pset) = BELOW; }
     break;
 
   case 641:
-/* Line 1792 of yacc.c  */
 #line 2039 "gram.y"
     { (yyval.pset) = LEFT; }
     break;
 
   case 642:
-/* Line 1792 of yacc.c  */
 #line 2040 "gram.y"
     { (yyval.pset) = RIGHT; }
     break;
 
   case 643:
-/* Line 1792 of yacc.c  */
 #line 2041 "gram.y"
     { (yyval.pset) = TOP; }
     break;
 
   case 644:
-/* Line 1792 of yacc.c  */
 #line 2042 "gram.y"
     { (yyval.pset) = BOTTOM ; }
     break;
 
   case 645:
-/* Line 1792 of yacc.c  */
 #line 2043 "gram.y"
     { (yyval.pset) = BOTH ; }
     break;
 
   case 646:
-/* Line 1792 of yacc.c  */
 #line 2047 "gram.y"
     { (yyval.pset) = MM; }
     break;
 
   case 647:
-/* Line 1792 of yacc.c  */
 #line 2048 "gram.y"
     { (yyval.pset) = CM; }
     break;
 
   case 648:
-/* Line 1792 of yacc.c  */
 #line 2049 "gram.y"
     { (yyval.pset) = M; }
     break;
 
   case 649:
-/* Line 1792 of yacc.c  */
 #line 2050 "gram.y"
     { (yyval.pset) = KM; }
     break;
 
   case 650:
-/* Line 1792 of yacc.c  */
 #line 2065 "gram.y"
     {
-	    int itmp = (int) (yyvsp[(3) - (6)].val) - 1;
+	    int itmp = (int) (yyvsp[-3].val) - 1;
 	    if (itmp >= ls) {
 		yyerror("subscript out of range");
 		return 1;
 	    } else {
-		(yyvsp[(1) - (6)].ptr)[itmp] = (yyvsp[(6) - (6)].val);
-		result = (yyvsp[(6) - (6)].val);
+		(yyvsp[-5].ptr)[itmp] = (yyvsp[0].val);
+		result = (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 651:
-/* Line 1792 of yacc.c  */
 #line 2079 "gram.y"
     {
 	    int i;
 	    for (i = 0; i < lxy; i++) {
-		(yyvsp[(1) - (3)].ptr)[i] = (yyvsp[(3) - (3)].ptr)[i];
+		(yyvsp[-2].ptr)[i] = (yyvsp[0].ptr)[i];
 	    }
-	    result = (yyvsp[(3) - (3)].ptr)[0];
+	    result = (yyvsp[0].ptr)[0];
 	}
     break;
 
   case 652:
-/* Line 1792 of yacc.c  */
 #line 2087 "gram.y"
     {
 	    int i;
 	    for (i = 0; i < lxy; i++) {
-		(yyvsp[(1) - (3)].ptr)[i] = (yyvsp[(3) - (3)].val);
+		(yyvsp[-2].ptr)[i] = (yyvsp[0].val);
 	    }
-	    result = (yyvsp[(3) - (3)].val);
+	    result = (yyvsp[0].val);
 	}
     break;
 
   case 653:
-/* Line 1792 of yacc.c  */
 #line 2098 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (1)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 654:
-/* Line 1792 of yacc.c  */
 #line 2107 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (1)].val);
+		(yyval.ptr)[i] = (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 655:
-/* Line 1792 of yacc.c  */
 #line 2116 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);
+		(yyval.ptr)[i] = (yyvsp[-2].val) + (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 656:
-/* Line 1792 of yacc.c  */
 #line 2125 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] + (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] + (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 657:
-/* Line 1792 of yacc.c  */
 #line 2134 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].val) + (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 658:
-/* Line 1792 of yacc.c  */
 #line 2143 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] + (yyvsp[(3) - (3)].val);
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] + (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 659:
-/* Line 1792 of yacc.c  */
 #line 2152 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);
+		(yyval.ptr)[i] = (yyvsp[-2].val) - (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 660:
-/* Line 1792 of yacc.c  */
 #line 2161 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] - (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] - (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 661:
-/* Line 1792 of yacc.c  */
 #line 2170 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].val) - (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 662:
-/* Line 1792 of yacc.c  */
 #line 2179 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] - (yyvsp[(3) - (3)].val);
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] - (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 663:
-/* Line 1792 of yacc.c  */
 #line 2188 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);
+		(yyval.ptr)[i] = (yyvsp[-2].val) * (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 664:
-/* Line 1792 of yacc.c  */
 #line 2197 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] * (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] * (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 665:
-/* Line 1792 of yacc.c  */
 #line 2206 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].val) * (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 666:
-/* Line 1792 of yacc.c  */
 #line 2215 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] * (yyvsp[(3) - (3)].val);
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] * (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 667:
-/* Line 1792 of yacc.c  */
 #line 2224 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
-	    if ((yyvsp[(3) - (3)].val) == 0.0) {
+	    if ((yyvsp[0].val) == 0.0) {
 		yyerror("Divide by Zero");
 		return 1;
 	    }
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);
+		(yyval.ptr)[i] = (yyvsp[-2].val) / (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 668:
-/* Line 1792 of yacc.c  */
 #line 2237 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		if ((yyvsp[(3) - (3)].ptr)[i] == 0.0) {
+		if ((yyvsp[0].ptr)[i] == 0.0) {
 		    yyerror("Divide by Zero");
 		    return 1;
 		}
 	    }
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] / (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] / (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 669:
-/* Line 1792 of yacc.c  */
 #line 2252 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		if ((yyvsp[(3) - (3)].ptr)[i] == 0.0) {
+		if ((yyvsp[0].ptr)[i] == 0.0) {
 		    yyerror("Divide by Zero");
 		    return 1;
 		}
 	    }
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].val) / (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 670:
-/* Line 1792 of yacc.c  */
 #line 2267 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
-	    if ((yyvsp[(3) - (3)].val) == 0.0) {
+	    if ((yyvsp[0].val) == 0.0) {
 		yyerror("Divide by Zero");
 		return 1;
 	    }
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] / (yyvsp[(3) - (3)].val);
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] / (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 671:
-/* Line 1792 of yacc.c  */
 #line 2280 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = pow((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val));
+		(yyval.ptr)[i] = pow((yyvsp[-2].val), (yyvsp[0].val));
 	    }
 	}
     break;
 
   case 672:
-/* Line 1792 of yacc.c  */
 #line 2289 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = pow((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].ptr)[i]);
+		(yyval.ptr)[i] = pow((yyvsp[-2].val), (yyvsp[0].ptr)[i]);
 	    }
 	}
     break;
 
   case 673:
-/* Line 1792 of yacc.c  */
 #line 2298 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = pow((yyvsp[(1) - (3)].ptr)[i], (yyvsp[(3) - (3)].val));
+		(yyval.ptr)[i] = pow((yyvsp[-2].ptr)[i], (yyvsp[0].val));
 	    }
 	}
     break;
 
   case 674:
-/* Line 1792 of yacc.c  */
 #line 2307 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = pow((yyvsp[(1) - (3)].ptr)[i], (yyvsp[(3) - (3)].ptr)[i]);
+		(yyval.ptr)[i] = pow((yyvsp[-2].ptr)[i], (yyvsp[0].ptr)[i]);
 	    }
 	}
     break;
 
   case 675:
-/* Line 1792 of yacc.c  */
 #line 2316 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = fabs((yyvsp[(3) - (4)].val));
+		(yyval.ptr)[i] = fabs((yyvsp[-1].val));
 	    }
 	}
     break;
 
   case 676:
-/* Line 1792 of yacc.c  */
 #line 2325 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = fabs((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = fabs((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 677:
-/* Line 1792 of yacc.c  */
 #line 2334 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = acos((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = acos((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 678:
-/* Line 1792 of yacc.c  */
 #line 2343 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = asin((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = asin((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 679:
-/* Line 1792 of yacc.c  */
 #line 2352 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = atan((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = atan((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 680:
-/* Line 1792 of yacc.c  */
 #line 2361 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = atan2((yyvsp[(3) - (6)].ptr)[i], (yyvsp[(5) - (6)].ptr)[i]);
+		(yyval.ptr)[i] = atan2((yyvsp[-3].ptr)[i], (yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 681:
-/* Line 1792 of yacc.c  */
 #line 2370 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = ceil((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = ceil((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 682:
-/* Line 1792 of yacc.c  */
 #line 2379 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = cos((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = cos((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 683:
-/* Line 1792 of yacc.c  */
 #line 2388 "gram.y"
     {
 	    int i;
@@ -9796,7 +8910,6 @@ yyreduce:
     break;
 
   case 684:
-/* Line 1792 of yacc.c  */
 #line 2397 "gram.y"
     {
 	    int i;
@@ -9809,7 +8922,6 @@ yyreduce:
     break;
 
   case 685:
-/* Line 1792 of yacc.c  */
 #line 2406 "gram.y"
     {
 	    int i;
@@ -9822,111 +8934,102 @@ yyreduce:
     break;
 
   case 686:
-/* Line 1792 of yacc.c  */
 #line 2415 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = erf((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = erf((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 687:
-/* Line 1792 of yacc.c  */
 #line 2424 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = erfc((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = erfc((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 688:
-/* Line 1792 of yacc.c  */
 #line 2433 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = exp((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = exp((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 689:
-/* Line 1792 of yacc.c  */
 #line 2442 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = floor((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = floor((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 690:
-/* Line 1792 of yacc.c  */
 #line 2451 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = hypot((yyvsp[(3) - (6)].ptr)[i], (yyvsp[(5) - (6)].ptr)[i]);
+		(yyval.ptr)[i] = hypot((yyvsp[-3].ptr)[i], (yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 691:
-/* Line 1792 of yacc.c  */
 #line 2460 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = hypot((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].ptr)[i]);
+		(yyval.ptr)[i] = hypot((yyvsp[-3].val), (yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 692:
-/* Line 1792 of yacc.c  */
 #line 2469 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = hypot((yyvsp[(3) - (6)].ptr)[i], (yyvsp[(5) - (6)].val));
+		(yyval.ptr)[i] = hypot((yyvsp[-3].ptr)[i], (yyvsp[-1].val));
 	    }
 	}
     break;
 
   case 693:
-/* Line 1792 of yacc.c  */
 #line 2478 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = hypot((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].val));
+		(yyval.ptr)[i] = hypot((yyvsp[-3].val), (yyvsp[-1].val));
 	    }
 	}
     break;
 
   case 694:
-/* Line 1792 of yacc.c  */
 #line 2487 "gram.y"
     {
 	    int i;
@@ -9939,150 +9042,138 @@ yyreduce:
     break;
 
   case 695:
-/* Line 1792 of yacc.c  */
 #line 2496 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (1)].func);
+		(yyval.ptr)[i] = (yyvsp[0].func);
 	    }
 	}
     break;
 
   case 696:
-/* Line 1792 of yacc.c  */
 #line 2505 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (int) (yyvsp[(3) - (4)].ptr)[i];
+		(yyval.ptr)[i] = (int) (yyvsp[-1].ptr)[i];
 	    }
 	}
     break;
 
   case 697:
-/* Line 1792 of yacc.c  */
 #line 2514 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = lrand48() % (long) ((yyvsp[(3) - (4)].val));
+		(yyval.ptr)[i] = lrand48() % (long) ((yyvsp[-1].val));
 	    }
 	}
     break;
 
   case 698:
-/* Line 1792 of yacc.c  */
 #line 2523 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = lgamma((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = lgamma((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 699:
-/* Line 1792 of yacc.c  */
 #line 2532 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = log((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = log((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 700:
-/* Line 1792 of yacc.c  */
 #line 2541 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = log10((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = log10((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 701:
-/* Line 1792 of yacc.c  */
 #line 2550 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = 1.0 / (1.0 + exp(-((yyvsp[(3) - (8)].ptr)[i] - (yyvsp[(5) - (8)].val))/ (yyvsp[(7) - (8)].val)));
+		(yyval.ptr)[i] = 1.0 / (1.0 + exp(-((yyvsp[-5].ptr)[i] - (yyvsp[-3].val))/ (yyvsp[-1].val)));
 	    }
 	}
     break;
 
   case 702:
-/* Line 1792 of yacc.c  */
 #line 2559 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(3) - (6)].ptr)[i] >= (yyvsp[(5) - (6)].ptr)[i] ? (yyvsp[(3) - (6)].ptr)[i] : (yyvsp[(5) - (6)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-3].ptr)[i] >= (yyvsp[-1].ptr)[i] ? (yyvsp[-3].ptr)[i] : (yyvsp[-1].ptr)[i];
 	    }
 	}
     break;
 
   case 703:
-/* Line 1792 of yacc.c  */
 #line 2568 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(3) - (6)].ptr)[i] <= (yyvsp[(5) - (6)].ptr)[i] ? (yyvsp[(3) - (6)].ptr)[i] : (yyvsp[(5) - (6)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-3].ptr)[i] <= (yyvsp[-1].ptr)[i] ? (yyvsp[-3].ptr)[i] : (yyvsp[-1].ptr)[i];
 	    }
 	}
     break;
 
   case 704:
-/* Line 1792 of yacc.c  */
 #line 2577 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = fmod((yyvsp[(3) - (6)].ptr)[i], (yyvsp[(5) - (6)].ptr)[i]);
+		(yyval.ptr)[i] = fmod((yyvsp[-3].ptr)[i], (yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 705:
-/* Line 1792 of yacc.c  */
 #line 2586 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = fx((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = fx((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 706:
-/* Line 1792 of yacc.c  */
 #line 2595 "gram.y"
     {
 	    int i;
@@ -10090,13 +9181,12 @@ yyreduce:
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = normp((yyvsp[(3) - (4)].ptr)[i], &tmp);
+		(yyval.ptr)[i] = normp((yyvsp[-1].ptr)[i], &tmp);
 	    }
 	}
     break;
 
   case 707:
-/* Line 1792 of yacc.c  */
 #line 2605 "gram.y"
     {
 	    int i;
@@ -10109,7 +9199,6 @@ yyreduce:
     break;
 
   case 708:
-/* Line 1792 of yacc.c  */
 #line 2614 "gram.y"
     {
 	    int i;
@@ -10122,7 +9211,6 @@ yyreduce:
     break;
 
   case 709:
-/* Line 1792 of yacc.c  */
 #line 2623 "gram.y"
     {
 	    int i;
@@ -10135,246 +9223,225 @@ yyreduce:
     break;
 
   case 710:
-/* Line 1792 of yacc.c  */
 #line 2632 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = sin((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = sin((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 711:
-/* Line 1792 of yacc.c  */
 #line 2641 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(3) - (4)].ptr)[i] * (yyvsp[(3) - (4)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-1].ptr)[i] * (yyvsp[-1].ptr)[i];
 	    }
 	}
     break;
 
   case 712:
-/* Line 1792 of yacc.c  */
 #line 2650 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = sqrt((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = sqrt((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 713:
-/* Line 1792 of yacc.c  */
 #line 2659 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = tan((yyvsp[(3) - (4)].ptr)[i]);
+		(yyval.ptr)[i] = tan((yyvsp[-1].ptr)[i]);
 	    }
 	}
     break;
 
   case 714:
-/* Line 1792 of yacc.c  */
 #line 2668 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] > (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] > (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 715:
-/* Line 1792 of yacc.c  */
 #line 2677 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] < (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] < (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 716:
-/* Line 1792 of yacc.c  */
 #line 2686 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] <= (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] <= (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 717:
-/* Line 1792 of yacc.c  */
 #line 2695 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] >= (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] >= (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 718:
-/* Line 1792 of yacc.c  */
 #line 2704 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] == (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] == (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 719:
-/* Line 1792 of yacc.c  */
 #line 2713 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] != (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] != (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 720:
-/* Line 1792 of yacc.c  */
 #line 2722 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] && (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] && (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 721:
-/* Line 1792 of yacc.c  */
 #line 2731 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(1) - (3)].ptr)[i] || (yyvsp[(3) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-2].ptr)[i] || (yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 722:
-/* Line 1792 of yacc.c  */
 #line 2740 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = !((yyvsp[(2) - (2)].ptr)[i]);
+		(yyval.ptr)[i] = !((yyvsp[0].ptr)[i]);
 	    }
 	}
     break;
 
   case 723:
-/* Line 1792 of yacc.c  */
 #line 2749 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = (yyvsp[(2) - (3)].ptr)[i];
+		(yyval.ptr)[i] = (yyvsp[-1].ptr)[i];
 	    }
 	}
     break;
 
   case 724:
-/* Line 1792 of yacc.c  */
 #line 2757 "gram.y"
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
 	    freelist[fcnt++] = (yyval.ptr);
 	    for (i = 0; i < lxy; i++) {
-		(yyval.ptr)[i] = -(yyvsp[(2) - (2)].ptr)[i];
+		(yyval.ptr)[i] = -(yyvsp[0].ptr)[i];
 	    }
 	}
     break;
 
   case 726:
-/* Line 1792 of yacc.c  */
 #line 2768 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (1)].val);
+	    (yyval.val) = (yyvsp[0].val);
 	}
     break;
 
   case 727:
-/* Line 1792 of yacc.c  */
 #line 2771 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (4)].ptr)[(int) (yyvsp[(3) - (4)].val)];
+	    (yyval.val) = (yyvsp[-3].ptr)[(int) (yyvsp[-1].val)];
 	}
     break;
 
   case 728:
-/* Line 1792 of yacc.c  */
 #line 2774 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) + (yyvsp[0].val);
 	}
     break;
 
   case 729:
-/* Line 1792 of yacc.c  */
 #line 2777 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) - (yyvsp[0].val);
 	}
     break;
 
   case 730:
-/* Line 1792 of yacc.c  */
 #line 2780 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) * (yyvsp[0].val);
 	}
     break;
 
   case 731:
-/* Line 1792 of yacc.c  */
 #line 2784 "gram.y"
     {
-	    if ((yyvsp[(3) - (3)].val) != 0.0) {
-		(yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);
+	    if ((yyvsp[0].val) != 0.0) {
+		(yyval.val) = (yyvsp[-2].val) / (yyvsp[0].val);
 	    } else {
 		yyerror("Divide by Zero");
 		return 1;
@@ -10383,79 +9450,69 @@ yyreduce:
     break;
 
   case 732:
-/* Line 1792 of yacc.c  */
 #line 2792 "gram.y"
     {
-	    (yyval.val) = fmod((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val));
+	    (yyval.val) = fmod((yyvsp[-2].val), (yyvsp[0].val));
 	}
     break;
 
   case 733:
-/* Line 1792 of yacc.c  */
 #line 2795 "gram.y"
     {
-	    (yyval.val) = pow((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val));
+	    (yyval.val) = pow((yyvsp[-2].val), (yyvsp[0].val));
 	}
     break;
 
   case 734:
-/* Line 1792 of yacc.c  */
 #line 2798 "gram.y"
     {
-	    (yyval.val) = fabs((yyvsp[(3) - (4)].val));
+	    (yyval.val) = fabs((yyvsp[-1].val));
 	}
     break;
 
   case 735:
-/* Line 1792 of yacc.c  */
 #line 2801 "gram.y"
     {
-	    (yyval.val) = acos((yyvsp[(3) - (4)].val));
+	    (yyval.val) = acos((yyvsp[-1].val));
 	}
     break;
 
   case 736:
-/* Line 1792 of yacc.c  */
 #line 2804 "gram.y"
     {
-	    (yyval.val) = asin((yyvsp[(3) - (4)].val));
+	    (yyval.val) = asin((yyvsp[-1].val));
 	}
     break;
 
   case 737:
-/* Line 1792 of yacc.c  */
 #line 2807 "gram.y"
     {
-	    (yyval.val) = atan((yyvsp[(3) - (4)].val));
+	    (yyval.val) = atan((yyvsp[-1].val));
 	}
     break;
 
   case 738:
-/* Line 1792 of yacc.c  */
 #line 2810 "gram.y"
     {
-	    (yyval.val) = atan2((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].val));
+	    (yyval.val) = atan2((yyvsp[-3].val), (yyvsp[-1].val));
 	}
     break;
 
   case 739:
-/* Line 1792 of yacc.c  */
 #line 2813 "gram.y"
     {
-	    (yyval.val) = ceil((yyvsp[(3) - (4)].val));
+	    (yyval.val) = ceil((yyvsp[-1].val));
 	}
     break;
 
   case 740:
-/* Line 1792 of yacc.c  */
 #line 2816 "gram.y"
     {
-	    (yyval.val) = cos((yyvsp[(3) - (4)].val));
+	    (yyval.val) = cos((yyvsp[-1].val));
 	}
     break;
 
   case 741:
-/* Line 1792 of yacc.c  */
 #line 2819 "gram.y"
     {
 	    (yyval.val) = 180.0 / M_PI;
@@ -10463,7 +9520,6 @@ yyreduce:
     break;
 
   case 742:
-/* Line 1792 of yacc.c  */
 #line 2822 "gram.y"
     {
 	    (yyval.val) = *xx;
@@ -10471,7 +9527,6 @@ yyreduce:
     break;
 
   case 743:
-/* Line 1792 of yacc.c  */
 #line 2825 "gram.y"
     {
 	    (yyval.val) = *yy;
@@ -10479,111 +9534,97 @@ yyreduce:
     break;
 
   case 744:
-/* Line 1792 of yacc.c  */
 #line 2828 "gram.y"
     {
-	    (yyval.val) = erf((yyvsp[(3) - (4)].val));
+	    (yyval.val) = erf((yyvsp[-1].val));
 	}
     break;
 
   case 745:
-/* Line 1792 of yacc.c  */
 #line 2831 "gram.y"
     {
-	    (yyval.val) = erfc((yyvsp[(3) - (4)].val));
+	    (yyval.val) = erfc((yyvsp[-1].val));
 	}
     break;
 
   case 746:
-/* Line 1792 of yacc.c  */
 #line 2834 "gram.y"
     {
-	    (yyval.val) = exp((yyvsp[(3) - (4)].val));
+	    (yyval.val) = exp((yyvsp[-1].val));
 	}
     break;
 
   case 747:
-/* Line 1792 of yacc.c  */
 #line 2837 "gram.y"
     {
-	    (yyval.val) = floor((yyvsp[(3) - (4)].val));
+	    (yyval.val) = floor((yyvsp[-1].val));
 	}
     break;
 
   case 748:
-/* Line 1792 of yacc.c  */
 #line 2840 "gram.y"
     {
-	    (yyval.val) = hypot((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].val));
+	    (yyval.val) = hypot((yyvsp[-3].val), (yyvsp[-1].val));
 	}
     break;
 
   case 749:
-/* Line 1792 of yacc.c  */
 #line 2843 "gram.y"
     {
-	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].v.xv1;
+	    (yyval.val) = g[(yyvsp[-2].pset)].v.xv1;
 	}
     break;
 
   case 750:
-/* Line 1792 of yacc.c  */
 #line 2846 "gram.y"
     {
-	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].v.xv2;
+	    (yyval.val) = g[(yyvsp[-2].pset)].v.xv2;
 	}
     break;
 
   case 751:
-/* Line 1792 of yacc.c  */
 #line 2849 "gram.y"
     {
-	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].v.yv1;
+	    (yyval.val) = g[(yyvsp[-2].pset)].v.yv1;
 	}
     break;
 
   case 752:
-/* Line 1792 of yacc.c  */
 #line 2852 "gram.y"
     {
-	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].v.yv2;
+	    (yyval.val) = g[(yyvsp[-2].pset)].v.yv2;
 	}
     break;
 
   case 753:
-/* Line 1792 of yacc.c  */
 #line 2855 "gram.y"
     {
-	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].w.xg1;
+	    (yyval.val) = g[(yyvsp[-2].pset)].w.xg1;
 	}
     break;
 
   case 754:
-/* Line 1792 of yacc.c  */
 #line 2858 "gram.y"
     {
-	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].w.xg2;
+	    (yyval.val) = g[(yyvsp[-2].pset)].w.xg2;
 	}
     break;
 
   case 755:
-/* Line 1792 of yacc.c  */
 #line 2861 "gram.y"
     {
-	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].w.yg1;
+	    (yyval.val) = g[(yyvsp[-2].pset)].w.yg1;
 	}
     break;
 
   case 756:
-/* Line 1792 of yacc.c  */
 #line 2864 "gram.y"
     {
-	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].w.yg2;
+	    (yyval.val) = g[(yyvsp[-2].pset)].w.yg2;
 	}
     break;
 
   case 757:
-/* Line 1792 of yacc.c  */
 #line 2867 "gram.y"
     {
 	    (yyval.val) = g[curg].v.xv1;
@@ -10591,7 +9632,6 @@ yyreduce:
     break;
 
   case 758:
-/* Line 1792 of yacc.c  */
 #line 2870 "gram.y"
     {
 	    (yyval.val) = g[curg].v.xv2;
@@ -10599,7 +9639,6 @@ yyreduce:
     break;
 
   case 759:
-/* Line 1792 of yacc.c  */
 #line 2873 "gram.y"
     {
 	    (yyval.val) = g[curg].v.yv1;
@@ -10607,7 +9646,6 @@ yyreduce:
     break;
 
   case 760:
-/* Line 1792 of yacc.c  */
 #line 2876 "gram.y"
     {
 	    (yyval.val) = g[curg].v.yv2;
@@ -10615,7 +9653,6 @@ yyreduce:
     break;
 
   case 761:
-/* Line 1792 of yacc.c  */
 #line 2879 "gram.y"
     {
 	    (yyval.val) = g[curg].w.xg1;
@@ -10623,7 +9660,6 @@ yyreduce:
     break;
 
   case 762:
-/* Line 1792 of yacc.c  */
 #line 2882 "gram.y"
     {
 	    (yyval.val) = g[curg].w.xg2;
@@ -10631,7 +9667,6 @@ yyreduce:
     break;
 
   case 763:
-/* Line 1792 of yacc.c  */
 #line 2885 "gram.y"
     {
 	    (yyval.val) = g[curg].w.yg1;
@@ -10639,7 +9674,6 @@ yyreduce:
     break;
 
   case 764:
-/* Line 1792 of yacc.c  */
 #line 2888 "gram.y"
     {
 	    (yyval.val) = g[curg].w.yg2;
@@ -10647,7 +9681,6 @@ yyreduce:
     break;
 
   case 765:
-/* Line 1792 of yacc.c  */
 #line 2891 "gram.y"
     {
 	    (yyval.val) = setindex;
@@ -10655,7 +9688,6 @@ yyreduce:
     break;
 
   case 766:
-/* Line 1792 of yacc.c  */
 #line 2894 "gram.y"
     {
 	    (yyval.val) = setsetno;
@@ -10663,96 +9695,84 @@ yyreduce:
     break;
 
   case 767:
-/* Line 1792 of yacc.c  */
 #line 2897 "gram.y"
     {
-	    (yyval.val) = (long) (yyvsp[(3) - (4)].val);
+	    (yyval.val) = (long) (yyvsp[-1].val);
 	}
     break;
 
   case 768:
-/* Line 1792 of yacc.c  */
 #line 2900 "gram.y"
     {
-	    (yyval.val) = lrand48() % (long) ((yyvsp[(3) - (4)].val));
+	    (yyval.val) = lrand48() % (long) ((yyvsp[-1].val));
 	}
     break;
 
   case 769:
-/* Line 1792 of yacc.c  */
 #line 2903 "gram.y"
     {
-	    (yyval.val) = lgamma((yyvsp[(3) - (4)].val));
+	    (yyval.val) = lgamma((yyvsp[-1].val));
 	}
     break;
 
   case 770:
-/* Line 1792 of yacc.c  */
 #line 2906 "gram.y"
     {
-	    (yyval.val) = log((yyvsp[(3) - (4)].val));
+	    (yyval.val) = log((yyvsp[-1].val));
 	}
     break;
 
   case 771:
-/* Line 1792 of yacc.c  */
 #line 2909 "gram.y"
     {
-	    (yyval.val) = log10((yyvsp[(3) - (4)].val));
+	    (yyval.val) = log10((yyvsp[-1].val));
 	}
     break;
 
   case 772:
-/* Line 1792 of yacc.c  */
 #line 2913 "gram.y"
     {
-	    (yyval.val) = 1.0 / (1.0 + exp(-((yyvsp[(3) - (8)].val) - (yyvsp[(5) - (8)].val))/ (yyvsp[(7) - (8)].val)));
+	    (yyval.val) = 1.0 / (1.0 + exp(-((yyvsp[-5].val) - (yyvsp[-3].val))/ (yyvsp[-1].val)));
 	}
     break;
 
   case 773:
-/* Line 1792 of yacc.c  */
 #line 2916 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(3) - (6)].val) >= (yyvsp[(5) - (6)].val) ? (yyvsp[(3) - (6)].val) : (yyvsp[(5) - (6)].val);
+	    (yyval.val) = (yyvsp[-3].val) >= (yyvsp[-1].val) ? (yyvsp[-3].val) : (yyvsp[-1].val);
 	}
     break;
 
   case 774:
-/* Line 1792 of yacc.c  */
 #line 2919 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(3) - (6)].val) <= (yyvsp[(5) - (6)].val) ? (yyvsp[(3) - (6)].val) : (yyvsp[(5) - (6)].val);
+	    (yyval.val) = (yyvsp[-3].val) <= (yyvsp[-1].val) ? (yyvsp[-3].val) : (yyvsp[-1].val);
 	}
     break;
 
   case 775:
-/* Line 1792 of yacc.c  */
 #line 2922 "gram.y"
     {
-	    (yyval.val) = fmod((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].val));
+	    (yyval.val) = fmod((yyvsp[-3].val), (yyvsp[-1].val));
 	}
     break;
 
   case 776:
-/* Line 1792 of yacc.c  */
 #line 2925 "gram.y"
     {
-	    (yyval.val) = fx((yyvsp[(3) - (4)].val));
+	    (yyval.val) = fx((yyvsp[-1].val));
 	}
     break;
 
   case 777:
-/* Line 1792 of yacc.c  */
 #line 2928 "gram.y"
     {
 	    double tmp;
-	    (yyval.val) = normp((yyvsp[(3) - (4)].val), &tmp);
+	    (yyval.val) = normp((yyvsp[-1].val), &tmp);
 	}
     break;
 
   case 778:
-/* Line 1792 of yacc.c  */
 #line 2932 "gram.y"
     {
 	    (yyval.val) = M_PI;
@@ -10760,7 +9780,6 @@ yyreduce:
     break;
 
   case 779:
-/* Line 1792 of yacc.c  */
 #line 2935 "gram.y"
     {
 	    (yyval.val) = M_PI / 180.0;
@@ -10768,7 +9787,6 @@ yyreduce:
     break;
 
   case 780:
-/* Line 1792 of yacc.c  */
 #line 2938 "gram.y"
     {
 	    (yyval.val) = (double) drand48();
@@ -10776,169 +9794,144 @@ yyreduce:
     break;
 
   case 781:
-/* Line 1792 of yacc.c  */
 #line 2941 "gram.y"
     {
-	    (yyval.val) = sin((yyvsp[(3) - (4)].val));
+	    (yyval.val) = sin((yyvsp[-1].val));
 	}
     break;
 
   case 782:
-/* Line 1792 of yacc.c  */
 #line 2944 "gram.y"
     {
-	    (yyval.val) = pow((yyvsp[(3) - (4)].val), 2.0);
+	    (yyval.val) = pow((yyvsp[-1].val), 2.0);
 	}
     break;
 
   case 783:
-/* Line 1792 of yacc.c  */
 #line 2947 "gram.y"
     {
-	    (yyval.val) = sqrt((yyvsp[(3) - (4)].val));
+	    (yyval.val) = sqrt((yyvsp[-1].val));
 	}
     break;
 
   case 784:
-/* Line 1792 of yacc.c  */
 #line 2950 "gram.y"
     {
-	    (yyval.val) = tan((yyvsp[(3) - (4)].val));
+	    (yyval.val) = tan((yyvsp[-1].val));
 	}
     break;
 
   case 785:
-/* Line 1792 of yacc.c  */
 #line 2953 "gram.y"
     {
-	    if ((int) (yyvsp[(3) - (5)].val))
-		(yyval.val) = (yyvsp[(5) - (5)].val);
+	    if ((int) (yyvsp[-2].val))
+		(yyval.val) = (yyvsp[0].val);
 	}
     break;
 
   case 786:
-/* Line 1792 of yacc.c  */
 #line 2957 "gram.y"
     {
-	    if ((int) (yyvsp[(3) - (7)].val)) {
-		(yyval.val) = (yyvsp[(5) - (7)].val);
+	    if ((int) (yyvsp[-4].val)) {
+		(yyval.val) = (yyvsp[-2].val);
 	    } else {
-		(yyval.val) = (yyvsp[(7) - (7)].val);
+		(yyval.val) = (yyvsp[0].val);
 	    }
 	}
     break;
 
   case 787:
-/* Line 1792 of yacc.c  */
 #line 2964 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) > (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) > (yyvsp[0].val);
 	}
     break;
 
   case 788:
-/* Line 1792 of yacc.c  */
 #line 2967 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) < (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) < (yyvsp[0].val);
 	}
     break;
 
   case 789:
-/* Line 1792 of yacc.c  */
 #line 2970 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) <= (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) <= (yyvsp[0].val);
 	}
     break;
 
   case 790:
-/* Line 1792 of yacc.c  */
 #line 2973 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) >= (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) >= (yyvsp[0].val);
 	}
     break;
 
   case 791:
-/* Line 1792 of yacc.c  */
 #line 2976 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) == (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) == (yyvsp[0].val);
 	}
     break;
 
   case 792:
-/* Line 1792 of yacc.c  */
 #line 2979 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) != (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) != (yyvsp[0].val);
 	}
     break;
 
   case 793:
-/* Line 1792 of yacc.c  */
 #line 2982 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) && (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) && (yyvsp[0].val);
 	}
     break;
 
   case 794:
-/* Line 1792 of yacc.c  */
 #line 2985 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(1) - (3)].val) || (yyvsp[(3) - (3)].val);
+	    (yyval.val) = (yyvsp[-2].val) || (yyvsp[0].val);
 	}
     break;
 
   case 795:
-/* Line 1792 of yacc.c  */
 #line 2988 "gram.y"
     {
-	    (yyval.val) = !((yyvsp[(2) - (2)].val));
+	    (yyval.val) = !((yyvsp[0].val));
 	}
     break;
 
   case 796:
-/* Line 1792 of yacc.c  */
 #line 2991 "gram.y"
     {
-	    (yyval.val) = (yyvsp[(2) - (3)].val);
+	    (yyval.val) = (yyvsp[-1].val);
 	}
     break;
 
   case 797:
-/* Line 1792 of yacc.c  */
 #line 2994 "gram.y"
     {
-	    (yyval.val) = -(yyvsp[(2) - (2)].val);
+	    (yyval.val) = -(yyvsp[0].val);
 	}
     break;
 
 
-/* Line 1792 of yacc.c  */
-#line 10922 "y.tab.c"
       default: break;
     }
-  /* User semantic actions sometimes alter yychar, and that requires
-     that yytoken be updated with the new translation.  We take the
-     approach of translating immediately before every use of yytoken.
-     One alternative is translating here after every semantic action,
-     but that translation would be missed if the semantic action invokes
-     YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
-     if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
-     incorrect destructor might then be invoked immediately.  In the
-     case of YYERROR or YYBACKUP, subsequent parser actions might lead
-     to an incorrect destructor call or verbose syntax error message
-     before the lookahead is translated.  */
-  YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
 
-  YYPOPSTACK (yylen);
-  yylen = 0;
+/* Line 1126 of yacc.c.  */
+#line 9926 "y.tab.c"
+
+  yyvsp -= yylen;
+  yyssp -= yylen;
+
+
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
+
 
   /* Now `shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -10959,72 +9952,137 @@ yyreduce:
 | yyerrlab -- here on detecting error |
 `------------------------------------*/
 yyerrlab:
-  /* Make sure we have latest lookahead translation.  See comments at
-     user semantic actions for why this is necessary.  */
-  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
-
   /* If not already recovering from an error, report this error.  */
   if (!yyerrstatus)
     {
       ++yynerrs;
-#if ! YYERROR_VERBOSE
-      yyerror (YY_("syntax error"));
-#else
-# define YYSYNTAX_ERROR yysyntax_error (&yymsg_alloc, &yymsg, \
-                                        yyssp, yytoken)
-      {
-        char const *yymsgp = YY_("syntax error");
-        int yysyntax_error_status;
-        yysyntax_error_status = YYSYNTAX_ERROR;
-        if (yysyntax_error_status == 0)
-          yymsgp = yymsg;
-        else if (yysyntax_error_status == 1)
-          {
-            if (yymsg != yymsgbuf)
-              YYSTACK_FREE (yymsg);
-            yymsg = (char *) YYSTACK_ALLOC (yymsg_alloc);
-            if (!yymsg)
-              {
-                yymsg = yymsgbuf;
-                yymsg_alloc = sizeof yymsgbuf;
-                yysyntax_error_status = 2;
-              }
-            else
-              {
-                yysyntax_error_status = YYSYNTAX_ERROR;
-                yymsgp = yymsg;
-              }
-          }
-        yyerror (yymsgp);
-        if (yysyntax_error_status == 2)
-          goto yyexhaustedlab;
-      }
-# undef YYSYNTAX_ERROR
+#if YYERROR_VERBOSE
+      yyn = yypact[yystate];
+
+      if (YYPACT_NINF < yyn && yyn < YYLAST)
+	{
+	  int yytype = YYTRANSLATE (yychar);
+	  YYSIZE_T yysize0 = yytnamerr (0, yytname[yytype]);
+	  YYSIZE_T yysize = yysize0;
+	  YYSIZE_T yysize1;
+	  int yysize_overflow = 0;
+	  char *yymsg = 0;
+#	  define YYERROR_VERBOSE_ARGS_MAXIMUM 5
+	  char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+	  int yyx;
+
+#if 0
+	  /* This is so xgettext sees the translatable formats that are
+	     constructed on the fly.  */
+	  YY_("syntax error, unexpected %s");
+	  YY_("syntax error, unexpected %s, expecting %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s or %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
 #endif
+	  char *yyfmt;
+	  char const *yyf;
+	  static char const yyunexpected[] = "syntax error, unexpected %s";
+	  static char const yyexpecting[] = ", expecting %s";
+	  static char const yyor[] = " or %s";
+	  char yyformat[sizeof yyunexpected
+			+ sizeof yyexpecting - 1
+			+ ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2)
+			   * (sizeof yyor - 1))];
+	  char const *yyprefix = yyexpecting;
+
+	  /* Start YYX at -YYN if negative to avoid negative indexes in
+	     YYCHECK.  */
+	  int yyxbegin = yyn < 0 ? -yyn : 0;
+
+	  /* Stay within bounds of both yycheck and yytname.  */
+	  int yychecklim = YYLAST - yyn;
+	  int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+	  int yycount = 1;
+
+	  yyarg[0] = yytname[yytype];
+	  yyfmt = yystpcpy (yyformat, yyunexpected);
+
+	  for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+	    if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
+	      {
+		if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+		  {
+		    yycount = 1;
+		    yysize = yysize0;
+		    yyformat[sizeof yyunexpected - 1] = '\0';
+		    break;
+		  }
+		yyarg[yycount++] = yytname[yyx];
+		yysize1 = yysize + yytnamerr (0, yytname[yyx]);
+		yysize_overflow |= yysize1 < yysize;
+		yysize = yysize1;
+		yyfmt = yystpcpy (yyfmt, yyprefix);
+		yyprefix = yyor;
+	      }
+
+	  yyf = YY_(yyformat);
+	  yysize1 = yysize + yystrlen (yyf);
+	  yysize_overflow |= yysize1 < yysize;
+	  yysize = yysize1;
+
+	  if (!yysize_overflow && yysize <= YYSTACK_ALLOC_MAXIMUM)
+	    yymsg = (char *) YYSTACK_ALLOC (yysize);
+	  if (yymsg)
+	    {
+	      /* Avoid sprintf, as that infringes on the user's name space.
+		 Don't have undefined behavior even if the translation
+		 produced a string with the wrong number of "%s"s.  */
+	      char *yyp = yymsg;
+	      int yyi = 0;
+	      while ((*yyp = *yyf))
+		{
+		  if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
+		    {
+		      yyp += yytnamerr (yyp, yyarg[yyi++]);
+		      yyf += 2;
+		    }
+		  else
+		    {
+		      yyp++;
+		      yyf++;
+		    }
+		}
+	      yyerror (yymsg);
+	      YYSTACK_FREE (yymsg);
+	    }
+	  else
+	    {
+	      yyerror (YY_("syntax error"));
+	      goto yyexhaustedlab;
+	    }
+	}
+      else
+#endif /* YYERROR_VERBOSE */
+	yyerror (YY_("syntax error"));
     }
 
 
 
   if (yyerrstatus == 3)
     {
-      /* If just tried and failed to reuse lookahead token after an
+      /* If just tried and failed to reuse look-ahead token after an
 	 error, discard it.  */
 
       if (yychar <= YYEOF)
-	{
+        {
 	  /* Return failure if at end of input.  */
 	  if (yychar == YYEOF)
 	    YYABORT;
-	}
+        }
       else
 	{
-	  yydestruct ("Error: discarding",
-		      yytoken, &yylval);
+	  yydestruct ("Error: discarding", yytoken, &yylval);
 	  yychar = YYEMPTY;
 	}
     }
 
-  /* Else will try to reuse lookahead token after shifting the error
+  /* Else will try to reuse look-ahead token after shifting the error
      token.  */
   goto yyerrlab1;
 
@@ -11037,14 +10095,11 @@ yyerrorlab:
   /* Pacify compilers like GCC when the user code never invokes
      YYERROR and the label yyerrorlab therefore never appears in user
      code.  */
-  if (/*CONSTCOND*/ 0)
+  if (0)
      goto yyerrorlab;
 
-  /* Do not reclaim the symbols of the rule which action triggered
-     this YYERROR.  */
-  YYPOPSTACK (yylen);
-  yylen = 0;
-  YY_STACK_PRINT (yyss, yyssp);
+yyvsp -= yylen;
+  yyssp -= yylen;
   yystate = *yyssp;
   goto yyerrlab1;
 
@@ -11058,7 +10113,7 @@ yyerrlab1:
   for (;;)
     {
       yyn = yypact[yystate];
-      if (!yypact_value_is_default (yyn))
+      if (yyn != YYPACT_NINF)
 	{
 	  yyn += YYTERROR;
 	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
@@ -11074,19 +10129,19 @@ yyerrlab1:
 	YYABORT;
 
 
-      yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp);
-      YYPOPSTACK (1);
+      yydestruct ("Error: popping", yystos[yystate], yyvsp);
+      YYPOPSTACK;
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
     }
 
-  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+  if (yyn == YYFINAL)
+    YYACCEPT;
+
   *++yyvsp = yylval;
-  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
 
-  /* Shift the error token.  */
+  /* Shift the error token. */
   YY_SYMBOL_PRINT ("Shifting", yystos[yyn], yyvsp, yylsp);
 
   yystate = yyn;
@@ -11107,7 +10162,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#if !defined yyoverflow || YYERROR_VERBOSE
+#ifndef yyoverflow
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -11118,38 +10173,23 @@ yyexhaustedlab:
 #endif
 
 yyreturn:
-  if (yychar != YYEMPTY)
-    {
-      /* Make sure we have latest lookahead translation.  See comments at
-         user semantic actions for why this is necessary.  */
-      yytoken = YYTRANSLATE (yychar);
-      yydestruct ("Cleanup: discarding lookahead",
-                  yytoken, &yylval);
-    }
-  /* Do not reclaim the symbols of the rule which action triggered
-     this YYABORT or YYACCEPT.  */
-  YYPOPSTACK (yylen);
-  YY_STACK_PRINT (yyss, yyssp);
+  if (yychar != YYEOF && yychar != YYEMPTY)
+     yydestruct ("Cleanup: discarding lookahead",
+		 yytoken, &yylval);
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
 		  yystos[*yyssp], yyvsp);
-      YYPOPSTACK (1);
+      YYPOPSTACK;
     }
 #ifndef yyoverflow
   if (yyss != yyssa)
     YYSTACK_FREE (yyss);
 #endif
-#if YYERROR_VERBOSE
-  if (yymsg != yymsgbuf)
-    YYSTACK_FREE (yymsg);
-#endif
-  /* Make sure YYID is used.  */
-  return YYID (yyresult);
+  return yyresult;
 }
 
 
-/* Line 2055 of yacc.c  */
 #line 2998 "gram.y"
 
 
@@ -11966,3 +11006,4 @@ double normp(double b, double *s)
     *s = fx(b);
     return sum * dx / 3.0;
 }
+

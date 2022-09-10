@@ -1,16 +1,11 @@
 
 ############# CMake versioning and backward compatibility #####
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 2.8) 
 if(POLICY CMP0017)
   cmake_policy(SET CMP0017 OLD)
 endif(POLICY CMP0017)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
-
-# This policy has to do with variables called <module>_ROOT
-# and possible collisions with module-finding.
-cmake_policy(SET CMP0074 OLD)
-
 
 enable_testing()
 
@@ -24,16 +19,13 @@ include(SCHISMTest)
 
 message(STATUS "\n################   Begin SCHISM Configuration   ################" )
 message(STATUS "In-source builds not allowed")
-
-set(comp_lang_list C Fortran)
-project(SCHISM LANGUAGES ${comp_lang_list} CXX)
+project(SCHISM C CXX Fortran)
 add_definitions("-DSCHISM")
-
-
-
 
 ########### Announce compiler #####
 message(STATUS "\n### Your compiler is ${CMAKE_Fortran_COMPILER}")
+
+
 
 ########### Build types are Release, Debug and RelWithDebInfo (Release with debug info) #####
 if (NOT CMAKE_BUILD_TYPE)
@@ -42,81 +34,28 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-########### C Preprocessor #####
-# The thought is to enable this globally, since it is needed for all
-# of SCHISM and several Utilities
-if (NOT DEFINED C_PREPROCESS_FLAG)
-  message(FATAL_ERROR "Preprocessor flag (e.g. -cpp for intel, -MPreprocess for PGI0 is not set")
-endif()
-add_compile_options(${C_PREPROCESS_FLAG})
-
-
-######### Algorithmic switches and build options involving functionality
-
-message(STATUS "\n### Processing algorithmic switches and build options involving functionality for main project")
-
-define_opt(NO_PARMETIS "Disable ParMETIS" OFF)
-define_opt(DEBUG "Enable diagnostics (slow and not suitable for production simulations" OFF)
-define_opt(USE_ANALYSIS "Triggers detailed calculations and output options" OFF)
-define_opt(INCLUDE_TIMING "Add timing profile instrumentation to simulation" OFF)
-define_opt(OLDIO "Old nc output option" OFF)
-define_opt(PREC_EVAP "Use  precipitation/evaporation option" OFF)
-define_opt(IMPOSE_NET_FLUX "Specify net heat and salt fluxes in sflux" OFF)
-define_opt(USE_BULK_FAIRALL "Enable Fairall scheme" OFF)
-define_opt(USE_PAHM "Enable USE_PAHM scheme" OFF)
-define_opt(USE_HA "Enable Harmonic Analysis output" OFF)
-define_opt(USE_SIMPLE_WIND "Simplified wind data interface" OFF)
-define_opt(USE_GOTM  "Enable compiling with GOTM turbulence closure" OFF)
-define_opt(USE_MARSH "Enable Marsh module" OFF)
-define_opt(DEBUG "Enable debug mode" OFF)
-define_opt(USE_GEN "Enable generic tracer module" OFF)
-define_opt(USE_AGE "Enable age tracer module" OFF)
-define_opt(ICM_PH "Enable pH module in ICM" OFF)
-define_opt(USE_DVD "Enable DVD module" OFF)
-
-
-
-if(NOT DEFINED TVD_LIM)
-  message(WARNING "TVD_LIM must be provided, either in the cache. It must be one of SB, VL, MM or OS for Superbee, Van Leer, Minmod, or Osher. Default is VL")
-endif()
-set(TVD_LIM VL CACHE STRING "Flux limiter. SB, VL, MM or OS for Superbee, Van Leer, Minmod, or Osher")
-list(APPEND def_tags _TVD-${TVD_LIM})
-
-string(CONCAT all_def_tags ${def_tags})
-string(REPLACE USE_ "" def_tag_rev ${all_def_tags})
-string(REPLACE INCLUDE_ "" def_tag_rev ${def_tag_rev})
-
-message(STATUS "Build definition tags set to ${def_tag_rev}")
-
 
 ########### MPI Library ########
 # The typical pattern with cmake is to use the mpi wrapper (e.g. mpif90)
 # to infer flags and locations for the compiler
-message(STATUS "\n### Configuring MPI Library")
-if ($ENV{MPI_VERSION})
-   set(MPIVERSION_DEFAULT $ENV{MPI_VERSION})
-else ($ENV{MPI_VERSION})
-   set(MPIVERSION_DEFAULT 2)
+message(STATUS "\n### Configuring MPI Library") 
+if (NOT MPIVERSION)
+   if ($ENV{MPI_VERSION})
+      set(MPIVERSION $ENV{MPI_VERSION} CACHE STRING "Version of MPI (1 or 2)")
+   else()
+      set(MPIVERSION "2" CACHE STRING "Version of MPI (1 or 2)")
+    endif()
 endif()
-set(MPIVERSION ${MPIVERSION_DEFAULT} CACHE STRING "Version of MPI API (1 or 2)") 
-
 find_package(MPI REQUIRED)
-message(STATUS "MPIVERSION = ${MPIVERSION}")
-add_compile_definitions(MPIVERSION=${MPIVERSION})
-
-#set_property(GLOBAL APPEND PROPERTY DEFINE-LIST "MPIVERSION=${MPIVERSION}")
+set_property(GLOBAL APPEND PROPERTY DEFINE-LIST "MPIVERSION=${MPIVERSION}")
 
 add_definitions(${MPI_Fortran_COMPILE_FLAGS})
 if (CMAKE_Fortran_FLAGS)
   set(CMAKE_Fortran_FLAGS ${CMAKE_Fortran_FLAGS} ${MPI_Fortran_COMPILE_FLAGS})
 endif (CMAKE_Fortran_FLAGS)
+
 include_directories(${MPI_Fortran_INCLUDE_PATH})
 
-add_definitions(${MPI_C_COMPILE_FLAGS})
-if (CMAKE_C_FLAGS)
-  set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${MPI_C_COMPILE_FLAGS})
-endif (CMAKE_C_FLAGS)
-include_directories(${MPI_C_INCLUDE_PATH})
 
 ########### NetCDF Dependency is handled here because so many libraries use it ##############
 message(STATUS "\n### Configuring NetCDF ")
@@ -136,7 +75,7 @@ if( NOT DEFINED NetCDF_FORTRAN_DIR AND ($ENV{NETCDF_FORTRAN_DIR} MATCHES ".+") )
   set(NetCDF_FORTRAN_DIR $ENV{NETCDF_FORTRAN_DIR})
 endif()
 
-find_package(NetCDF REQUIRED COMPONENTS ${comp_lang_list})
+find_package(NetCDF REQUIRED)
 if(NetCDF_NEEDS_HDF5)
   set( HDF5_USE_STATIC_LIBRARIES 1 )
   find_package(HDF5 COMPONENTS C REQUIRED)
@@ -151,22 +90,6 @@ endif(NetCDF_NEEDS_HDF5)
 include_directories( ${NetCDF_INCLUDE_DIRS} )
 
 set (NetCDFLIBS ${NetCDF_LIBRARIES} ${HDF_LIB_NAMES})
-
-# this might help to use old or pre-compiled GOTM versions:
-#if (USE_GOTM)
-#  if (NOT DEFINED GOTM_DIR)
-#    if( DEFINED $ENV{GOTM_DIR} )
-#      set( GOTM_DIR ${ENV{GOTM_DIR} CACHE PATH "Path to GOTM")
-#    else( DEFINED ${ENV{GOTM_DIR})
-#     message(STATUS "GOTM_DIR not in the environment, setting to local copy -- should be pre built")
-#     set(GOTM_DIR "${PROJECT_SOURCE_DIR}/GOTM3.2.5" CACHE PATH "Path to GOTM Library")
-#    endif( DEFINED ${ENV{GOTM_DIR} )
-#  endif(NOT DEFINED GOTM_DIR)
-#  find_package(GOTM REQUIRED)
-#  set(GOTMLIBS ${GOTM_LIBRARIES} )
-#  message("GOTM_INCLUDE_DIRS: ${GOTM_INCLUDE_DIRS}")
-#  include_directories(${GOTM_INCLUDE_DIRS})
-#endif(USE_GOTM)
 
 ########### Put each type of output (exe, libraries, modules) in the normal places
 ###         This file is untested for compilers with no output module directory option
@@ -206,98 +129,14 @@ macro( add_module name option_name  default)
   endif(${option_name})
 endmacro(add_module)
 
-
-
-
 # Create list of modules
-add_module(WWMIII    USE_WWM   OFF)
-add_module(WW3    USE_WW3   OFF)
-add_module(COSINE USE_COSINE OFF)
-add_module(ICM      USE_ICM OFF)
-add_module(FIB      USE_FIB OFF)
-add_module(Ice      USE_ICE   OFF)
-add_module(Multi_ice USE_MICE   OFF)
 add_module(Fabm     USE_FABM  OFF)
 add_module(EcoSim   USE_ECO   OFF)
 add_module(Sediment USE_SED   OFF)
 add_module(Sed2d    USE_SED2D OFF)
+add_module(WWMII    USE_WWM   OFF)
 add_module(Hydro    USE_HYDRO ON)
 add_module(Core     USE_SCHISM ON)
-
-if(NOT NO_PARMETIS)
-  ########## BEG:: PARMETIS ##########
-  ### Panagiotis Velissariou 08/25/2022
-  ### Code block to allow the use of an externally compiled ParMETIS library.
-  ### The user can supply one of the following variables to provide the full path
-  ### to the installed ParMETIS librarie(s):
-  ### (a) Via the cmake command line:
-  ###   -DPARMETIS_HOME=PATH, or -DPARMETISHOME=PATH, or
-  ###   -DPARMETIS_ROOT=PATH, or -DPARMETISROOT=PATH, or
-  ###   -DPARMETIS_PATH=PATH, or -DPARMETISPATH=PATH
-  ### (b) Via the environment:
-  ###   PARMETIS_HOME=PATH, or PARMETISHOME=PATH, or
-  ###   PARMETIS_ROOT=PATH, or PARMETISROOT=PATH, or
-  ###   PARMETIS_PATH=PATH, or PARMETISPATH=PATH
-  ###  We keep PARMETIS_DIR for internal use only.
-  ### NOTE: If the supplied PATH is not a valid directory, then the PARMETIS_DIR
-  ###       below is not set and the compilation proceeds with the SCHISM's
-  ###       internal ParMetis library source.
-  message(STATUS "\n### Configuring ParMETIS ")
-  unset(PARMETIS_DIR CACHE)
-  unset(ENV{PARMETIS_DIR})
-  foreach( pm_sfx IN ITEMS HOME ROOT PATH)
-    foreach( pm_sep IN ITEMS "_" "" )
-      set(pm_tmp_nam "PARMETIS${pm_sep}${pm_sfx}")
-      if(DEFINED ${pm_tmp_nam})
-        if(NOT "${${pm_tmp_nam}}" STREQUAL "")
-          get_filename_component(pm_tmp_val "${${pm_tmp_nam}}" ABSOLUTE REALPATH)
-          if(IS_DIRECTORY ${pm_tmp_val})
-            set(PARMETIS_DIR "${pm_tmp_val}")
-            break()
-          endif()
-        endif()
-      elseif(DEFINED ENV{${pm_tmp_nam}})
-        if(NOT "$ENV{${pm_tmp_nam}}" STREQUAL "")
-          get_filename_component(pm_tmp_val "$ENV{${pm_tmp_nam}}" ABSOLUTE REALPATH)
-          if(IS_DIRECTORY ${pm_tmp_val})
-            set(PARMETIS_DIR "${pm_tmp_val}")
-            break()
-          endif()
-        endif()
-      endif()
-    endforeach()
-  endforeach()
-  unset(pm_sfx)
-  unset(pm_sep)
-  unset(pm_tmp_nam)
-  unset(pm_tmp_val)
-
-  if(DEFINED PARMETIS_DIR)
-    message(STATUS "Trying to Use an externally compiled ParMETIS library.")
-
-    find_package(ParMETIS REQUIRED C CXX)
-
-    if(PARMETIS_EXTERNAL_FOUND)
-      set(PARMETIS_DIR "${PARMETIS_DIR}/" CACHE PATH "Path to already compiled ParMetis external library." FORCE)
-      message(STATUS "Using ParMETIS in: ${PARMETIS_DIR}")
-    else()
-      message(WARNING "The externaly compiled ParMETIS library could not be found. Reverting back to SCHISM's internal ParMETIS.")
-      unset(PARMETIS_DIR CACHE)
-    endif()
-  endif()
-
-  if(NOT DEFINED PARMETIS_DIR)
-    message(STATUS "Using SCHISM's internal ParMETIS library.")
-
-    set(PARMETIS_VER ParMetis-4.0.3 CACHE STRING "Version and relative path to Parmetis library inside /src.")
-    set(PARMETIS_DIR "${CMAKE_SOURCE_DIR}/${PARMETIS_VER}/" CACHE PATH "Path to ParMetis which defaults to /src/PARMETIS_VER in the schism source directory. Support for other locations not tested." FORCE)
-    add_subdirectory( ${PARMETIS_VER} )
-
-    message(STATUS "PARMETIS_DIR: ${PARMETIS_DIR}")
-    message(STATUS "PARMETIS_VER: ${PARMETIS_VER}")
-  endif()
-  ########## END:: PARMETIS ##########
-endif(NOT NO_PARMETIS)
 
 # Now recurse them and process the contents. 
 # In the process, we accumulate a (global) list of compile options and libraries
@@ -309,37 +148,12 @@ foreach (moddir ${schismmoddirs})
     message(STATUS "Added ${moddir}")
 endforeach()
 
-######## Executable Name
-
-# Create string to append to executable name with module names for the executable name
-string(CONCAT mod_tag ${all_use_mod_defs})
-string(REPLACE USE_ _ mod_tag_rev ${mod_tag})
-string(REPLACE _HYDRO_SCHISM "" mod_tag_rev ${mod_tag_rev})
-
 
 ######## Tests ##################
 
 # Note this is fine for the unit test directory but it may not be what we want because it doesn't pick and 
 # choose the subdirectories according to what modules got selected
 #add_subdirectory(${PROJECT_SOURCE_DIR}/../test/unittest/${moddir} ${PROJECT_BINARY_DIR}/unittest/${moddir})
-
-######## GOTM ############
-# call cmake with -DUSE_GOTM=ON -DGOTM_BASE=[gotm code directory]
-#
-if(USE_GOTM)
-find_path(GOTM_BASE src/gotm/gotm.F90 DOC "GOTM source directory")
-if(GOTM_BASE)
-  set(GOTM_BUILD_LIBRARIES_ONLY ON)
-  set(GOTM_USE_FABM OFF CACHE BOOL "use GOTM without FABM")
-  set(GOTM_USE_FLEXIBLE_OUTPUT OFF CACHE BOOL "use GOTM without flexible output")
-  add_subdirectory(${GOTM_BASE}/src gotm)
-  set(GOTM_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/gotm/modules)
-  set(GOTM_LIBRARIES turbulence util)
-  add_dependencies(hydro ${GOTM_LIBRARIES})
-  set(GOTMLIBS ${GOTM_LIBRARIES} )
-  set_property(TARGET hydro APPEND PROPERTY INCLUDE_DIRECTORIES "${GOTM_INCLUDE_DIRS}")
-endif(GOTM_BASE)
-endif(USE_GOTM)
 
 ########  Main executable #######
 message(STATUS "\n### Configuring Driver")
@@ -357,4 +171,5 @@ endforeach()
 ######## Utilities ########
 message(STATUS "\n### Configuring Utilities")
 add_subdirectory( Utility )
+
 

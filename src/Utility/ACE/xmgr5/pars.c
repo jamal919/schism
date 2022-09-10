@@ -1,10 +1,25 @@
-/* A Bison parser, made by GNU Bison 2.7.  */
+<<<<<<< .mine
+/* A Bison parser, made by GNU Bison 2.4.2.  */
+=======
+>>>>>>> .r440
 
-/* Bison implementation for Yacc-like parsers in C
+<<<<<<< .mine
+/* Skeleton implementation for Bison's Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2006, 2009-2010 Free Software
+   Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
+=======
+/* A Bison parser, made by GNU Bison 2.4.1.  */
+
+/* Skeleton implementation for Bison's Yacc-like parsers in C
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
+   
+   This program is free software: you can redistribute it and/or modify
+>>>>>>> .r440
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
@@ -43,9 +58,15 @@
 /* Identify Bison output.  */
 #define YYBISON 1
 
+<<<<<<< .mine
 /* Bison version.  */
-#define YYBISON_VERSION "2.7"
+#define YYBISON_VERSION "2.4.2"
 
+=======
+/* Bison version.  */
+#define YYBISON_VERSION "2.4.1"
+
+>>>>>>> .r440
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
 
@@ -58,11 +79,15 @@
 /* Pull parsers.  */
 #define YYPULL 1
 
+/* Using locations.  */
+#define YYLSP_NEEDED 0
 
 
 
+<<<<<<< .mine
 /* Copy the first part of user declarations.  */
-/* Line 371 of yacc.c  */
+
+/* Line 189 of yacc.c  */
 #line 1 "pars.y"
 
 
@@ -139,16 +164,14 @@ extern int change_gno;
 extern int change_type;
 
 
-/* Line 371 of yacc.c  */
-#line 144 "y.tab.c"
 
-# ifndef YY_NULL
-#  if defined __cplusplus && 201103L <= __cplusplus
-#   define YY_NULL nullptr
-#  else
-#   define YY_NULL 0
-#  endif
-# endif
+/* Line 189 of yacc.c  */
+#line 149 "y.tab.c"
+
+/* Enabling traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
 
 /* Enabling verbose error messages.  */
 #ifdef YYERROR_VERBOSE
@@ -158,18 +181,116 @@ extern int change_type;
 # define YYERROR_VERBOSE 0
 #endif
 
-/* In a future release of Bison, this section will be replaced
-   by #include "y.tab.h".  */
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+/* Enabling the token table.  */
+#ifndef YYTOKEN_TABLE
+# define YYTOKEN_TABLE 0
+#endif
+
+
+=======
+/* Copy the first part of user declarations.  */
+
+/* Line 189 of yacc.c  */
+#line 1 "pars.y"
+
+
+/* $Id: pars.y,v 1.8 2004/06/16 18:34:10 pturner Exp $
+ * 
+ * evaluate expressions, commands, parameter files
+ * 
+ */
+
+#define PARS			/* to overide some defines in defines.h */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <math.h>
+#include <ctype.h>
+#ifndef WIN32
+#include <sys/param.h>
+#endif
+#include <stdarg.h>
+ 
+#include "globals.h"
+#include "noxprotos.h"
+
+void set_prop(int gno, ...);
+void set_monitor(int monitor, ...);
+
+#ifndef M_PI
+#     define M_PI  3.14159265358979323846
+#endif
+
+#ifndef TRUE
+#     define TRUE 1
+#endif
+
+#ifndef FALSE
+#     define FALSE 0
+#endif
+
+double result, resx, resy;	/* return value if expression */
+
+double drand48(void);
+long lrand48(void);
+double erf(double arg); /* doesn't seem to be in ANSI C */
+double erfc(double arg); /* doesn't seem to be in ANSI C */
+double rnorm(double mean, double sdev);
+double fx(double x);
+double *getvptr(int gno, int setno, int v);
+double vmin(double *x, int n);
+double vmax(double *x, int n);
+void yyerror(char *s);
+
+static int interr;
+
+static double *freelist[100]; 	/* temporary vectors */
+static int fcnt;		/* number allocated */
+
+int naxis = 0;	/* current axis */
+int curline, curbox, curstring, curleg, curgrid;
+
+int gotbatch, gotparams, gotread; /* these guys attempt to avoid reentrancy problems */
+int readtype, readsrc;
+char batchfile[256], paramfile[256], readfile[256];
+
+static char f_string[512];	/* buffer for string to parse */
+static int pos = 0;
+static double *aa, *bb, *cc, *dd, *xx, *yy;
+static int setindex, lxy, ls;
+static int setsetno;
+static int whichgraph;
+static int whichset;
+
+extern int change_gno;
+extern int change_type;
+
+
+
+/* Line 189 of yacc.c  */
+#line 150 "y.tab.c"
+
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
 #endif
-#if YYDEBUG
-extern int yydebug;
+
+/* Enabling verbose error messages.  */
+#ifdef YYERROR_VERBOSE
+# undef YYERROR_VERBOSE
+# define YYERROR_VERBOSE 1
+#else
+# define YYERROR_VERBOSE 0
 #endif
 
+/* Enabling the token table.  */
+#ifndef YYTOKEN_TABLE
+# define YYTOKEN_TABLE 0
+#endif
+
+
+>>>>>>> .r440
 /* Tokens.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
@@ -990,10 +1111,12 @@ extern int yydebug;
 
 
 
+
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-/* Line 387 of yacc.c  */
+
+/* Line 214 of yacc.c  */
 #line 77 "pars.y"
 
     double val;
@@ -1004,36 +1127,35 @@ typedef union YYSTYPE
     char *str;
 
 
-/* Line 387 of yacc.c  */
+
+<<<<<<< .mine
+/* Line 214 of yacc.c  */
+#line 1008 "y.tab.c"
+} YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define YYSTYPE_IS_DECLARED 1
+=======
+/* Line 214 of yacc.c  */
 #line 1009 "y.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
+>>>>>>> .r440
 #endif
 
-extern YYSTYPE yylval;
-
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
-
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-/* Line 390 of yacc.c  */
-#line 1037 "y.tab.c"
+
+<<<<<<< .mine
+/* Line 264 of yacc.c  */
+#line 1020 "y.tab.c"
+=======
+/* Line 264 of yacc.c  */
+#line 1021 "y.tab.c"
+>>>>>>> .r440
 
 #ifdef short
 # undef short
@@ -1082,28 +1204,41 @@ typedef short int yytype_int16;
 
 #define YYSIZE_MAXIMUM ((YYSIZE_T) -1)
 
+<<<<<<< .mine
 #ifndef YY_
 # if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
-#   define YY_(Msgid) dgettext ("bison-runtime", Msgid)
+#   define YY_(msgid) dgettext ("bison-runtime", msgid)
 #  endif
 # endif
 # ifndef YY_
-#  define YY_(Msgid) Msgid
+#  define YY_(msgid) msgid
 # endif
+=======
+#ifndef YY_
+# if YYENABLE_NLS
+#  if ENABLE_NLS
+#   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
+#   define YY_(msgid) dgettext ("bison-runtime", msgid)
+#  endif
+# endif
+# ifndef YY_
+#  define YY_(msgid) msgid
+# endif
+>>>>>>> .r440
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
+# define YYUSE(e) ((void) (e))
 #else
-# define YYUSE(E) /* empty */
+# define YYUSE(e) /* empty */
 #endif
 
 /* Identity function, used to suppress warnings about constant conditions.  */
 #ifndef lint
-# define YYID(N) (N)
+# define YYID(n) (n)
 #else
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
@@ -1136,12 +1271,11 @@ YYID (yyi)
 #    define alloca _alloca
 #   else
 #    define YYSTACK_ALLOC alloca
-#    if ! defined _ALLOCA_H && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
+#    if ! defined _ALLOCA_H && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 #     include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-      /* Use EXIT_SUCCESS as a witness for stdlib.h.  */
-#     ifndef EXIT_SUCCESS
-#      define EXIT_SUCCESS 0
+#     ifndef _STDLIB_H
+#      define _STDLIB_H 1
 #     endif
 #    endif
 #   endif
@@ -1164,24 +1298,24 @@ YYID (yyi)
 #  ifndef YYSTACK_ALLOC_MAXIMUM
 #   define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
 #  endif
-#  if (defined __cplusplus && ! defined EXIT_SUCCESS \
+#  if (defined __cplusplus && ! defined _STDLIB_H \
        && ! ((defined YYMALLOC || defined malloc) \
 	     && (defined YYFREE || defined free)))
 #   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#   ifndef EXIT_SUCCESS
-#    define EXIT_SUCCESS 0
+#   ifndef _STDLIB_H
+#    define _STDLIB_H 1
 #   endif
 #  endif
 #  ifndef YYMALLOC
 #   define YYMALLOC malloc
-#   if ! defined malloc && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
+#   if ! defined malloc && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 void *malloc (YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 #  ifndef YYFREE
 #   define YYFREE free
-#   if ! defined free && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
+#   if ! defined free && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
@@ -1210,7 +1344,23 @@ union yyalloc
      ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE)) \
       + YYSTACK_GAP_MAXIMUM)
 
-# define YYCOPY_NEEDED 1
+/* Copy COUNT objects from FROM to TO.  The source and destination do
+   not overlap.  */
+# ifndef YYCOPY
+#  if defined __GNUC__ && 1 < __GNUC__
+#   define YYCOPY(To, From, Count) \
+      __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
+#  else
+#   define YYCOPY(To, From, Count)		\
+      do					\
+	{					\
+	  YYSIZE_T yyi;				\
+	  for (yyi = 0; yyi < (Count); yyi++)	\
+	    (To)[yyi] = (From)[yyi];		\
+	}					\
+      while (YYID (0))
+#  endif
+# endif
 
 /* Relocate STACK from its old location to the new one.  The
    local variables YYSIZE and YYSTACKSIZE give the old and new number of
@@ -1229,26 +1379,6 @@ union yyalloc
     while (YYID (0))
 
 #endif
-
-#if defined YYCOPY_NEEDED && YYCOPY_NEEDED
-/* Copy COUNT objects from SRC to DST.  The source and destination do
-   not overlap.  */
-# ifndef YYCOPY
-#  if defined __GNUC__ && 1 < __GNUC__
-#   define YYCOPY(Dst, Src, Count) \
-      __builtin_memcpy (Dst, Src, (Count) * sizeof (*(Src)))
-#  else
-#   define YYCOPY(Dst, Src, Count)              \
-      do                                        \
-        {                                       \
-          YYSIZE_T yyi;                         \
-          for (yyi = 0; yyi < (Count); yyi++)   \
-            (Dst)[yyi] = (Src)[yyi];            \
-        }                                       \
-      while (YYID (0))
-#  endif
-# endif
-#endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  513
@@ -1791,7 +1921,7 @@ static const yytype_uint16 yyrline[] =
 };
 #endif
 
-#if YYDEBUG || YYERROR_VERBOSE || 0
+#if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
@@ -1861,7 +1991,7 @@ static const char *const yytname[] =
   "onoff", "colpat", "runtype", "ffttype", "sourcetype", "filltype",
   "opchoice", "justchoice", "extremetype", "torf", "inoutchoice",
   "formatchoice", "signchoice", "direction", "worldview", "vector", "asgn",
-  "rasgn", "vasgn", "vexpr", "expr", YY_NULL
+  "rasgn", "vasgn", "vexpr", "expr", 0
 };
 #endif
 
@@ -2074,8 +2204,8 @@ static const yytype_uint8 yyr2[] =
        3,     2,     3,     2
 };
 
-/* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
-   Performed when YYTABLE doesn't specify something else to do.  Zero
+/* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
+   STATE-NUM when YYTABLE doesn't specify something else to do.  Zero
    means the default is an error.  */
 static const yytype_uint16 yydefact[] =
 {
@@ -2440,7 +2570,8 @@ static const yytype_int16 yypgoto[] =
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
-   number is the opposite.  If YYTABLE_NINF, syntax error.  */
+   number is the opposite.  If zero, do what YYDEFACT says.
+   If YYTABLE_NINF, syntax error.  */
 #define YYTABLE_NINF -734
 static const yytype_int16 yytable[] =
 {
@@ -3179,12 +3310,6 @@ static const yytype_int16 yytable[] =
      558,   559,   560,   561,   562,   563,   564,     0,   565,     0,
        0,     0,     0,     0,     0,  1486,     0,     0,   567
 };
-
-#define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-882)))
-
-#define yytable_value_is_error(Yytable_value) \
-  (!!((Yytable_value) == (-734)))
 
 static const yytype_int16 yycheck[] =
 {
@@ -4122,35 +4247,92 @@ static const yytype_uint16 yystos[] =
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)                                  \
-do                                                              \
-  if (yychar == YYEMPTY)                                        \
-    {                                                           \
-      yychar = (Token);                                         \
-      yylval = (Value);                                         \
-      YYPOPSTACK (yylen);                                       \
-      yystate = *yyssp;                                         \
-      goto yybackup;                                            \
-    }                                                           \
-  else                                                          \
-    {                                                           \
+#define YYBACKUP(Token, Value)					\
+do								\
+  if (yychar == YYEMPTY && yylen == 1)				\
+    {								\
+      yychar = (Token);						\
+      yylval = (Value);						\
+      yytoken = YYTRANSLATE (yychar);				\
+      YYPOPSTACK (1);						\
+      goto yybackup;						\
+    }								\
+  else								\
+    {								\
       yyerror (YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
 
-/* Error token number */
+
 #define YYTERROR	1
 #define YYERRCODE	256
 
 
-/* This macro is provided for backward compatibility. */
+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
+   If N is 0, then set CURRENT to the empty location which ends
+   the previous symbol: RHS[0] (always defined).  */
+
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
+#ifndef YYLLOC_DEFAULT
+# define YYLLOC_DEFAULT(Current, Rhs, N)				\
+    do									\
+      if (YYID (N))                                                    \
+	{								\
+	  (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;	\
+	  (Current).first_column = YYRHSLOC (Rhs, 1).first_column;	\
+	  (Current).last_line    = YYRHSLOC (Rhs, N).last_line;		\
+	  (Current).last_column  = YYRHSLOC (Rhs, N).last_column;	\
+	}								\
+      else								\
+	{								\
+	  (Current).first_line   = (Current).last_line   =		\
+	    YYRHSLOC (Rhs, 0).last_line;				\
+	  (Current).first_column = (Current).last_column =		\
+	    YYRHSLOC (Rhs, 0).last_column;				\
+	}								\
+    while (YYID (0))
+#endif
+
+<<<<<<< .mine
+
+/* YY_LOCATION_PRINT -- Print the location on the stream.
+   This macro was not mandated originally: define only if we know
+   we won't break user code: when these are the locations we know.  */
+
 #ifndef YY_LOCATION_PRINT
-# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+#  define YY_LOCATION_PRINT(File, Loc)			\
+     fprintf (File, "%d.%d-%d.%d",			\
+	      (Loc).first_line, (Loc).first_column,	\
+	      (Loc).last_line,  (Loc).last_column)
+# else
+#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# endif
 #endif
 
 
+=======
+
+/* YY_LOCATION_PRINT -- Print the location on the stream.
+   This macro was not mandated originally: define only if we know
+   we won't break user code: when these are the locations we know.  */
+
+#ifndef YY_LOCATION_PRINT
+# if YYLTYPE_IS_TRIVIAL
+#  define YY_LOCATION_PRINT(File, Loc)			\
+     fprintf (File, "%d.%d-%d.%d",			\
+	      (Loc).first_line, (Loc).first_column,	\
+	      (Loc).last_line,  (Loc).last_column)
+# else
+#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# endif
+#endif
+
+
+>>>>>>> .r440
 /* YYLEX -- calling `yylex' with the right arguments.  */
+
 #ifdef YYLEX_PARAM
 # define YYLEX yylex (YYLEX_PARAM)
 #else
@@ -4200,8 +4382,6 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
     YYSTYPE const * const yyvaluep;
 #endif
 {
-  FILE *yyo = yyoutput;
-  YYUSE (yyo);
   if (!yyvaluep)
     return;
 # ifdef YYPRINT
@@ -4213,7 +4393,7 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
   switch (yytype)
     {
       default:
-        break;
+	break;
     }
 }
 
@@ -4339,6 +4519,7 @@ int yydebug;
 # define YYMAXDEPTH 10000
 #endif
 
+
 
 #if YYERROR_VERBOSE
 
@@ -4441,145 +4622,115 @@ yytnamerr (char *yyres, const char *yystr)
 }
 # endif
 
-/* Copy into *YYMSG, which is of size *YYMSG_ALLOC, an error message
-   about the unexpected token YYTOKEN for the state stack whose top is
-   YYSSP.
-
-   Return 0 if *YYMSG was successfully written.  Return 1 if *YYMSG is
-   not large enough to hold the message.  In that case, also set
-   *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
-   required number of bytes is too large to store.  */
-static int
-yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
-                yytype_int16 *yyssp, int yytoken)
+/* Copy into YYRESULT an error message about the unexpected token
+   YYCHAR while in state YYSTATE.  Return the number of bytes copied,
+   including the terminating null byte.  If YYRESULT is null, do not
+   copy anything; just return the number of bytes that would be
+   copied.  As a special case, return 0 if an ordinary "syntax error"
+   message will do.  Return YYSIZE_MAXIMUM if overflow occurs during
+   size calculation.  */
+static YYSIZE_T
+yysyntax_error (char *yyresult, int yystate, int yychar)
 {
-  YYSIZE_T yysize0 = yytnamerr (YY_NULL, yytname[yytoken]);
-  YYSIZE_T yysize = yysize0;
-  enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
-  /* Internationalized format string. */
-  const char *yyformat = YY_NULL;
-  /* Arguments of yyformat. */
-  char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-  /* Number of reported tokens (one for the "unexpected", one per
-     "expected"). */
-  int yycount = 0;
+  int yyn = yypact[yystate];
 
-  /* There are many possibilities here to consider:
-     - Assume YYFAIL is not used.  It's too flawed to consider.  See
-       <http://lists.gnu.org/archive/html/bison-patches/2009-12/msg00024.html>
-       for details.  YYERROR is fine as it does not invoke this
-       function.
-     - If this state is a consistent state with a default action, then
-       the only way this function was invoked is if the default action
-       is an error action.  In that case, don't check for expected
-       tokens because there are none.
-     - The only way there can be no lookahead present (in yychar) is if
-       this state is a consistent state with a default action.  Thus,
-       detecting the absence of a lookahead is sufficient to determine
-       that there is no unexpected or expected token to report.  In that
-       case, just report a simple "syntax error".
-     - Don't assume there isn't a lookahead just because this state is a
-       consistent state with a default action.  There might have been a
-       previous inconsistent state, consistent state with a non-default
-       action, or user semantic action that manipulated yychar.
-     - Of course, the expected token list depends on states to have
-       correct lookahead information, and it depends on the parser not
-       to perform extra reductions after fetching a lookahead from the
-       scanner and before detecting a syntax error.  Thus, state merging
-       (from LALR or IELR) and default reductions corrupt the expected
-       token list.  However, the list is correct for canonical LR with
-       one exception: it will still contain any token that will not be
-       accepted due to an error action in a later state.
-  */
-  if (yytoken != YYEMPTY)
+  if (! (YYPACT_NINF < yyn && yyn <= YYLAST))
+    return 0;
+  else
     {
-      int yyn = yypact[*yyssp];
-      yyarg[yycount++] = yytname[yytoken];
-      if (!yypact_value_is_default (yyn))
-        {
-          /* Start YYX at -YYN if negative to avoid negative indexes in
-             YYCHECK.  In other words, skip the first -YYN actions for
-             this state because they are default actions.  */
-          int yyxbegin = yyn < 0 ? -yyn : 0;
-          /* Stay within bounds of both yycheck and yytname.  */
-          int yychecklim = YYLAST - yyn + 1;
-          int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-          int yyx;
+      int yytype = YYTRANSLATE (yychar);
+      YYSIZE_T yysize0 = yytnamerr (0, yytname[yytype]);
+      YYSIZE_T yysize = yysize0;
+      YYSIZE_T yysize1;
+      int yysize_overflow = 0;
+      enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
+      char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+      int yyx;
 
-          for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-            if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR
-                && !yytable_value_is_error (yytable[yyx + yyn]))
-              {
-                if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-                  {
-                    yycount = 1;
-                    yysize = yysize0;
-                    break;
-                  }
-                yyarg[yycount++] = yytname[yyx];
-                {
-                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULL, yytname[yyx]);
-                  if (! (yysize <= yysize1
-                         && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
-                    return 2;
-                  yysize = yysize1;
-                }
-              }
-        }
+# if 0
+      /* This is so xgettext sees the translatable formats that are
+	 constructed on the fly.  */
+      YY_("syntax error, unexpected %s");
+      YY_("syntax error, unexpected %s, expecting %s");
+      YY_("syntax error, unexpected %s, expecting %s or %s");
+      YY_("syntax error, unexpected %s, expecting %s or %s or %s");
+      YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
+# endif
+      char *yyfmt;
+      char const *yyf;
+      static char const yyunexpected[] = "syntax error, unexpected %s";
+      static char const yyexpecting[] = ", expecting %s";
+      static char const yyor[] = " or %s";
+      char yyformat[sizeof yyunexpected
+		    + sizeof yyexpecting - 1
+		    + ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2)
+		       * (sizeof yyor - 1))];
+      char const *yyprefix = yyexpecting;
+
+      /* Start YYX at -YYN if negative to avoid negative indexes in
+	 YYCHECK.  */
+      int yyxbegin = yyn < 0 ? -yyn : 0;
+
+      /* Stay within bounds of both yycheck and yytname.  */
+      int yychecklim = YYLAST - yyn + 1;
+      int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+      int yycount = 1;
+
+      yyarg[0] = yytname[yytype];
+      yyfmt = yystpcpy (yyformat, yyunexpected);
+
+      for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+	if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
+	  {
+	    if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+	      {
+		yycount = 1;
+		yysize = yysize0;
+		yyformat[sizeof yyunexpected - 1] = '\0';
+		break;
+	      }
+	    yyarg[yycount++] = yytname[yyx];
+	    yysize1 = yysize + yytnamerr (0, yytname[yyx]);
+	    yysize_overflow |= (yysize1 < yysize);
+	    yysize = yysize1;
+	    yyfmt = yystpcpy (yyfmt, yyprefix);
+	    yyprefix = yyor;
+	  }
+
+      yyf = YY_(yyformat);
+      yysize1 = yysize + yystrlen (yyf);
+      yysize_overflow |= (yysize1 < yysize);
+      yysize = yysize1;
+
+      if (yysize_overflow)
+	return YYSIZE_MAXIMUM;
+
+      if (yyresult)
+	{
+	  /* Avoid sprintf, as that infringes on the user's name space.
+	     Don't have undefined behavior even if the translation
+	     produced a string with the wrong number of "%s"s.  */
+	  char *yyp = yyresult;
+	  int yyi = 0;
+	  while ((*yyp = *yyf) != '\0')
+	    {
+	      if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
+		{
+		  yyp += yytnamerr (yyp, yyarg[yyi++]);
+		  yyf += 2;
+		}
+	      else
+		{
+		  yyp++;
+		  yyf++;
+		}
+	    }
+	}
+      return yysize;
     }
-
-  switch (yycount)
-    {
-# define YYCASE_(N, S)                      \
-      case N:                               \
-        yyformat = S;                       \
-      break
-      YYCASE_(0, YY_("syntax error"));
-      YYCASE_(1, YY_("syntax error, unexpected %s"));
-      YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
-      YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
-      YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
-      YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
-# undef YYCASE_
-    }
-
-  {
-    YYSIZE_T yysize1 = yysize + yystrlen (yyformat);
-    if (! (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
-      return 2;
-    yysize = yysize1;
-  }
-
-  if (*yymsg_alloc < yysize)
-    {
-      *yymsg_alloc = 2 * yysize;
-      if (! (yysize <= *yymsg_alloc
-             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
-        *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
-      return 1;
-    }
-
-  /* Avoid sprintf, as that infringes on the user's name space.
-     Don't have undefined behavior even if the translation
-     produced a string with the wrong number of "%s"s.  */
-  {
-    char *yyp = *yymsg;
-    int yyi = 0;
-    while ((*yyp = *yyformat) != '\0')
-      if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
-        {
-          yyp += yytnamerr (yyp, yyarg[yyi++]);
-          yyformat += 2;
-        }
-      else
-        {
-          yyp++;
-          yyformat++;
-        }
-  }
-  return 0;
 }
 #endif /* YYERROR_VERBOSE */
+
 
 /*-----------------------------------------------.
 | Release the memory associated to this symbol.  |
@@ -4608,35 +4759,40 @@ yydestruct (yymsg, yytype, yyvaluep)
     {
 
       default:
-        break;
+	break;
     }
 }
 
-
+/* Prevent warnings from -Wmissing-prototypes.  */
+#ifdef YYPARSE_PARAM
+#if defined __STDC__ || defined __cplusplus
+int yyparse (void *YYPARSE_PARAM);
+#else
+int yyparse ();
+#endif
+#else /* ! YYPARSE_PARAM */
+#if defined __STDC__ || defined __cplusplus
+int yyparse (void);
+#else
+int yyparse ();
+#endif
+#endif /* ! YYPARSE_PARAM */
 
 
 /* The lookahead symbol.  */
 int yychar;
 
-
-#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-# define YY_IGNORE_MAYBE_UNINITIALIZED_END
-#endif
-#ifndef YY_INITIAL_VALUE
-# define YY_INITIAL_VALUE(Value) /* Nothing. */
-#endif
-
 /* The semantic value of the lookahead symbol.  */
-YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
+YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
 int yynerrs;
 
 
-/*----------.
-| yyparse.  |
-`----------*/
+
+/*-------------------------.
+| yyparse or yypush_parse.  |
+`-------------------------*/
 
 #ifdef YYPARSE_PARAM
 #if (defined __STDC__ || defined __C99__FUNC__ \
@@ -4660,6 +4816,8 @@ yyparse ()
 #endif
 #endif
 {
+
+
     int yystate;
     /* Number of tokens to shift before error messages enabled.  */
     int yyerrstatus;
@@ -4668,7 +4826,7 @@ yyparse ()
        `yyss': related to states.
        `yyvs': related to semantic values.
 
-       Refer to the stacks through separate pointers, to allow yyoverflow
+       Refer to the stacks thru separate pointers, to allow yyoverflow
        to reallocate them elsewhere.  */
 
     /* The state stack.  */
@@ -4686,7 +4844,7 @@ yyparse ()
   int yyn;
   int yyresult;
   /* Lookahead token as an internal (translated) token number.  */
-  int yytoken = 0;
+  int yytoken;
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
@@ -4704,8 +4862,9 @@ yyparse ()
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
 
-  yyssp = yyss = yyssa;
-  yyvsp = yyvs = yyvsa;
+  yytoken = 0;
+  yyss = yyssa;
+  yyvs = yyvsa;
   yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
@@ -4714,6 +4873,14 @@ yyparse ()
   yyerrstatus = 0;
   yynerrs = 0;
   yychar = YYEMPTY; /* Cause a token to be read.  */
+
+  /* Initialize stack pointers.
+     Waste one element of value and location stack
+     so that they stay on the same level as the state stack.
+     The wasted elements are never initialized.  */
+  yyssp = yyss;
+  yyvsp = yyvs;
+
   goto yysetstate;
 
 /*------------------------------------------------------------.
@@ -4805,7 +4972,7 @@ yybackup:
 
   /* First try to decide what to do without reference to lookahead token.  */
   yyn = yypact[yystate];
-  if (yypact_value_is_default (yyn))
+  if (yyn == YYPACT_NINF)
     goto yydefault;
 
   /* Not known => get a lookahead token if don't already have one.  */
@@ -4836,8 +5003,8 @@ yybackup:
   yyn = yytable[yyn];
   if (yyn <= 0)
     {
-      if (yytable_value_is_error (yyn))
-        goto yyerrlab;
+      if (yyn == 0 || yyn == YYTABLE_NINF)
+	goto yyerrlab;
       yyn = -yyn;
       goto yyreduce;
     }
@@ -4854,9 +5021,7 @@ yybackup:
   yychar = YYEMPTY;
 
   yystate = yyn;
-  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
-  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
   goto yynewstate;
 
@@ -4893,25 +5058,49 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 532 "pars.y"
     {}
     break;
 
   case 4:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 533 "pars.y"
     {}
     break;
 
   case 5:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 534 "pars.y"
     {}
     break;
 
   case 6:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 535 "pars.y"
     {
 	    result = (yyvsp[(1) - (2)].val);
@@ -4919,7 +5108,13 @@ yyreduce:
     break;
 
   case 7:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 538 "pars.y"
     {
 	    result = *(yyvsp[(1) - (2)].ptr);
@@ -4927,49 +5122,97 @@ yyreduce:
     break;
 
   case 8:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 541 "pars.y"
     {}
     break;
 
   case 9:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 542 "pars.y"
     {}
     break;
 
   case 10:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 543 "pars.y"
     {}
     break;
 
   case 11:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 544 "pars.y"
     {}
     break;
 
   case 12:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 545 "pars.y"
     {}
     break;
 
   case 13:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 546 "pars.y"
     {}
     break;
 
   case 14:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 547 "pars.y"
     {}
     break;
 
   case 15:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 548 "pars.y"
     {
 	    return 1;
@@ -4977,7 +5220,13 @@ yyreduce:
     break;
 
   case 16:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 554 "pars.y"
     {
 	    if ((yyvsp[(2) - (3)].pset) == FILEP) {
@@ -4991,7 +5240,13 @@ yyreduce:
     break;
 
   case 17:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 563 "pars.y"
     {
 	    if ((yyvsp[(3) - (4)].pset) == FILEP) {
@@ -5005,7 +5260,13 @@ yyreduce:
     break;
 
   case 18:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 572 "pars.y"
     {
 	    if ((yyvsp[(3) - (3)].pset) == FILEP) {
@@ -5018,7 +5279,13 @@ yyreduce:
     break;
 
   case 19:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 580 "pars.y"
     {
 	    tdevice = (int) (yyvsp[(2) - (2)].val);
@@ -5026,7 +5293,13 @@ yyreduce:
     break;
 
   case 20:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 583 "pars.y"
     {
 	    hdevice = (int) (yyvsp[(3) - (3)].val);
@@ -5034,7 +5307,13 @@ yyreduce:
     break;
 
   case 21:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 586 "pars.y"
     {
 	    do_hardcopy();
@@ -5042,7 +5321,13 @@ yyreduce:
     break;
 
   case 22:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 590 "pars.y"
     { 
 	    extern int pslwfactor; /* fudge factor for linewidths in the PS driver */
@@ -5051,55 +5336,109 @@ yyreduce:
     break;
 
   case 23:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 597 "pars.y"
     { (yyval.pset) = GR_PS_P; }
     break;
 
   case 24:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 598 "pars.y"
     { (yyval.pset) = GR_PS_L; }
     break;
 
   case 25:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 599 "pars.y"
     { (yyval.pset) = GR_MIF_P; }
     break;
 
   case 26:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 600 "pars.y"
     { (yyval.pset) = GR_MIF_L; }
     break;
 
   case 27:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 601 "pars.y"
     { (yyval.pset) = GR_GIFP; }
     break;
 
   case 28:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 602 "pars.y"
     { (yyval.pset) = GR_GIFL; }
     break;
 
   case 29:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 603 "pars.y"
     { (yyval.pset) = hdevice; }
     break;
 
   case 30:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 604 "pars.y"
     { (yyval.pset) = FILEP; }
     break;
 
   case 31:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 608 "pars.y"
     {
 	    rg[(yyvsp[(1) - (2)].pset)].active = (yyvsp[(2) - (2)].pset);
@@ -5107,7 +5446,13 @@ yyreduce:
     break;
 
   case 32:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 611 "pars.y"
     {
 	    rg[(yyvsp[(1) - (3)].pset)].type = (yyvsp[(3) - (3)].pset);
@@ -5115,7 +5460,13 @@ yyreduce:
     break;
 
   case 33:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 614 "pars.y"
     {
 	    rg[(yyvsp[(1) - (3)].pset)].color = checkon(COLOR, rg[(yyvsp[(1) - (3)].pset)].color, (int) (yyvsp[(3) - (3)].val));
@@ -5123,7 +5474,13 @@ yyreduce:
     break;
 
   case 34:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 617 "pars.y"
     {
 	    rg[(yyvsp[(1) - (3)].pset)].lines = checkon(LINESTYLE, rg[(yyvsp[(1) - (3)].pset)].lines, (int) (yyvsp[(3) - (3)].val));
@@ -5131,7 +5488,13 @@ yyreduce:
     break;
 
   case 35:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 620 "pars.y"
     {
 	    rg[(yyvsp[(1) - (3)].pset)].linew = checkon(LINEWIDTH, rg[(yyvsp[(1) - (3)].pset)].linew, (int) (yyvsp[(3) - (3)].val));
@@ -5139,7 +5502,13 @@ yyreduce:
     break;
 
   case 36:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 624 "pars.y"
     {
 	    rg[(yyvsp[(1) - (9)].pset)].x1 = (yyvsp[(3) - (9)].val);
@@ -5150,7 +5519,13 @@ yyreduce:
     break;
 
   case 37:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 631 "pars.y"
     {
 	    if (rg[(yyvsp[(1) - (5)].pset)].x == NULL || rg[(yyvsp[(1) - (5)].pset)].n == 0) {
@@ -5168,7 +5543,13 @@ yyreduce:
     break;
 
   case 38:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 644 "pars.y"
     {
 	    rg[(yyvsp[(2) - (4)].pset)].linkto[(yyvsp[(4) - (4)].pset)] = TRUE;
@@ -5176,7 +5557,13 @@ yyreduce:
     break;
 
   case 39:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 650 "pars.y"
     {
 	    drawgraph();
@@ -5184,7 +5571,13 @@ yyreduce:
     break;
 
   case 40:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 653 "pars.y"
     {
 	    auto_redraw = ((yyvsp[(3) - (3)].pset) == ON);
@@ -5192,7 +5585,13 @@ yyreduce:
     break;
 
   case 41:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 656 "pars.y"
     {
 	    char buf[MAXPATHLEN];
@@ -5209,7 +5608,13 @@ yyreduce:
     break;
 
   case 42:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 668 "pars.y"
     {
 	    if (inwin) {
@@ -5223,7 +5628,13 @@ yyreduce:
     break;
 
   case 43:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 677 "pars.y"
     {
 	    setbgcolor((int) (yyvsp[(3) - (3)].val));
@@ -5231,7 +5642,13 @@ yyreduce:
     break;
 
   case 44:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 680 "pars.y"
     {
 	    xlibsetcmap((int) (yyvsp[(2) - (8)].val), (int) (yyvsp[(4) - (8)].val), (int) (yyvsp[(6) - (8)].val), (int) (yyvsp[(8) - (8)].val));
@@ -5239,7 +5656,13 @@ yyreduce:
     break;
 
   case 45:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 683 "pars.y"
     {
 	    SetCorieTime((int) (yyvsp[(2) - (2)].pset) == TRUEP);
@@ -5247,7 +5670,13 @@ yyreduce:
     break;
 
   case 46:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 686 "pars.y"
     {
 	    exit(0);
@@ -5255,7 +5684,13 @@ yyreduce:
     break;
 
   case 47:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 690 "pars.y"
     {
             set_pagelayout((yyvsp[(3) - (3)].pset));
@@ -5263,7 +5698,13 @@ yyreduce:
     break;
 
   case 48:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 694 "pars.y"
     {
             set_toolbars((yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].pset) == ON);
@@ -5271,7 +5712,13 @@ yyreduce:
     break;
 
   case 49:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 698 "pars.y"
     {
             set_toolbars((yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].pset) == ON);
@@ -5279,7 +5726,13 @@ yyreduce:
     break;
 
   case 50:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 702 "pars.y"
     {
             set_toolbars((yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].pset) == ON);
@@ -5287,7 +5740,13 @@ yyreduce:
     break;
 
   case 51:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 706 "pars.y"
     {
 	    if (inwin) {
@@ -5298,7 +5757,13 @@ yyreduce:
     break;
 
   case 52:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 712 "pars.y"
     {
 	    if (inwin) {
@@ -5308,7 +5773,13 @@ yyreduce:
     break;
 
   case 53:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 717 "pars.y"
     {
 	    if (inwin) {
@@ -5321,7 +5792,13 @@ yyreduce:
     break;
 
   case 54:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 725 "pars.y"
     {
 	    if (inwin) {
@@ -5331,7 +5808,13 @@ yyreduce:
     break;
 
   case 55:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 730 "pars.y"
     {
 	    if (inwin) {
@@ -5341,7 +5824,13 @@ yyreduce:
     break;
 
   case 56:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 735 "pars.y"
     {
 	    if (inwin) {
@@ -5351,14 +5840,26 @@ yyreduce:
     break;
 
   case 57:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 740 "pars.y"
     {
 	}
     break;
 
   case 58:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 744 "pars.y"
     {
 	    switch ((yyvsp[(2) - (2)].pset)) {
@@ -5385,7 +5886,13 @@ yyreduce:
     break;
 
   case 59:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 766 "pars.y"
     {
 	    scroll_proc((int) (yyvsp[(2) - (2)].val));
@@ -5393,7 +5900,13 @@ yyreduce:
     break;
 
   case 60:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 769 "pars.y"
     {
 	    scrollinout_proc((int) (yyvsp[(3) - (3)].val));
@@ -5401,7 +5914,13 @@ yyreduce:
     break;
 
   case 61:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 772 "pars.y"
     {
 	    scrolling_islinked = (yyvsp[(3) - (3)].pset) == ON;
@@ -5409,7 +5928,13 @@ yyreduce:
     break;
 
   case 62:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 775 "pars.y"
     {
 	    my_doublebuffer((yyvsp[(2) - (2)].pset) == TRUEP);
@@ -5417,7 +5942,13 @@ yyreduce:
     break;
 
   case 63:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 778 "pars.y"
     {
 	    my_frontbuffer((yyvsp[(2) - (2)].pset) == TRUEP);
@@ -5425,7 +5956,13 @@ yyreduce:
     break;
 
   case 64:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 781 "pars.y"
     {
 	    my_backbuffer((yyvsp[(2) - (2)].pset) == TRUEP);
@@ -5433,7 +5970,13 @@ yyreduce:
     break;
 
   case 65:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 784 "pars.y"
     {
 	    my_swapbuffer();
@@ -5441,7 +5984,13 @@ yyreduce:
     break;
 
   case 66:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 787 "pars.y"
     {
 	    sleep((int) (yyvsp[(2) - (2)].val));
@@ -5449,21 +5998,39 @@ yyreduce:
     break;
 
   case 67:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 790 "pars.y"
     {	/* TODO add delay function */
 	}
     break;
 
   case 68:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 792 "pars.y"
     {		/* TODO add abort flag and function */
 	}
     break;
 
   case 69:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 795 "pars.y"
     {
 	    gotparams = TRUE;
@@ -5473,7 +6040,13 @@ yyreduce:
     break;
 
   case 70:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 801 "pars.y"
     {
 	    if (!fexists((char *) (yyvsp[(2) - (2)].pset))) {
@@ -5490,7 +6063,13 @@ yyreduce:
     break;
 
   case 71:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 813 "pars.y"
     {
 	    cg = (int) (yyvsp[(2) - (2)].pset);
@@ -5500,7 +6079,13 @@ yyreduce:
     break;
 
   case 72:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 818 "pars.y"
     {
 	    curset = (int) (yyvsp[(2) - (2)].pset);
@@ -5508,7 +6093,13 @@ yyreduce:
     break;
 
   case 73:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 823 "pars.y"
     {
 	    set_hotlink(cg, (yyvsp[(1) - (4)].pset), 1, (char *) (yyvsp[(4) - (4)].pset), (yyvsp[(3) - (4)].pset));
@@ -5517,7 +6108,13 @@ yyreduce:
     break;
 
   case 74:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 827 "pars.y"
     {
 	    set_hotlink((yyvsp[(1) - (6)].pset), (yyvsp[(3) - (6)].pset), 1, (char *) (yyvsp[(6) - (6)].pset), (yyvsp[(5) - (6)].pset));
@@ -5526,7 +6123,13 @@ yyreduce:
     break;
 
   case 75:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 831 "pars.y"
     {
 	    set_hotlink(cg, (yyvsp[(1) - (3)].pset), (yyvsp[(3) - (3)].pset) == ON, NULL, 0);
@@ -5534,7 +6137,13 @@ yyreduce:
     break;
 
   case 76:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 834 "pars.y"
     {
 	    set_hotlink((yyvsp[(1) - (5)].pset), (yyvsp[(3) - (5)].pset), (yyvsp[(5) - (5)].pset) == ON, NULL, 0);
@@ -5542,7 +6151,13 @@ yyreduce:
     break;
 
   case 77:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 838 "pars.y"
     {
 	    do_activateset(cg, (yyvsp[(2) - (3)].pset), (int) (yyvsp[(3) - (3)].val));
@@ -5550,7 +6165,13 @@ yyreduce:
     break;
 
   case 78:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 841 "pars.y"
     {
             activateset(cg, (yyvsp[(2) - (4)].pset));
@@ -5562,7 +6183,13 @@ yyreduce:
     break;
 
   case 79:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 848 "pars.y"
     {
             activateset((yyvsp[(2) - (6)].pset), (yyvsp[(4) - (6)].pset));
@@ -5574,7 +6201,13 @@ yyreduce:
     break;
 
   case 80:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 855 "pars.y"
     {
 	    add_point(cg, (yyvsp[(1) - (5)].pset), (yyvsp[(3) - (5)].val), (yyvsp[(5) - (5)].val), 0.0, 0.0, XY);
@@ -5582,7 +6215,13 @@ yyreduce:
     break;
 
   case 81:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 858 "pars.y"
     {
 	    add_point((yyvsp[(1) - (7)].pset), (yyvsp[(3) - (7)].pset), (yyvsp[(5) - (7)].val), (yyvsp[(7) - (7)].val), 0.0, 0.0, XY);
@@ -5590,7 +6229,13 @@ yyreduce:
     break;
 
   case 82:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 862 "pars.y"
     {
 	    int start = (int) (yyvsp[(3) - (5)].val) - 1;
@@ -5603,7 +6248,13 @@ yyreduce:
     break;
 
   case 83:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 870 "pars.y"
     {
 	    int start = (int) (yyvsp[(5) - (7)].val) - 1;
@@ -5616,7 +6267,13 @@ yyreduce:
     break;
 
   case 84:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 878 "pars.y"
     {
 	    do_copyset(cg, (yyvsp[(2) - (4)].pset), cg, (yyvsp[(4) - (4)].pset));
@@ -5624,7 +6281,13 @@ yyreduce:
     break;
 
   case 85:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 881 "pars.y"
     {
 	    do_copyset((yyvsp[(2) - (8)].pset), (yyvsp[(4) - (8)].pset), (yyvsp[(6) - (8)].pset), (yyvsp[(8) - (8)].pset));
@@ -5632,7 +6295,13 @@ yyreduce:
     break;
 
   case 86:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 884 "pars.y"
     {
 	    do_moveset(cg, (yyvsp[(2) - (4)].pset), cg, (yyvsp[(4) - (4)].pset));
@@ -5640,7 +6309,13 @@ yyreduce:
     break;
 
   case 87:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 887 "pars.y"
     {
 	    do_moveset((yyvsp[(2) - (8)].pset), (yyvsp[(4) - (8)].pset), (yyvsp[(6) - (8)].pset), (yyvsp[(8) - (8)].pset));
@@ -5648,7 +6323,13 @@ yyreduce:
     break;
 
   case 88:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 891 "pars.y"
     {
 	    killset(cg, (yyvsp[(2) - (2)].pset));
@@ -5656,7 +6337,13 @@ yyreduce:
     break;
 
   case 89:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 895 "pars.y"
     {
 	    int i;
@@ -5667,7 +6354,13 @@ yyreduce:
     break;
 
   case 90:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 902 "pars.y"
     {
 	    kill_graph((yyvsp[(2) - (2)].pset));
@@ -5675,7 +6368,13 @@ yyreduce:
     break;
 
   case 91:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 906 "pars.y"
     {
 	    kill_graph(maxgraph);
@@ -5683,7 +6382,13 @@ yyreduce:
     break;
 
   case 92:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 910 "pars.y"
     {
 	    wipeout(0);
@@ -5691,7 +6396,13 @@ yyreduce:
     break;
 
   case 93:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 914 "pars.y"
     {
 	    int i;
@@ -5702,7 +6413,13 @@ yyreduce:
     break;
 
   case 94:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 921 "pars.y"
     {
 	    int setno = (yyvsp[(3) - (6)].pset), ideg = (int) (yyvsp[(5) - (6)].val);
@@ -5711,7 +6428,13 @@ yyreduce:
     break;
 
   case 95:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 926 "pars.y"
     {
 	    do_running_command((yyvsp[(1) - (6)].pset), (yyvsp[(3) - (6)].pset), (int) (yyvsp[(5) - (6)].val));
@@ -5719,7 +6442,13 @@ yyreduce:
     break;
 
   case 96:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 930 "pars.y"
     {
 	    do_fourier_command((yyvsp[(1) - (6)].pset), (yyvsp[(3) - (6)].pset), (int) (yyvsp[(5) - (6)].val));
@@ -5727,7 +6456,13 @@ yyreduce:
     break;
 
   case 97:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 934 "pars.y"
     {
 	    do_spline((yyvsp[(3) - (10)].pset), (yyvsp[(5) - (10)].val), (yyvsp[(7) - (10)].val), (int) (yyvsp[(9) - (10)].val));
@@ -5735,7 +6470,13 @@ yyreduce:
     break;
 
   case 98:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 938 "pars.y"
     {
 	    do_histo_command((yyvsp[(3) - (10)].pset), -1, -1, (yyvsp[(5) - (10)].val), (yyvsp[(7) - (10)].val), (int) (yyvsp[(9) - (10)].val));
@@ -5743,7 +6484,13 @@ yyreduce:
     break;
 
   case 99:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 942 "pars.y"
     {
 	    do_differ((yyvsp[(3) - (6)].pset), (int) (yyvsp[(5) - (6)].val));
@@ -5751,7 +6498,13 @@ yyreduce:
     break;
 
   case 100:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 946 "pars.y"
     {
 	    do_int((yyvsp[(3) - (4)].pset), 0);
@@ -5759,7 +6512,13 @@ yyreduce:
     break;
 
   case 101:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 950 "pars.y"
     {
 	    if (activeset(cg)) {
@@ -5777,7 +6536,13 @@ yyreduce:
     break;
 
   case 102:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 964 "pars.y"
     {
 	    if (activeset(cg)) {
@@ -5793,7 +6558,13 @@ yyreduce:
     break;
 
   case 103:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 976 "pars.y"
     {
 	    if (activeset(cg)) {
@@ -5809,7 +6580,13 @@ yyreduce:
     break;
 
   case 104:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 988 "pars.y"
     {
 	    if (isactive_set(cg, (yyvsp[(2) - (2)].pset))) {
@@ -5827,7 +6604,13 @@ yyreduce:
     break;
 
   case 105:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1002 "pars.y"
     {
 	    extern int go_locateflag;
@@ -5836,7 +6619,13 @@ yyreduce:
     break;
 
   case 106:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1007 "pars.y"
     {
 	    draw_focus(cg);
@@ -5850,7 +6639,13 @@ yyreduce:
     break;
 
   case 107:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1016 "pars.y"
     {
 	    draw_focus_flag = (yyvsp[(2) - (2)].pset);
@@ -5858,7 +6653,13 @@ yyreduce:
     break;
 
   case 108:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1019 "pars.y"
     {
 	    focus_policy = (yyvsp[(2) - (2)].pset);
@@ -5866,7 +6667,13 @@ yyreduce:
     break;
 
   case 109:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1022 "pars.y"
     {
 	    focus_policy = (yyvsp[(2) - (2)].pset);
@@ -5874,7 +6681,13 @@ yyreduce:
     break;
 
   case 110:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1025 "pars.y"
     {
 	    focus_policy = (yyvsp[(2) - (2)].pset);
@@ -5882,7 +6695,13 @@ yyreduce:
     break;
 
   case 111:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1028 "pars.y"
     {
 	    cursource = (yyvsp[(2) - (2)].pset);
@@ -5890,7 +6709,13 @@ yyreduce:
     break;
 
   case 112:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1031 "pars.y"
     {
 	    curtype = (yyvsp[(2) - (2)].pset);
@@ -5899,7 +6724,13 @@ yyreduce:
     break;
 
   case 113:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1036 "pars.y"
     {
 	    gotread = TRUE;
@@ -5911,7 +6742,13 @@ yyreduce:
     break;
 
   case 114:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1044 "pars.y"
     {
 	    gotbatch = TRUE;
@@ -5921,7 +6758,13 @@ yyreduce:
     break;
 
   case 115:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1050 "pars.y"
     {
 	    getdata(cg, (char *) (yyvsp[(3) - (3)].pset), DISK, BLOCK);
@@ -5930,7 +6773,13 @@ yyreduce:
     break;
 
   case 116:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1055 "pars.y"
     {
 	    getdata(cg, (char *) (yyvsp[(4) - (4)].pset), (yyvsp[(3) - (4)].pset), BLOCK);
@@ -5939,7 +6788,13 @@ yyreduce:
     break;
 
   case 117:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1060 "pars.y"
     {
 	    create_set_fromblock(cg, (yyvsp[(2) - (3)].pset), (char *) (yyvsp[(3) - (3)].pset));
@@ -5948,7 +6803,13 @@ yyreduce:
     break;
 
   case 118:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1065 "pars.y"
     {
 	    gotread = TRUE;
@@ -5960,7 +6821,13 @@ yyreduce:
     break;
 
   case 119:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1073 "pars.y"
     {
 	    gotread = TRUE;
@@ -5972,7 +6839,13 @@ yyreduce:
     break;
 
   case 120:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1081 "pars.y"
     {
 	    read_image((char *) (yyvsp[(3) - (3)].pset));
@@ -5981,7 +6854,13 @@ yyreduce:
     break;
 
   case 121:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1086 "pars.y"
     {
 	    getdata(cg, (char  *) (yyvsp[(4) - (4)].pset), DISK, CTD);
@@ -5989,35 +6868,65 @@ yyreduce:
     break;
 
   case 122:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1090 "pars.y"
     { /* set, file, type, TIME node, level, start, stop, skip, missing val*/
 	}
     break;
 
   case 123:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1093 "pars.y"
     { /* set, file, type, TIME level, start, stop, skip*/
 	}
     break;
 
   case 124:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1096 "pars.y"
     { /* set, file, type, PROFILE node*/
 	}
     break;
 
   case 125:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1099 "pars.y"
     { /* set, file, type, TIME level, start, stop, skip*/
 	}
     break;
 
   case 126:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1102 "pars.y"
     {
 	    write_image((char *) (yyvsp[(3) - (3)].pset));
@@ -6026,7 +6935,13 @@ yyreduce:
     break;
 
   case 127:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1107 "pars.y"
     {
 	    imagex = (int) (yyvsp[(3) - (5)].val);
@@ -6035,7 +6950,13 @@ yyreduce:
     break;
 
   case 128:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1112 "pars.y"
     {
 	    outputset(cg, (yyvsp[(2) - (2)].pset), (char *) NULL, (char *) NULL);
@@ -6043,7 +6964,13 @@ yyreduce:
     break;
 
   case 129:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1116 "pars.y"
     {
 	    outputset(cg, (yyvsp[(2) - (4)].pset), (char *) NULL, (char *) (yyvsp[(4) - (4)].pset));
@@ -6052,7 +6979,13 @@ yyreduce:
     break;
 
   case 130:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1121 "pars.y"
     {
 	    outputset(cg, (yyvsp[(2) - (4)].pset), (char *) (yyvsp[(4) - (4)].pset), (char *) NULL);
@@ -6061,7 +6994,13 @@ yyreduce:
     break;
 
   case 131:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1126 "pars.y"
     {
 	    outputset(cg, (yyvsp[(2) - (6)].pset), (char *) (yyvsp[(4) - (6)].pset), (char *) (yyvsp[(6) - (6)].pset));
@@ -6071,7 +7010,13 @@ yyreduce:
     break;
 
   case 132:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1132 "pars.y"
     {
             extern char sformat[];
@@ -6081,7 +7026,13 @@ yyreduce:
     break;
 
   case 133:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1137 "pars.y"
     {
 	    push_world();
@@ -6089,7 +7040,13 @@ yyreduce:
     break;
 
   case 134:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1140 "pars.y"
     {
 	    pop_world();
@@ -6097,7 +7054,13 @@ yyreduce:
     break;
 
   case 135:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1143 "pars.y"
     {
 	    cycle_world_stack();
@@ -6105,7 +7068,13 @@ yyreduce:
     break;
 
   case 136:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1146 "pars.y"
     {
 	    if ((int) (yyvsp[(2) - (2)].val) > 0)
@@ -6114,7 +7083,13 @@ yyreduce:
     break;
 
   case 137:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1151 "pars.y"
     {
 	    add_world(cg, (yyvsp[(3) - (17)].val), (yyvsp[(5) - (17)].val), (yyvsp[(7) - (17)].val), (yyvsp[(9) - (17)].val), (yyvsp[(11) - (17)].val), (yyvsp[(13) - (17)].val), (yyvsp[(15) - (17)].val), (yyvsp[(17) - (17)].val));
@@ -6122,7 +7097,13 @@ yyreduce:
     break;
 
   case 138:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1154 "pars.y"
     {
 	    clear_world_stack();
@@ -6130,7 +7111,13 @@ yyreduce:
     break;
 
   case 139:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1157 "pars.y"
     {
 	    do_clear_boxes();
@@ -6138,7 +7125,13 @@ yyreduce:
     break;
 
   case 140:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1160 "pars.y"
     {
 	    curbox = next_box();
@@ -6146,7 +7139,13 @@ yyreduce:
     break;
 
   case 141:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1163 "pars.y"
     {
 	    curbox = (int) (yyvsp[(3) - (3)].val);
@@ -6154,7 +7153,13 @@ yyreduce:
     break;
 
   case 142:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1166 "pars.y"
     {
 	    boxes[curbox].active = (yyvsp[(2) - (2)].pset);
@@ -6162,7 +7167,13 @@ yyreduce:
     break;
 
   case 143:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1169 "pars.y"
     {
 	    boxes[curbox].gno = (yyvsp[(2) - (2)].pset);
@@ -6170,7 +7181,13 @@ yyreduce:
     break;
 
   case 144:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1173 "pars.y"
     {
 	    if (curbox >= 0 && curbox < MAXBOXES) {
@@ -6183,7 +7200,13 @@ yyreduce:
     break;
 
   case 145:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1181 "pars.y"
     {
 	    box_loctype = (yyvsp[(3) - (3)].pset);
@@ -6191,7 +7214,13 @@ yyreduce:
     break;
 
   case 146:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1184 "pars.y"
     {
 	    box_lines = checkon(LINESTYLE, box_lines, (int) (yyvsp[(3) - (3)].val));
@@ -6199,7 +7228,13 @@ yyreduce:
     break;
 
   case 147:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1187 "pars.y"
     {
 	    box_linew = checkon(LINEWIDTH, box_linew, (int) (yyvsp[(3) - (3)].val));
@@ -6207,7 +7242,13 @@ yyreduce:
     break;
 
   case 148:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1190 "pars.y"
     {
 	    box_color = checkon(COLOR, box_color, (int) (yyvsp[(3) - (3)].val));
@@ -6215,7 +7256,13 @@ yyreduce:
     break;
 
   case 149:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1193 "pars.y"
     {
 	    box_fill = (yyvsp[(3) - (3)].pset);
@@ -6223,7 +7270,13 @@ yyreduce:
     break;
 
   case 150:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1196 "pars.y"
     {
 	    box_fillcolor = checkon(COLOR, box_fillcolor, (int) (yyvsp[(4) - (4)].val));
@@ -6231,7 +7284,13 @@ yyreduce:
     break;
 
   case 151:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1199 "pars.y"
     {
 	    box_fillpat = checkon(PATTERN, box_fillpat, (int) (yyvsp[(4) - (4)].val));
@@ -6239,7 +7298,13 @@ yyreduce:
     break;
 
   case 152:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1203 "pars.y"
     {
 	    if (curbox >= 0 && curbox < MAXBOXES) {
@@ -6255,7 +7320,13 @@ yyreduce:
     break;
 
   case 153:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1214 "pars.y"
     {
 	    curline = next_line();
@@ -6263,7 +7334,13 @@ yyreduce:
     break;
 
   case 154:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1217 "pars.y"
     {
 	    curline = (int) (yyvsp[(3) - (3)].val);
@@ -6271,7 +7348,13 @@ yyreduce:
     break;
 
   case 155:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1220 "pars.y"
     {
 	    do_clear_lines();
@@ -6279,7 +7362,13 @@ yyreduce:
     break;
 
   case 156:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1223 "pars.y"
     {
 	    lines[curline].active = (yyvsp[(2) - (2)].pset);
@@ -6287,7 +7376,13 @@ yyreduce:
     break;
 
   case 157:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1226 "pars.y"
     {
 	    lines[curline].gno = (yyvsp[(2) - (2)].pset);
@@ -6295,7 +7390,13 @@ yyreduce:
     break;
 
   case 158:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1230 "pars.y"
     {
 	    lines[curline].x1 = (yyvsp[(2) - (8)].val);
@@ -6306,7 +7407,13 @@ yyreduce:
     break;
 
   case 159:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1236 "pars.y"
     {
 	    line_loctype = (yyvsp[(3) - (3)].pset);
@@ -6314,7 +7421,13 @@ yyreduce:
     break;
 
   case 160:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1239 "pars.y"
     {
 	    line_linew = checkon(LINEWIDTH, line_linew, (int) (yyvsp[(3) - (3)].val));
@@ -6322,7 +7435,13 @@ yyreduce:
     break;
 
   case 161:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1242 "pars.y"
     {
 	    line_lines = checkon(LINESTYLE, line_lines, (int) (yyvsp[(3) - (3)].val));
@@ -6330,7 +7449,13 @@ yyreduce:
     break;
 
   case 162:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1245 "pars.y"
     {
 	    line_color = checkon(COLOR, line_color, (int) (yyvsp[(3) - (3)].val));
@@ -6338,7 +7463,13 @@ yyreduce:
     break;
 
   case 163:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1248 "pars.y"
     {
 	    line_arrow = checkon(ARROW, line_arrow, (int) (yyvsp[(3) - (3)].val));
@@ -6346,7 +7477,13 @@ yyreduce:
     break;
 
   case 164:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1251 "pars.y"
     {
 	    line_asize = (yyvsp[(4) - (4)].val);
@@ -6354,7 +7491,13 @@ yyreduce:
     break;
 
   case 165:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1254 "pars.y"
     {
 	    line_atype = (int) (yyvsp[(4) - (4)].val);
@@ -6362,7 +7505,13 @@ yyreduce:
     break;
 
   case 166:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1258 "pars.y"
     {
 	    if (curline >= 0 && curline < MAXLINES) {
@@ -6378,7 +7527,13 @@ yyreduce:
     break;
 
   case 167:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1269 "pars.y"
     {
 	    do_clear_text();
@@ -6386,7 +7541,13 @@ yyreduce:
     break;
 
   case 168:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1272 "pars.y"
     {
 	    curstring = next_string();
@@ -6394,7 +7555,13 @@ yyreduce:
     break;
 
   case 169:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1275 "pars.y"
     {
 	    curstring = (int) (yyvsp[(3) - (3)].val);
@@ -6402,7 +7569,13 @@ yyreduce:
     break;
 
   case 170:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1278 "pars.y"
     {
 	    pstr[curstring].active = (yyvsp[(2) - (2)].pset);
@@ -6410,7 +7583,13 @@ yyreduce:
     break;
 
   case 171:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1281 "pars.y"
     {
 	    pstr[curstring].gno = (yyvsp[(2) - (2)].pset);
@@ -6418,7 +7597,13 @@ yyreduce:
     break;
 
   case 172:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1285 "pars.y"
     {
 	    pstr[curstring].x = (yyvsp[(2) - (4)].val);
@@ -6427,7 +7612,13 @@ yyreduce:
     break;
 
   case 173:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1289 "pars.y"
     {
 	    string_loctype = (yyvsp[(3) - (3)].pset);
@@ -6435,7 +7626,13 @@ yyreduce:
     break;
 
   case 174:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1292 "pars.y"
     {
 	    string_linew = checkon(LINEWIDTH, string_linew, (int) (yyvsp[(3) - (3)].val));
@@ -6443,7 +7640,13 @@ yyreduce:
     break;
 
   case 175:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1295 "pars.y"
     {
 	    string_color = checkon(COLOR, string_color, (int) (yyvsp[(3) - (3)].val));
@@ -6451,7 +7654,13 @@ yyreduce:
     break;
 
   case 176:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1298 "pars.y"
     {
 	    string_rot = (int) (yyvsp[(3) - (3)].val);
@@ -6459,7 +7668,13 @@ yyreduce:
     break;
 
   case 177:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1301 "pars.y"
     {
 	    string_font = checkon(FONTP, string_font, (int) (yyvsp[(3) - (3)].val));
@@ -6467,7 +7682,13 @@ yyreduce:
     break;
 
   case 178:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1304 "pars.y"
     {
 	    string_just = checkon(JUST, string_just, (int) (yyvsp[(3) - (3)].val));
@@ -6475,7 +7696,13 @@ yyreduce:
     break;
 
   case 179:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1307 "pars.y"
     {
 	    string_size = (yyvsp[(4) - (4)].val);
@@ -6483,7 +7710,13 @@ yyreduce:
     break;
 
   case 180:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1311 "pars.y"
     {
 	    set_plotstr_string(&pstr[curstring], (char *) (yyvsp[(3) - (3)].pset));
@@ -6499,7 +7732,13 @@ yyreduce:
     break;
 
   case 181:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1322 "pars.y"
     {
 	    grdefaults.lines = (int) (yyvsp[(3) - (3)].val);
@@ -6507,7 +7746,13 @@ yyreduce:
     break;
 
   case 182:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1325 "pars.y"
     {
 	    grdefaults.linew = (int) (yyvsp[(3) - (3)].val);
@@ -6515,7 +7760,13 @@ yyreduce:
     break;
 
   case 183:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1328 "pars.y"
     {
 	    grdefaults.color = (int) (yyvsp[(3) - (3)].val);
@@ -6523,7 +7774,13 @@ yyreduce:
     break;
 
   case 184:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1331 "pars.y"
     {
 	    grdefaults.charsize = (yyvsp[(4) - (4)].val);
@@ -6531,7 +7788,13 @@ yyreduce:
     break;
 
   case 185:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1334 "pars.y"
     {
 	    grdefaults.font = (int) (yyvsp[(3) - (3)].val);
@@ -6539,7 +7802,13 @@ yyreduce:
     break;
 
   case 186:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1337 "pars.y"
     {
 	    grdefaults.fontsrc = (int) (yyvsp[(4) - (4)].val);
@@ -6547,7 +7816,13 @@ yyreduce:
     break;
 
   case 187:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1340 "pars.y"
     {
 	    grdefaults.symsize = (yyvsp[(4) - (4)].val);
@@ -6555,7 +7830,13 @@ yyreduce:
     break;
 
   case 188:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1344 "pars.y"
     {
 	    g[cg].w.xg1 = (yyvsp[(2) - (8)].val);
@@ -6566,7 +7847,13 @@ yyreduce:
     break;
 
   case 189:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1350 "pars.y"
     {
 	    g[cg].w.xg1 = (yyvsp[(3) - (3)].val);
@@ -6574,7 +7861,13 @@ yyreduce:
     break;
 
   case 190:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1353 "pars.y"
     {
 	    g[cg].w.xg2 = (yyvsp[(3) - (3)].val);
@@ -6582,7 +7875,13 @@ yyreduce:
     break;
 
   case 191:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1356 "pars.y"
     {
 	    g[cg].w.yg1 = (yyvsp[(3) - (3)].val);
@@ -6590,7 +7889,13 @@ yyreduce:
     break;
 
   case 192:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1359 "pars.y"
     {
 	    g[cg].w.yg2 = (yyvsp[(3) - (3)].val);
@@ -6598,7 +7903,13 @@ yyreduce:
     break;
 
   case 193:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1363 "pars.y"
     {
 	    g[cg].v.xv1 = (yyvsp[(2) - (8)].val);
@@ -6609,7 +7920,13 @@ yyreduce:
     break;
 
   case 194:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1369 "pars.y"
     {
 	    g[cg].v.xv1 = (yyvsp[(3) - (3)].val);
@@ -6617,7 +7934,13 @@ yyreduce:
     break;
 
   case 195:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1372 "pars.y"
     {
 	    g[cg].v.xv2 = (yyvsp[(3) - (3)].val);
@@ -6625,7 +7948,13 @@ yyreduce:
     break;
 
   case 196:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1375 "pars.y"
     {
 	    g[cg].v.yv1 = (yyvsp[(3) - (3)].val);
@@ -6633,7 +7962,13 @@ yyreduce:
     break;
 
   case 197:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1378 "pars.y"
     {
 	    g[cg].v.yv2 = (yyvsp[(3) - (3)].val);
@@ -6641,7 +7976,13 @@ yyreduce:
     break;
 
   case 198:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1381 "pars.y"
     {
 	    set_plotstr_string(&g[cg].labs.title, (char *) (yyvsp[(2) - (2)].pset));
@@ -6650,7 +7991,13 @@ yyreduce:
     break;
 
   case 199:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1385 "pars.y"
     {
 	    g[cg].labs.title.font = checkon(FONTP, g[cg].labs.title.font, (int) (yyvsp[(3) - (3)].val));
@@ -6658,7 +8005,13 @@ yyreduce:
     break;
 
   case 200:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1388 "pars.y"
     {
 	    g[cg].labs.title.charsize = (yyvsp[(3) - (3)].val);
@@ -6666,7 +8019,13 @@ yyreduce:
     break;
 
   case 201:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1391 "pars.y"
     {
 	    g[cg].labs.title.color = checkon(COLOR, g[cg].labs.title.color, (int) (yyvsp[(3) - (3)].val));
@@ -6674,7 +8033,13 @@ yyreduce:
     break;
 
   case 202:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1395 "pars.y"
     {
 	    g[cg].labs.title.linew = checkon(LINEWIDTH, g[cg].labs.title.linew, (int) (yyvsp[(3) - (3)].val));
@@ -6682,7 +8047,13 @@ yyreduce:
     break;
 
   case 203:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1398 "pars.y"
     {
 	    set_plotstr_string(&g[cg].labs.stitle, (char *) (yyvsp[(2) - (2)].pset));
@@ -6691,7 +8062,13 @@ yyreduce:
     break;
 
   case 204:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1403 "pars.y"
     {
 	    g[cg].labs.stitle.font = checkon(FONTP, g[cg].labs.stitle.font, (int) (yyvsp[(3) - (3)].val));
@@ -6699,7 +8076,13 @@ yyreduce:
     break;
 
   case 205:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1406 "pars.y"
     {
 	    g[cg].labs.stitle.charsize = (yyvsp[(3) - (3)].val);
@@ -6707,7 +8090,13 @@ yyreduce:
     break;
 
   case 206:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1410 "pars.y"
     {
 	    g[cg].labs.stitle.color = checkon(COLOR, g[cg].labs.stitle.color, (int) (yyvsp[(3) - (3)].val));
@@ -6715,7 +8104,13 @@ yyreduce:
     break;
 
   case 207:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1414 "pars.y"
     {
 	    g[cg].labs.stitle.linew = checkon(LINEWIDTH, g[cg].labs.stitle.color, (int) (yyvsp[(3) - (3)].val));
@@ -6723,7 +8118,13 @@ yyreduce:
     break;
 
   case 208:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1417 "pars.y"
     {
 	    realloc_plots((int) (yyvsp[(4) - (4)].val));
@@ -6731,7 +8132,13 @@ yyreduce:
     break;
 
   case 209:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1420 "pars.y"
     {
 	    g[cg].l.active = (yyvsp[(2) - (2)].pset);
@@ -6739,7 +8146,13 @@ yyreduce:
     break;
 
   case 210:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1423 "pars.y"
     {
 	    g[cg].l.loctype = (yyvsp[(3) - (3)].pset);
@@ -6747,7 +8160,13 @@ yyreduce:
     break;
 
   case 211:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1426 "pars.y"
     {
 	    g[cg].l.layout = (int) (yyvsp[(3) - (3)].val);
@@ -6755,7 +8174,13 @@ yyreduce:
     break;
 
   case 212:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1429 "pars.y"
     {
 	    g[cg].l.vgap = (int) (yyvsp[(3) - (3)].val);
@@ -6763,7 +8188,13 @@ yyreduce:
     break;
 
   case 213:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1432 "pars.y"
     {
 	    g[cg].l.hgap = (int) (yyvsp[(3) - (3)].val);
@@ -6771,7 +8202,13 @@ yyreduce:
     break;
 
   case 214:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1435 "pars.y"
     {
 	    g[cg].l.len = (int) (yyvsp[(3) - (3)].val);
@@ -6779,7 +8216,13 @@ yyreduce:
     break;
 
   case 215:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1438 "pars.y"
     {
 	    g[cg].l.box = (yyvsp[(3) - (3)].pset);
@@ -6787,7 +8230,13 @@ yyreduce:
     break;
 
   case 216:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1441 "pars.y"
     {
 	    g[cg].l.boxfill = (yyvsp[(4) - (4)].pset);
@@ -6795,7 +8244,13 @@ yyreduce:
     break;
 
   case 217:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1444 "pars.y"
     {
 	    g[cg].l.boxfillusing = (yyvsp[(5) - (5)].pset);
@@ -6803,7 +8258,13 @@ yyreduce:
     break;
 
   case 218:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1448 "pars.y"
     {
 	    if ((yyvsp[(4) - (5)].pset) == COLOR) {
@@ -6815,7 +8276,13 @@ yyreduce:
     break;
 
   case 219:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1455 "pars.y"
     {
 	    g[cg].l.boxlcolor = checkon(COLOR, g[cg].l.boxlcolor, (int) (yyvsp[(4) - (4)].val));
@@ -6823,7 +8290,13 @@ yyreduce:
     break;
 
   case 220:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1458 "pars.y"
     {
 	    g[cg].l.boxlines = checkon(LINESTYLE, g[cg].l.boxlines, (int) (yyvsp[(4) - (4)].val));
@@ -6831,7 +8304,13 @@ yyreduce:
     break;
 
   case 221:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1461 "pars.y"
     {
 	    g[cg].l.boxlinew = checkon(LINEWIDTH, g[cg].l.boxlinew, (int) (yyvsp[(4) - (4)].val));
@@ -6839,7 +8318,13 @@ yyreduce:
     break;
 
   case 222:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1464 "pars.y"
     {
 	    g[cg].l.legx = (yyvsp[(2) - (4)].val);
@@ -6848,7 +8333,13 @@ yyreduce:
     break;
 
   case 223:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1468 "pars.y"
     {
 	    g[cg].l.legx = (yyvsp[(3) - (3)].val);
@@ -6856,7 +8347,13 @@ yyreduce:
     break;
 
   case 224:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1471 "pars.y"
     {
 	    g[cg].l.legy = (yyvsp[(3) - (3)].val);
@@ -6864,7 +8361,13 @@ yyreduce:
     break;
 
   case 225:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1474 "pars.y"
     {
 	    g[cg].l.charsize = (yyvsp[(4) - (4)].val);
@@ -6872,7 +8375,13 @@ yyreduce:
     break;
 
   case 226:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1477 "pars.y"
     {
 	    g[cg].l.font = checkon(FONTP, g[cg].l.font, (int) (yyvsp[(3) - (3)].val));
@@ -6880,7 +8389,13 @@ yyreduce:
     break;
 
   case 227:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1480 "pars.y"
     {
 	    g[cg].l.lines = checkon(LINESTYLE, g[cg].l.lines, (int) (yyvsp[(3) - (3)].val));
@@ -6888,7 +8403,13 @@ yyreduce:
     break;
 
   case 228:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1483 "pars.y"
     {
 	    g[cg].l.linew = checkon(LINEWIDTH, g[cg].l.linew, (int) (yyvsp[(3) - (3)].val));
@@ -6896,7 +8417,13 @@ yyreduce:
     break;
 
   case 229:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1486 "pars.y"
     {
 	    g[cg].l.color = checkon(COLOR, g[cg].l.color, (int) (yyvsp[(3) - (3)].val));
@@ -6904,7 +8431,13 @@ yyreduce:
     break;
 
   case 230:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1489 "pars.y"
     {
 	    set_plotstr_string(&g[cg].l.str[(int) (yyvsp[(3) - (4)].val)], (char *) (yyvsp[(4) - (4)].pset));
@@ -6913,7 +8446,13 @@ yyreduce:
     break;
 
   case 231:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1493 "pars.y"
     {
 	    g[cg].isol.nisol = (int) (yyvsp[(2) - (2)].val);
@@ -6921,7 +8460,13 @@ yyreduce:
     break;
 
   case 232:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1496 "pars.y"
     {
 	    g[cg].isol.isoltype = (int) (yyvsp[(3) - (3)].val);
@@ -6929,7 +8474,13 @@ yyreduce:
     break;
 
   case 233:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1499 "pars.y"
     {
 	    g[cg].isol.cis[(int) (yyvsp[(2) - (4)].val)] = (yyvsp[(4) - (4)].val);
@@ -6937,28 +8488,52 @@ yyreduce:
     break;
 
   case 234:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1502 "pars.y"
     {
 	}
     break;
 
   case 235:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1504 "pars.y"
     {
 	}
     break;
 
   case 236:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1506 "pars.y"
     {
 	}
     break;
 
   case 237:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1508 "pars.y"
     {
 	    g[cg].isol.cis[0] = (double) (yyvsp[(3) - (5)].val);
@@ -6967,7 +8542,13 @@ yyreduce:
     break;
 
   case 238:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1512 "pars.y"
     {
 	    g[cg].isol.lactive = (yyvsp[(3) - (3)].pset);
@@ -6975,7 +8556,13 @@ yyreduce:
     break;
 
   case 239:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1515 "pars.y"
     {
 	    g[cg].isol.loctype = (yyvsp[(4) - (4)].pset);
@@ -6983,7 +8570,13 @@ yyreduce:
     break;
 
   case 240:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1518 "pars.y"
     {
 	    g[cg].isol.x = (double) (yyvsp[(3) - (5)].val);
@@ -6992,7 +8585,13 @@ yyreduce:
     break;
 
   case 241:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1522 "pars.y"
     {
 	    g[cg].isol.layout = (yyvsp[(4) - (4)].pset);
@@ -7000,7 +8599,13 @@ yyreduce:
     break;
 
   case 242:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1525 "pars.y"
     {
 	    g[cg].isol.layout = (yyvsp[(4) - (4)].pset);
@@ -7008,7 +8613,13 @@ yyreduce:
     break;
 
   case 243:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1528 "pars.y"
     {
 	    g[cg].isol.p.format = (yyvsp[(5) - (5)].pset);
@@ -7016,7 +8627,13 @@ yyreduce:
     break;
 
   case 244:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1531 "pars.y"
     {
 	    g[cg].isol.p.prec = (int) (yyvsp[(5) - (5)].val);
@@ -7024,7 +8641,13 @@ yyreduce:
     break;
 
   case 245:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1534 "pars.y"
     {
 	    g[cg].isol.p.charsize = (yyvsp[(5) - (5)].val);
@@ -7032,7 +8655,13 @@ yyreduce:
     break;
 
   case 246:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1537 "pars.y"
     {
 	    g[cg].isol.xlen = (yyvsp[(4) - (6)].val);
@@ -7041,7 +8670,13 @@ yyreduce:
     break;
 
   case 247:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1541 "pars.y"
     {
 	    g[cg].isol.xgap = (yyvsp[(4) - (6)].val);
@@ -7050,7 +8685,13 @@ yyreduce:
     break;
 
   case 248:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1545 "pars.y"
     {
 	    g[cg].f.active = (yyvsp[(2) - (2)].pset);
@@ -7058,7 +8699,13 @@ yyreduce:
     break;
 
   case 249:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1548 "pars.y"
     {
 	    g[cg].f.type = (int) (yyvsp[(3) - (3)].val);
@@ -7066,7 +8713,13 @@ yyreduce:
     break;
 
   case 250:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1551 "pars.y"
     {
 	    g[cg].f.lines = checkon(LINESTYLE, g[cg].f.lines, (int) (yyvsp[(3) - (3)].val));
@@ -7074,7 +8727,13 @@ yyreduce:
     break;
 
   case 251:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1554 "pars.y"
     {
 	    g[cg].f.linew = checkon(LINEWIDTH, g[cg].f.linew, (int) (yyvsp[(3) - (3)].val));
@@ -7082,7 +8741,13 @@ yyreduce:
     break;
 
   case 252:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1557 "pars.y"
     {
 	    g[cg].f.color = checkon(COLOR, g[cg].f.color, (int) (yyvsp[(3) - (3)].val));
@@ -7090,7 +8755,13 @@ yyreduce:
     break;
 
   case 253:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1560 "pars.y"
     {
 	    g[cg].f.fillbg = (yyvsp[(3) - (3)].pset);
@@ -7098,7 +8769,13 @@ yyreduce:
     break;
 
   case 254:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1563 "pars.y"
     {
 	    g[cg].f.bgcolor = (int) (yyvsp[(4) - (4)].val);
@@ -7106,7 +8783,13 @@ yyreduce:
     break;
 
   case 255:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1566 "pars.y"
     {
 	    g[(yyvsp[(1) - (2)].pset)].active = (yyvsp[(2) - (2)].pset);
@@ -7114,7 +8797,13 @@ yyreduce:
     break;
 
   case 256:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1569 "pars.y"
     {
 	    g[(yyvsp[(1) - (3)].pset)].label = (yyvsp[(3) - (3)].pset);
@@ -7122,7 +8811,13 @@ yyreduce:
     break;
 
   case 257:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1572 "pars.y"
     {
 	    g[(yyvsp[(1) - (4)].pset)].auto_type = (yyvsp[(4) - (4)].pset);
@@ -7130,7 +8825,13 @@ yyreduce:
     break;
 
   case 258:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1575 "pars.y"
     {
 	    g[(yyvsp[(1) - (4)].pset)].auto_type = (yyvsp[(4) - (4)].pset);
@@ -7138,7 +8839,13 @@ yyreduce:
     break;
 
   case 259:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1578 "pars.y"
     {
 	    g[(yyvsp[(1) - (3)].pset)].parmsread = ((yyvsp[(3) - (3)].pset) == FALSEP);
@@ -7146,7 +8853,13 @@ yyreduce:
     break;
 
   case 260:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1581 "pars.y"
     {
 	    g[(yyvsp[(1) - (3)].pset)].hidden = ((yyvsp[(3) - (3)].pset) == TRUEP);
@@ -7154,7 +8867,13 @@ yyreduce:
     break;
 
   case 261:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1584 "pars.y"
     {
 	    g[(yyvsp[(1) - (3)].pset)].type = (yyvsp[(3) - (3)].pset);
@@ -7162,7 +8881,13 @@ yyreduce:
     break;
 
   case 262:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1587 "pars.y"
     {
 	    g[(yyvsp[(1) - (4)].pset)].barwid = (yyvsp[(4) - (4)].val);
@@ -7170,7 +8895,13 @@ yyreduce:
     break;
 
   case 263:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1590 "pars.y"
     {
 	    g[(yyvsp[(1) - (4)].pset)].sbarwid = (yyvsp[(4) - (4)].val);
@@ -7178,7 +8909,13 @@ yyreduce:
     break;
 
   case 264:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1593 "pars.y"
     {
 	    g[(yyvsp[(1) - (3)].pset)].pointset = ((yyvsp[(3) - (3)].pset) == ON);
@@ -7186,7 +8923,13 @@ yyreduce:
     break;
 
   case 265:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1597 "pars.y"
     {
 	    g[(yyvsp[(1) - (5)].pset)].fx = (yyvsp[(4) - (5)].pset);
@@ -7195,7 +8938,13 @@ yyreduce:
     break;
 
   case 266:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1602 "pars.y"
     {
 	    g[(yyvsp[(1) - (6)].pset)].px = (yyvsp[(4) - (6)].val);
@@ -7204,7 +8953,13 @@ yyreduce:
     break;
 
   case 267:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1607 "pars.y"
     {
 	    g[(yyvsp[(1) - (6)].pset)].dsx = (yyvsp[(4) - (6)].val);
@@ -7213,7 +8968,13 @@ yyreduce:
     break;
 
   case 268:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1611 "pars.y"
     {
 	    g[(yyvsp[(1) - (4)].pset)].pt_type = (int) (yyvsp[(4) - (4)].val);
@@ -7221,7 +8982,13 @@ yyreduce:
     break;
 
   case 269:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+=======
+
+/* Line 1455 of yacc.c  */
+>>>>>>> .r440
 #line 1614 "pars.y"
     {
 	    realloc_graph_plots((yyvsp[(1) - (4)].pset), (int) (yyvsp[(4) - (4)].val));
@@ -7229,84 +8996,177 @@ yyreduce:
     break;
 
   case 270:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1621 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1620 "pars.y"
+>>>>>>> .r440
     { /* set the DB host name, database */
+<<<<<<< .mine
 #ifdef PGSQL
 		SetDBHost((char *) (yyvsp[(2) - (4)].pset), (char *) (yyvsp[(4) - (4)].pset));
 #endif
+=======
+		SetDBHost((char *) (yyvsp[(2) - (4)].pset), (char *) (yyvsp[(4) - (4)].pset));
+>>>>>>> .r440
 	}
     break;
 
   case 271:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1627 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1624 "pars.y"
+>>>>>>> .r440
     { /* graph set site, iid, x, y, cday1, cday2 */
+<<<<<<< .mine
 #ifdef PGSQL
 		ReadDB((yyvsp[(2) - (15)].pset), (yyvsp[(4) - (15)].pset), (char *) (yyvsp[(5) - (15)].pset), (char *) (yyvsp[(7) - (15)].pset), (char *) (yyvsp[(9) - (15)].pset), 
 			(char *) (yyvsp[(11) - (15)].pset), (double) (yyvsp[(13) - (15)].val), (double) (yyvsp[(15) - (15)].val));
 #endif
+=======
+		ReadDB((yyvsp[(2) - (15)].pset), (yyvsp[(4) - (15)].pset), (char *) (yyvsp[(5) - (15)].pset), (char *) (yyvsp[(7) - (15)].pset), (char *) (yyvsp[(9) - (15)].pset), 
+			(char *) (yyvsp[(11) - (15)].pset), (double) (yyvsp[(13) - (15)].val), (double) (yyvsp[(15) - (15)].val));
+>>>>>>> .r440
 	}
     break;
 
   case 272:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1634 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1629 "pars.y"
+>>>>>>> .r440
     { /* default graph, next set site, iid, x, y, cday1, cday2 */
+<<<<<<< .mine
 #ifdef PGSQL
 		ReadDB(cg, -1, (char *) (yyvsp[(2) - (12)].pset), (char *) (yyvsp[(4) - (12)].pset), (char *) (yyvsp[(6) - (12)].pset), 
 			(char *) (yyvsp[(8) - (12)].pset), (double) (yyvsp[(10) - (12)].val), (double) (yyvsp[(12) - (12)].val));
 #endif
+=======
+		ReadDB(cg, -1, (char *) (yyvsp[(2) - (12)].pset), (char *) (yyvsp[(4) - (12)].pset), (char *) (yyvsp[(6) - (12)].pset), 
+			(char *) (yyvsp[(8) - (12)].pset), (double) (yyvsp[(10) - (12)].val), (double) (yyvsp[(12) - (12)].val));
+>>>>>>> .r440
 	}
     break;
 
   case 273:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1641 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1634 "pars.y"
+>>>>>>> .r440
     { /* default graph, next set site, iid, x, y, cday1, cday2 */
+<<<<<<< .mine
 #ifdef PGSQL
 		ReadDB((yyvsp[(2) - (13)].pset), -1, (char *) (yyvsp[(3) - (13)].pset), (char *) (yyvsp[(5) - (13)].pset), (char *) (yyvsp[(7) - (13)].pset), 
 			(char *) (yyvsp[(9) - (13)].pset), (double) (yyvsp[(11) - (13)].val), (double) (yyvsp[(13) - (13)].val));
 #endif
+=======
+		ReadDB((yyvsp[(2) - (13)].pset), -1, (char *) (yyvsp[(3) - (13)].pset), (char *) (yyvsp[(5) - (13)].pset), (char *) (yyvsp[(7) - (13)].pset), 
+			(char *) (yyvsp[(9) - (13)].pset), (double) (yyvsp[(11) - (13)].val), (double) (yyvsp[(13) - (13)].val));
+>>>>>>> .r440
 	}
     break;
 
   case 274:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1648 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1639 "pars.y"
+>>>>>>> .r440
     { /* graph set site, iid, x, y, bin#, cday1, cday2 */
+<<<<<<< .mine
 #ifdef PGSQL
 		ReadDBADP((yyvsp[(2) - (18)].pset), (yyvsp[(4) - (18)].pset), (char *) (yyvsp[(6) - (18)].pset), (char *) (yyvsp[(8) - (18)].pset), (char *) (yyvsp[(10) - (18)].pset), 
 			(char *) (yyvsp[(12) - (18)].pset), (int) (yyvsp[(14) - (18)].val), (double) (yyvsp[(16) - (18)].val), (double) (yyvsp[(18) - (18)].val));
 #endif
+=======
+		ReadDBADP((yyvsp[(2) - (18)].pset), (yyvsp[(4) - (18)].pset), (char *) (yyvsp[(6) - (18)].pset), (char *) (yyvsp[(8) - (18)].pset), (char *) (yyvsp[(10) - (18)].pset), 
+			(char *) (yyvsp[(12) - (18)].pset), (int) (yyvsp[(14) - (18)].val), (double) (yyvsp[(16) - (18)].val), (double) (yyvsp[(18) - (18)].val));
+>>>>>>> .r440
 	}
     break;
 
   case 275:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1655 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1644 "pars.y"
+>>>>>>> .r440
     { /* graph set SQL */
+<<<<<<< .mine
 #ifdef PGSQL
 		ReadDBSQL((yyvsp[(2) - (5)].pset), (yyvsp[(4) - (5)].pset), (char *) (yyvsp[(5) - (5)].pset));
 #endif
+=======
+		ReadDBSQL((yyvsp[(2) - (5)].pset), (yyvsp[(4) - (5)].pset), (char *) (yyvsp[(5) - (5)].pset));
+>>>>>>> .r440
 	}
     break;
 
   case 276:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1663 "pars.y"
     { g[cg].vp.vscale = (yyvsp[(3) - (3)].val); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1650 "pars.y"
+    { g[cg].vp.vscale = (yyvsp[(3) - (3)].val); }
+>>>>>>> .r440
     break;
 
   case 277:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1664 "pars.y"
     { g[cg].vp.active = (yyvsp[(3) - (3)].pset); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1651 "pars.y"
+    { g[cg].vp.active = (yyvsp[(3) - (3)].pset); }
+>>>>>>> .r440
     break;
 
   case 278:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1665 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1652 "pars.y"
+>>>>>>> .r440
     { 
 		    g[cg].vp.velx = (yyvsp[(4) - (6)].val); 
 		    g[cg].vp.vely = (yyvsp[(6) - (6)].val); 
@@ -7314,646 +9174,1248 @@ yyreduce:
     break;
 
   case 279:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1669 "pars.y"
     { g[cg].vp.userlength = (double) (yyvsp[(4) - (4)].val); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1656 "pars.y"
+    { g[cg].vp.userlength = (double) (yyvsp[(4) - (4)].val); }
+>>>>>>> .r440
     break;
 
   case 280:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1670 "pars.y"
     { set_plotstr_string(&g[cg].vp.vstr, (char *) (yyvsp[(4) - (4)].pset)); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1657 "pars.y"
+    { set_plotstr_string(&g[cg].vp.vstr, (char *) (yyvsp[(4) - (4)].pset)); }
+>>>>>>> .r440
     break;
 
   case 281:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1671 "pars.y"
     { g[cg].vp.linew = (int) (yyvsp[(3) - (3)].val); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1658 "pars.y"
+    { g[cg].vp.linew = (int) (yyvsp[(3) - (3)].val); }
+>>>>>>> .r440
     break;
 
   case 282:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1672 "pars.y"
     { g[cg].vp.lines = (int) (yyvsp[(3) - (3)].val); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1659 "pars.y"
+    { g[cg].vp.lines = (int) (yyvsp[(3) - (3)].val); }
+>>>>>>> .r440
     break;
 
   case 283:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1673 "pars.y"
     { g[cg].vp.color = (int) (yyvsp[(3) - (3)].val); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1660 "pars.y"
+    { g[cg].vp.color = (int) (yyvsp[(3) - (3)].val); }
+>>>>>>> .r440
     break;
 
   case 284:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1674 "pars.y"
     { g[cg].vp.loctype = (yyvsp[(3) - (3)].pset); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1661 "pars.y"
+    { g[cg].vp.loctype = (yyvsp[(3) - (3)].pset); }
+>>>>>>> .r440
     break;
 
   case 285:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1675 "pars.y"
     { g[cg].vp.arrowtype = (int) (yyvsp[(4) - (4)].val); }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1662 "pars.y"
+    { g[cg].vp.arrowtype = (int) (yyvsp[(4) - (4)].val); }
+>>>>>>> .r440
     break;
 
   case 286:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1679 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1666 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XY;
 	}
     break;
 
   case 287:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1682 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1669 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYARC;
 	}
     break;
 
   case 288:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1685 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1672 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYBOX;
 	}
     break;
 
   case 289:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1688 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1675 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYBOXPLOT;
 	}
     break;
 
   case 290:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1691 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1678 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYHILO;
 	}
     break;
 
   case 291:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1694 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1681 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYRT;
 	}
     break;
 
   case 292:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1697 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1684 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYSEG;
 	}
     break;
 
   case 293:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1700 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1687 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYSTRING;
 	}
     break;
 
   case 294:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1703 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1690 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYDX;
 	}
     break;
 
   case 295:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1706 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1693 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYDY;
 	}
     break;
 
   case 296:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1709 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1696 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYDXDX;
 	}
     break;
 
   case 297:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1712 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1699 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYDYDY;
 	}
     break;
 
   case 298:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1715 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1702 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYDXDY;
 	}
     break;
 
   case 299:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1718 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1705 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYX2Y2;
 	}
     break;
 
   case 300:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1721 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1708 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYXX;
 	}
     break;
 
   case 301:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1724 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1711 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYYY;
 	}
     break;
 
   case 302:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1727 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1714 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYZ;
 	}
     break;
 
   case 303:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1730 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1717 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYZW;
 	}
     break;
 
   case 304:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1733 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1720 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XYUV;
 	}
     break;
 
   case 305:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1736 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1723 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RECTGRID;
 	}
     break;
 
   case 306:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1739 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1726 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = FEGRID;
 	}
     break;
 
   case 307:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1742 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1729 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = NXY;
 	}
     break;
 
   case 308:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1745 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1732 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = BIN;
 	}
     break;
 
   case 309:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1751 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1738 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 310:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1754 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1741 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 311:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1757 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1744 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 312:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1760 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1747 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 313:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1763 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1750 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 314:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1766 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1753 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 315:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1769 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1756 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 316:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1772 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1759 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 317:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1775 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1762 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XY;		/* not active */
 	}
     break;
 
   case 318:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1778 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1765 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = XY;		/* not active */
 	}
     break;
 
   case 319:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1781 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1768 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 320:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1784 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1771 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 321:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1790 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1777 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = FREE;
         }
     break;
 
   case 322:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1793 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1780 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = LANDSCAPE;
         }
     break;
 
   case 323:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1796 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1783 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = PORTRAIT;
         }
     break;
 
   case 324:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1799 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1786 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = FIXED;
         }
     break;
 
   case 325:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1805 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1792 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 326:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1806 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1793 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 327:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1807 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1794 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 328:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1808 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1795 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 329:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1809 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1796 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 330:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1810 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1797 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 331:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1814 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1801 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 332:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1815 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1802 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 333:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1816 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1803 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 334:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1820 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1807 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 335:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1835 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1822 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ACTIVE, (yyvsp[(1) - (1)].pset), 0);
 	}
     break;
 
   case 336:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1838 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1825 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ACTIVE, (yyvsp[(1) - (1)].pset), 0);
 	}
     break;
 
   case 337:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1841 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1828 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, TYPE, (yyvsp[(2) - (2)].pset), 0);
 	}
     break;
 
   case 338:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1844 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1831 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, MISSINGP, (yyvsp[(2) - (2)].val), 0);
 	}
     break;
 
   case 339:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1847 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1834 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, PREC, (int) (yyvsp[(2) - (2)].val), 0);
 	}
     break;
 
   case 340:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1850 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1837 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, FORMAT, (yyvsp[(2) - (2)].pset), 0);
 	}
     break;
 
   case 341:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1853 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1840 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, TYPE, (int) (yyvsp[(2) - (2)].val), 0);
 	}
     break;
 
   case 342:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1856 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1843 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, FILL, (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 343:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1859 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1846 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, CENTER, ((yyvsp[(3) - (3)].pset) == TRUEP), 0);
 	}
     break;
 
   case 344:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1862 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1849 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, SIZE, (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 345:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1865 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1852 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, CHAR, (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 346:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1868 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1855 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, SKIP, (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 347:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1871 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1858 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, COLOR, (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 348:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1874 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1861 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, LINEWIDTH, (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 349:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1877 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1864 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SYMBOL, LINESTYLE, (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 350:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1880 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1867 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, (yyvsp[(1) - (2)].pset), (int) (yyvsp[(2) - (2)].val), 0);
 	}
     break;
 
   case 351:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1883 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1870 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, FILL, TYPE, (int) (yyvsp[(2) - (2)].val), 0);
 	}
     break;
 
   case 352:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1886 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1873 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, FILL, WITH, (yyvsp[(3) - (3)].pset), 0);
 	}
     break;
 
   case 353:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1889 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1876 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, FILL, (yyvsp[(2) - (3)].pset), (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 354:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1892 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1879 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, SKIP, (int) (yyvsp[(2) - (2)].val), 0);
 	}
     break;
 
   case 355:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1895 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1882 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ERRORBAR, LENGTH, (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 356:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1898 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1885 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ERRORBAR, TYPE, (yyvsp[(3) - (3)].pset), 0);
 	}
     break;
 
   case 357:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1901 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1888 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ERRORBAR, LINEWIDTH, (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 358:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1904 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1891 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ERRORBAR, LINESTYLE, (int) (yyvsp[(3) - (3)].val), 0);
 	}
     break;
 
   case 359:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1907 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1894 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ERRORBAR, RISER, ACTIVE, (yyvsp[(3) - (3)].pset), 0);
 	}
     break;
 
   case 360:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1910 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1897 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ERRORBAR, RISER, LINEWIDTH, (int) (yyvsp[(4) - (4)].val), 0);
 	}
     break;
 
   case 361:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1913 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1900 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, ERRORBAR, RISER, LINESTYLE, (int) (yyvsp[(4) - (4)].val), 0);
 	}
     break;
 
   case 362:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1916 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1903 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, XYZ, (yyvsp[(2) - (4)].val), (yyvsp[(4) - (4)].val), 0);
 	}
     break;
 
   case 363:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1919 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1906 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(whichgraph, SET, SETNUM, whichset, COMMENT, (char *) (yyvsp[(2) - (2)].pset), 0);
 	    free((char *) (yyvsp[(2) - (2)].pset));
@@ -7961,198 +10423,408 @@ yyreduce:
     break;
 
   case 364:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1926 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1913 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 365:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1927 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1914 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 366:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1928 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1915 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 367:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1929 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1916 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 368:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1930 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1917 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 369:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1931 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1918 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 370:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1935 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1922 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 371:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1936 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1923 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 372:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1937 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1924 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 373:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1938 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1925 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 374:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1939 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1926 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 375:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1940 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1927 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 376:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1944 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1931 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 377:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1945 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1932 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 378:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1946 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1933 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 379:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1950 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1937 "pars.y"
+>>>>>>> .r440
     {
 	    set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (1)].pset), 0.0);
 	}
     break;
 
   case 380:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1953 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1940 "pars.y"
+>>>>>>> .r440
     {
 	    set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].val));
 	}
     break;
 
   case 381:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1956 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1943 "pars.y"
+>>>>>>> .r440
     {
 	    set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].val));
 	}
     break;
 
   case 382:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1959 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1946 "pars.y"
+>>>>>>> .r440
     {
 	    set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].val));
 	}
     break;
 
   case 383:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1962 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1949 "pars.y"
+>>>>>>> .r440
     {
 	    set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].val));
 	}
     break;
 
   case 384:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1965 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1952 "pars.y"
+>>>>>>> .r440
     {
 	    set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (3)].pset), (yyvsp[(3) - (3)].val));
 	}
     break;
 
   case 385:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1968 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1955 "pars.y"
+>>>>>>> .r440
     {
 	    set_axis_prop(whichgraph, naxis, (yyvsp[(1) - (2)].pset), (yyvsp[(2) - (2)].pset));
 	}
     break;
 
   case 386:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1974 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1961 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 387:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1975 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1962 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 388:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1976 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1963 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 389:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1977 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1964 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 390:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1978 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1965 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].active = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 391:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1984 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1971 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 392:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1985 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1972 "pars.y"
+>>>>>>> .r440
     {}
     break;
 
   case 393:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1990 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1977 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_flag = (yyvsp[(1) - (1)].pset);
 	    g[cg].t[naxis].t_mflag = (yyvsp[(1) - (1)].pset);
@@ -8160,296 +10832,555 @@ yyreduce:
     break;
 
   case 394:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1994 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1981 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_flag = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 395:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 1997 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1984 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_mflag = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 396:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2000 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1987 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tmajor = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 397:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2003 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1990 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tminor = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 398:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2006 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1993 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].offsx = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 399:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2009 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1996 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].offsy = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 400:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2012 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 1999 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].alt = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 401:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2015 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2002 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tmin = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 402:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2018 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2005 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tmax = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 403:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2021 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2008 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_num = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 404:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2024 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2011 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_inout = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 405:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2027 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2014 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_log = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 406:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2030 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2017 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_size = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 407:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2033 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2020 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_size = (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 408:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2036 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2023 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_msize = (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 409:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2039 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2026 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_color = g[cg].t[naxis].t_mcolor = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 410:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2042 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2029 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_linew = g[cg].t[naxis].t_mlinew = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 411:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2045 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2032 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_color = (int) (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 412:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2048 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2035 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_mcolor = (int) (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 413:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2051 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2038 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_linew = (int) (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 414:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2054 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2041 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_mlinew = (int) (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 415:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2057 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2044 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_lines = (int) (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 416:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2060 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2047 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_mlines = (int) (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 417:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2063 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2050 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_gridflag = (yyvsp[(3) - (3)].pset);
 	}
     break;
 
   case 418:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2066 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2053 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_mgridflag = (yyvsp[(3) - (3)].pset);
 	}
     break;
 
   case 419:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2069 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2056 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_op = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 420:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2072 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2059 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_type = AUTO;
 	}
     break;
 
   case 421:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2075 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2062 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_type = SPEC;
 	}
     break;
 
   case 422:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2078 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2065 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_spec = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 423:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2081 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2068 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_specloc[(int) (yyvsp[(1) - (3)].val)] = (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 426:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2092 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2079 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_flag = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 427:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2095 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2082 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_type = AUTO;
 	}
     break;
 
   case 428:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2098 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2085 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_type = SPEC;
 	}
     break;
 
   case 429:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2101 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2088 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_prec = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 430:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2104 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2091 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_format = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 431:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2107 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2094 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_format = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 432:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2110 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2097 "pars.y"
+>>>>>>> .r440
     {
 	    strcpy(g[cg].t[naxis].tl_appstr, (char *) (yyvsp[(2) - (2)].pset));
 	    free((char *) (yyvsp[(2) - (2)].pset));
@@ -8457,8 +11388,15 @@ yyreduce:
     break;
 
   case 433:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2114 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2101 "pars.y"
+>>>>>>> .r440
     {
 	    strcpy(g[cg].t[naxis].tl_prestr, (char *) (yyvsp[(2) - (2)].pset));
 	    free((char *) (yyvsp[(2) - (2)].pset));
@@ -8466,176 +11404,330 @@ yyreduce:
     break;
 
   case 434:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2118 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2105 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_layout = HORIZONTAL;
 	}
     break;
 
   case 435:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2121 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2108 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_layout = VERTICAL;
 	}
     break;
 
   case 436:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2124 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2111 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_layout = SPEC;
 	}
     break;
 
   case 437:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2127 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2114 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_angle = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 438:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2130 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2117 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_just = (int) (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 439:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2133 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2120 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_skip = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 440:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2136 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2123 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_staggered = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 441:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2139 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2126 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_op = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 442:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2142 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2129 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_sign = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 443:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2145 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2132 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_start = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 444:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2148 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2135 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_stop = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 445:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2151 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2138 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_starttype = (int) (yyvsp[(3) - (3)].pset);
 	}
     break;
 
   case 446:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2154 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2141 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_starttype = (int) (yyvsp[(3) - (3)].pset);
 	}
     break;
 
   case 447:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2157 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2144 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_stoptype = (int) (yyvsp[(3) - (3)].pset);
 	}
     break;
 
   case 448:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2160 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2147 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_stoptype = (int) (yyvsp[(3) - (3)].pset);
 	}
     break;
 
   case 449:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2163 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2150 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_vgap = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 450:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2166 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2153 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_hgap = (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 451:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2169 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2156 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_charsize = (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 452:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2172 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2159 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_font = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 453:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2175 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2162 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_color = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 454:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2178 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2165 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].tl_linew = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 455:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2181 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2168 "pars.y"
+>>>>>>> .r440
     {
 	    set_plotstr_string(&g[cg].t[naxis].t_speclab[(int) (yyvsp[(1) - (3)].val)], (char *) (yyvsp[(3) - (3)].pset));
 	    free((char *) (yyvsp[(3) - (3)].pset));
@@ -8643,8 +11735,15 @@ yyreduce:
     break;
 
   case 456:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2188 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2175 "pars.y"
+>>>>>>> .r440
     {
 	    set_plotstr_string(&g[cg].t[naxis].label, (char *) (yyvsp[(1) - (1)].pset));
 	    free((char *) (yyvsp[(1) - (1)].pset));
@@ -8652,40 +11751,75 @@ yyreduce:
     break;
 
   case 457:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2192 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2179 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label_layout = PERP;
 	}
     break;
 
   case 458:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2195 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2182 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label_layout = PARA;
 	}
     break;
 
   case 459:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2198 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2185 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label_place = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 460:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2201 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2188 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label_place = (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 461:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2204 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2191 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label.x = (yyvsp[(2) - (4)].val);
 	    g[cg].t[naxis].label.y = (yyvsp[(4) - (4)].val);
@@ -8693,80 +11827,150 @@ yyreduce:
     break;
 
   case 462:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2208 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2195 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label.just = (int) (yyvsp[(2) - (2)].pset);
 	}
     break;
 
   case 463:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2211 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2198 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label.charsize = (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 464:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2214 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2201 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label.font = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 465:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2217 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2204 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label.color = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 466:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2220 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2207 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].label.linew = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 467:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2226 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2213 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_drawbar = (yyvsp[(1) - (1)].pset);
 	}
     break;
 
   case 468:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2229 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2216 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_drawbarcolor = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 469:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2232 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2219 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_drawbarlines = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 470:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2235 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2222 "pars.y"
+>>>>>>> .r440
     {
 	    g[cg].t[naxis].t_drawbarlinew = (int) (yyvsp[(2) - (2)].val);
 	}
     break;
 
   case 471:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2242 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2229 "pars.y"
+>>>>>>> .r440
     {
 	    whichgraph = (yyvsp[(1) - (3)].pset);
 	    whichset = (yyvsp[(3) - (3)].pset);
@@ -8774,8 +11978,15 @@ yyreduce:
     break;
 
   case 472:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2247 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2234 "pars.y"
+>>>>>>> .r440
     {
 	    whichgraph = cg;
 	    whichset = (yyvsp[(1) - (1)].pset);
@@ -8783,8 +11994,15 @@ yyreduce:
     break;
 
   case 473:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2252 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2239 "pars.y"
+>>>>>>> .r440
     {
 	    whichgraph = cg;
 	    whichset = (yyvsp[(1) - (1)].pset);
@@ -8792,8 +12010,15 @@ yyreduce:
     break;
 
   case 474:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2257 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2244 "pars.y"
+>>>>>>> .r440
     {
 	    whichgraph = (yyvsp[(1) - (2)].pset);
 	    whichset = (yyvsp[(2) - (2)].pset);
@@ -8801,8 +12026,15 @@ yyreduce:
     break;
 
   case 475:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2262 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2249 "pars.y"
+>>>>>>> .r440
     {
 	    whichgraph = (yyvsp[(1) - (2)].pset);
 	    whichset = (yyvsp[(2) - (2)].pset);
@@ -8810,8 +12042,15 @@ yyreduce:
     break;
 
   case 476:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2267 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2254 "pars.y"
+>>>>>>> .r440
     {
 	    whichgraph = (yyvsp[(1) - (2)].pset);
 	    whichset = (yyvsp[(2) - (2)].pset);
@@ -8819,686 +12058,1311 @@ yyreduce:
     break;
 
   case 477:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2274 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2261 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = (yyvsp[(1) - (1)].pset);
         }
     break;
 
   case 478:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2277 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2264 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = (yyvsp[(1) - (1)].pset);
         }
     break;
 
   case 479:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2280 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2267 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = (yyvsp[(1) - (1)].pset);
         }
     break;
 
   case 480:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2283 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2270 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = (yyvsp[(1) - (1)].pset);
         }
     break;
 
   case 481:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2286 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2273 "pars.y"
+>>>>>>> .r440
     {
             (yyval.pset) = (yyvsp[(1) - (1)].pset);
         }
     break;
 
   case 482:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2292 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2279 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = ON;
 	}
     break;
 
   case 483:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2295 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2282 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = OFF;
 	}
     break;
 
   case 484:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2301 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2288 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = COLOR;
 	}
     break;
 
   case 485:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2304 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2291 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = PATTERN;
 	}
     break;
 
   case 486:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2310 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2297 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RUNAVG;
 	}
     break;
 
   case 487:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2313 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2300 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RUNSTD;
 	}
     break;
 
   case 488:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2316 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2303 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RUNMED;
 	}
     break;
 
   case 489:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2319 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2306 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RUNMAX;
 	}
     break;
 
   case 490:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2322 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2309 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RUNMIN;
 	}
     break;
 
   case 491:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2328 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2315 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DFT;
 	}
     break;
 
   case 492:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2331 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2318 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = FFT;
 	}
     break;
 
   case 493:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2334 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2321 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = INVDFT;
 	}
     break;
 
   case 494:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2337 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2324 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = INVFFT;
 	}
     break;
 
   case 495:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2343 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2330 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DISK;
 	}
     break;
 
   case 496:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2346 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2333 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = PIPE;
 	}
     break;
 
   case 497:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2352 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2339 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = PATTERN;
 	}
     break;
 
   case 498:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2355 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2342 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = COLOR;
 	}
     break;
 
   case 499:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2358 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2345 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = NONE;
 	}
     break;
 
   case 500:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2364 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2351 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = TOP;
 	}
     break;
 
   case 501:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2367 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2354 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = BOTTOM;
 	}
     break;
 
   case 502:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2370 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2357 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = LEFT;
 	}
     break;
 
   case 503:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2373 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2360 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RIGHT;
 	}
     break;
 
   case 504:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2376 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2363 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = BOTH;
 	}
     break;
 
   case 505:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2382 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2369 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RIGHT;
 	}
     break;
 
   case 506:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2385 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2372 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = LEFT;
 	}
     break;
 
   case 507:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2388 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2375 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = CENTER;
 	}
     break;
 
   case 508:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2394 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2381 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MINP;
 	}
     break;
 
   case 509:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2397 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2384 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MAXP;
 	}
     break;
 
   case 510:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2403 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2390 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = TRUEP;
 	}
     break;
 
   case 511:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2406 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2393 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = FALSEP;
 	}
     break;
 
   case 512:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2412 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2399 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = IN;
 	}
     break;
 
   case 513:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2415 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2402 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = OUT;
 	}
     break;
 
   case 514:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2418 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2405 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = BOTH;
 	}
     break;
 
   case 515:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2424 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2411 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DECIMAL;
 	}
     break;
 
   case 516:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2427 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2414 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = EXPONENTIAL;
 	}
     break;
 
   case 517:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2430 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2417 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = POWER;
 	}
     break;
 
   case 518:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2433 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2420 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = GENERAL;
 	}
     break;
 
   case 519:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2436 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2423 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DDMMYY;
 	}
     break;
 
   case 520:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2439 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2426 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MMDDYY;
 	}
     break;
 
   case 521:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2442 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2429 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MMYY;
 	}
     break;
 
   case 522:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2445 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2432 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MMDD;
 	}
     break;
 
   case 523:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2448 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2435 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MONTHDAY;
 	}
     break;
 
   case 524:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2451 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2438 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DAYMONTH;
 	}
     break;
 
   case 525:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2454 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2441 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DDMONTHSYYHHMMSS;
 	}
     break;
 
   case 526:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2457 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2444 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DDMONTHSYY;
 	}
     break;
 
   case 527:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2460 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2447 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MONTHS;
 	}
     break;
 
   case 528:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2463 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2450 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MONTHL;
 	}
     break;
 
   case 529:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2466 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2453 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DAYOFWEEKS;
 	}
     break;
 
   case 530:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2469 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2456 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DAYOFWEEKL;
 	}
     break;
 
   case 531:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2472 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2459 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DAYOFYEAR;
 	}
     break;
 
   case 532:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2475 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2462 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = HMS;
 	}
     break;
 
   case 533:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2478 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2465 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = HH;
 	}
     break;
 
   case 534:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2481 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2468 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MMDDHMS;
 	}
     break;
 
   case 535:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2484 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2471 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MMDDYYHMS;
 	}
     break;
 
   case 536:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2487 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2474 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DEGREESLON;
 	}
     break;
 
   case 537:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2490 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2477 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DEGREESMMLON;
 	}
     break;
 
   case 538:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2493 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2480 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DEGREESMMSSLON;
 	}
     break;
 
   case 539:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2496 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2483 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MMSSLON;
 	}
     break;
 
   case 540:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2499 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2486 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DEGREESLAT;
 	}
     break;
 
   case 541:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2502 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2489 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DEGREESMMLAT;
 	}
     break;
 
   case 542:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2505 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2492 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DEGREESMMSSLAT;
 	}
     break;
 
   case 543:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2508 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2495 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = MMSSLAT;
 	}
     break;
 
   case 544:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2514 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2501 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = NORMAL;
 	}
     break;
 
   case 545:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2517 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2504 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = ABSOLUTE;
 	}
     break;
 
   case 546:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2520 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2507 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = NEGATE;
 	}
     break;
 
   case 547:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2526 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2513 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = UP;
 	}
     break;
 
   case 548:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2529 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2516 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = DOWN;
 	}
     break;
 
   case 549:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2532 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2519 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = RIGHT;
 	}
     break;
 
   case 550:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2535 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2522 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = LEFT;
 	}
     break;
 
   case 551:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2538 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2525 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = IN;
 	}
     break;
 
   case 552:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2541 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2528 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = OUT;
 	}
     break;
 
   case 553:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2547 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2534 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = WORLD;
 	}
     break;
 
   case 554:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2550 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2537 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.pset) = VIEW;
 	}
     break;
 
   case 555:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2556 "pars.y"
     { (yyval.pset) = X; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2543 "pars.y"
+    { (yyval.pset) = X; }
+>>>>>>> .r440
     break;
 
   case 556:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2557 "pars.y"
     { (yyval.pset) = Y; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2544 "pars.y"
+    { (yyval.pset) = Y; }
+>>>>>>> .r440
     break;
 
   case 557:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2558 "pars.y"
     { (yyval.pset) = X0; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2545 "pars.y"
+    { (yyval.pset) = X0; }
+>>>>>>> .r440
     break;
 
   case 558:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2559 "pars.y"
     { (yyval.pset) = Y0; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2546 "pars.y"
+    { (yyval.pset) = Y0; }
+>>>>>>> .r440
     break;
 
   case 559:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2560 "pars.y"
     { (yyval.pset) = Y1; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2547 "pars.y"
+    { (yyval.pset) = Y1; }
+>>>>>>> .r440
     break;
 
   case 560:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2561 "pars.y"
     { (yyval.pset) = Y2; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2548 "pars.y"
+    { (yyval.pset) = Y2; }
+>>>>>>> .r440
     break;
 
   case 561:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2562 "pars.y"
     { (yyval.pset) = Y3; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2549 "pars.y"
+    { (yyval.pset) = Y3; }
+>>>>>>> .r440
     break;
 
   case 562:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2563 "pars.y"
     { (yyval.pset) = Y4; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2550 "pars.y"
+    { (yyval.pset) = Y4; }
+>>>>>>> .r440
     break;
 
   case 563:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2564 "pars.y"
     { (yyval.pset) = Y5; }
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2551 "pars.y"
+    { (yyval.pset) = Y5; }
+>>>>>>> .r440
     break;
 
   case 564:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2569 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2556 "pars.y"
+>>>>>>> .r440
     {
 	    int itmp = (int) (yyvsp[(3) - (6)].val) - 1;
 	    if (itmp >= ls) {
@@ -9512,8 +13376,15 @@ yyreduce:
     break;
 
   case 565:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2580 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2567 "pars.y"
+>>>>>>> .r440
     {
 	    int itmp = (int) (yyvsp[(3) - (6)].val) - 1;
 	    double *ptr = getvptr(cg, curset, (yyvsp[(3) - (6)].val));
@@ -9531,8 +13402,15 @@ yyreduce:
     break;
 
   case 566:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2595 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2582 "pars.y"
+>>>>>>> .r440
     {
 	    int itmp = (int) (yyvsp[(5) - (8)].val) - 1;
 	    double *ptr = getvptr(cg, (yyvsp[(1) - (8)].pset), (yyvsp[(3) - (8)].pset));
@@ -9550,8 +13428,15 @@ yyreduce:
     break;
 
   case 567:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2610 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2597 "pars.y"
+>>>>>>> .r440
     {
 	    set_prop(cg, SET, SETNUM, (yyvsp[(1) - (5)].pset), SYMBOL, TYPE, (int) (yyvsp[(5) - (5)].val), 0);
 	    result = 0;
@@ -9559,8 +13444,15 @@ yyreduce:
     break;
 
   case 568:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2622 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2609 "pars.y"
+>>>>>>> .r440
     {
 	    int itmp = (int) (yyvsp[(7) - (10)].val) - 1;
 	    double *ptr = getvptr((yyvsp[(1) - (10)].pset), (yyvsp[(3) - (10)].pset), (yyvsp[(5) - (10)].pset));
@@ -9578,8 +13470,15 @@ yyreduce:
     break;
 
   case 569:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2640 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2627 "pars.y"
+>>>>>>> .r440
     {
 	    if ((yyvsp[(3) - (5)].pset) == X) {
 		*xx = (yyvsp[(5) - (5)].val);
@@ -9590,8 +13489,15 @@ yyreduce:
     break;
 
   case 570:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2651 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2638 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    for (i = 0; i < lxy; i++) {
@@ -9602,8 +13508,15 @@ yyreduce:
     break;
 
   case 571:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2659 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2646 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr;
@@ -9629,8 +13542,15 @@ yyreduce:
     break;
 
   case 572:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2681 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2668 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr;
@@ -9656,8 +13576,15 @@ yyreduce:
     break;
 
   case 573:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2704 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2691 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr;
@@ -9683,8 +13610,15 @@ yyreduce:
     break;
 
   case 574:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2727 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2714 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    for (i = 0; i < lxy; i++) {
@@ -9695,8 +13629,15 @@ yyreduce:
     break;
 
   case 575:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2735 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2722 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr;
@@ -9722,8 +13663,15 @@ yyreduce:
     break;
 
   case 576:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2758 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2745 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr;
@@ -9749,8 +13697,15 @@ yyreduce:
     break;
 
   case 577:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2781 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2768 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr;
@@ -9776,8 +13731,15 @@ yyreduce:
     break;
 
   case 578:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2807 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2794 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9789,8 +13751,15 @@ yyreduce:
     break;
 
   case 579:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2816 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2803 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr = getvptr(cg, curset, (yyvsp[(1) - (1)].pset));
@@ -9807,8 +13776,15 @@ yyreduce:
     break;
 
   case 580:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2830 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2817 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr = getvptr(cg, (yyvsp[(1) - (3)].pset), (yyvsp[(3) - (3)].pset));
@@ -9825,8 +13801,15 @@ yyreduce:
     break;
 
   case 581:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2844 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2831 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    double *ptr = getvptr((yyvsp[(1) - (5)].pset), (yyvsp[(3) - (5)].pset), (yyvsp[(5) - (5)].pset));
@@ -9843,8 +13826,15 @@ yyreduce:
     break;
 
   case 582:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2858 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2845 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9856,8 +13846,15 @@ yyreduce:
     break;
 
   case 583:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2867 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2854 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9869,8 +13866,15 @@ yyreduce:
     break;
 
   case 584:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2876 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2863 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9882,8 +13886,15 @@ yyreduce:
     break;
 
   case 585:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2885 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2872 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9895,8 +13906,15 @@ yyreduce:
     break;
 
   case 586:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2894 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2881 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9908,8 +13926,15 @@ yyreduce:
     break;
 
   case 587:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2903 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2890 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9921,8 +13946,15 @@ yyreduce:
     break;
 
   case 588:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2912 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2899 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9934,8 +13966,15 @@ yyreduce:
     break;
 
   case 589:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2921 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2908 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9947,8 +13986,15 @@ yyreduce:
     break;
 
   case 590:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2930 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2917 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9960,8 +14006,15 @@ yyreduce:
     break;
 
   case 591:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2939 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2926 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9973,8 +14026,15 @@ yyreduce:
     break;
 
   case 592:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2948 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2935 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9986,8 +14046,15 @@ yyreduce:
     break;
 
   case 593:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2957 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2944 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -9999,8 +14066,15 @@ yyreduce:
     break;
 
   case 594:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2966 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2953 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10012,8 +14086,15 @@ yyreduce:
     break;
 
   case 595:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2975 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2962 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10029,8 +14110,15 @@ yyreduce:
     break;
 
   case 596:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 2988 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2975 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10048,8 +14136,15 @@ yyreduce:
     break;
 
   case 597:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3003 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 2990 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10067,8 +14162,15 @@ yyreduce:
     break;
 
   case 598:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3018 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3005 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10084,8 +14186,15 @@ yyreduce:
     break;
 
   case 599:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3031 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3018 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10097,8 +14206,15 @@ yyreduce:
     break;
 
   case 600:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3040 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3027 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10110,8 +14226,15 @@ yyreduce:
     break;
 
   case 601:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3049 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3036 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10123,8 +14246,15 @@ yyreduce:
     break;
 
   case 602:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3058 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3045 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10136,8 +14266,15 @@ yyreduce:
     break;
 
   case 603:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3067 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3054 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10149,8 +14286,15 @@ yyreduce:
     break;
 
   case 604:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3076 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3063 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10162,8 +14306,15 @@ yyreduce:
     break;
 
   case 605:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3085 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3072 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10175,8 +14326,15 @@ yyreduce:
     break;
 
   case 606:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3094 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3081 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10188,8 +14346,15 @@ yyreduce:
     break;
 
   case 607:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3103 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3090 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10201,8 +14366,15 @@ yyreduce:
     break;
 
   case 608:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3112 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3099 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10214,8 +14386,15 @@ yyreduce:
     break;
 
   case 609:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3121 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3108 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10227,8 +14406,15 @@ yyreduce:
     break;
 
   case 610:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3130 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3117 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10240,8 +14426,15 @@ yyreduce:
     break;
 
   case 611:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3139 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3126 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10253,8 +14446,15 @@ yyreduce:
     break;
 
   case 612:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3148 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3135 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10266,8 +14466,15 @@ yyreduce:
     break;
 
   case 613:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3157 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3144 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10279,8 +14486,15 @@ yyreduce:
     break;
 
   case 614:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3166 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3153 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10292,8 +14506,15 @@ yyreduce:
     break;
 
   case 615:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3175 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3162 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10305,8 +14526,15 @@ yyreduce:
     break;
 
   case 616:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3184 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3171 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10318,8 +14546,15 @@ yyreduce:
     break;
 
   case 617:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3193 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3180 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10331,8 +14566,15 @@ yyreduce:
     break;
 
   case 618:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3202 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3189 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10344,8 +14586,15 @@ yyreduce:
     break;
 
   case 619:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3211 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3198 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10357,8 +14606,15 @@ yyreduce:
     break;
 
   case 620:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3220 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3207 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10370,8 +14626,15 @@ yyreduce:
     break;
 
   case 621:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3229 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3216 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10383,8 +14646,15 @@ yyreduce:
     break;
 
   case 622:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3238 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3225 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10396,8 +14666,15 @@ yyreduce:
     break;
 
   case 623:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3247 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3234 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10409,8 +14686,15 @@ yyreduce:
     break;
 
   case 624:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3256 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3243 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10422,8 +14706,15 @@ yyreduce:
     break;
 
   case 625:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3265 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3252 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10435,8 +14726,15 @@ yyreduce:
     break;
 
   case 626:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3274 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3261 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10448,8 +14746,15 @@ yyreduce:
     break;
 
   case 627:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3283 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3270 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10461,8 +14766,15 @@ yyreduce:
     break;
 
   case 628:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3292 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3279 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10474,8 +14786,15 @@ yyreduce:
     break;
 
   case 629:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3301 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3288 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10487,8 +14806,15 @@ yyreduce:
     break;
 
   case 630:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3310 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3297 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10500,8 +14826,15 @@ yyreduce:
     break;
 
   case 631:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3319 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3306 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10513,8 +14846,15 @@ yyreduce:
     break;
 
   case 632:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3328 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3315 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10526,8 +14866,15 @@ yyreduce:
     break;
 
   case 633:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3337 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3324 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10539,8 +14886,15 @@ yyreduce:
     break;
 
   case 634:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3346 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3333 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10552,8 +14906,15 @@ yyreduce:
     break;
 
   case 635:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3355 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3342 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10565,8 +14926,15 @@ yyreduce:
     break;
 
   case 636:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3364 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3351 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10578,8 +14946,15 @@ yyreduce:
     break;
 
   case 637:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3373 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3360 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10591,8 +14966,15 @@ yyreduce:
     break;
 
   case 638:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3382 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3369 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10604,8 +14986,15 @@ yyreduce:
     break;
 
   case 639:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3391 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3378 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10617,8 +15006,15 @@ yyreduce:
     break;
 
   case 640:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3400 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3387 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10630,8 +15026,15 @@ yyreduce:
     break;
 
   case 641:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3409 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3396 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10643,8 +15046,15 @@ yyreduce:
     break;
 
   case 642:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3418 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3405 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10656,8 +15066,15 @@ yyreduce:
     break;
 
   case 643:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3426 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3413 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10673,8 +15090,15 @@ yyreduce:
     break;
 
   case 644:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3439 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3426 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10686,8 +15110,15 @@ yyreduce:
     break;
 
   case 645:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3448 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3435 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10699,8 +15130,15 @@ yyreduce:
     break;
 
   case 646:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3457 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3444 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10712,8 +15150,15 @@ yyreduce:
     break;
 
   case 647:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3466 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3453 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10725,8 +15170,15 @@ yyreduce:
     break;
 
   case 648:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3475 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3462 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10738,8 +15190,15 @@ yyreduce:
     break;
 
   case 649:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3484 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3471 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10751,8 +15210,15 @@ yyreduce:
     break;
 
   case 650:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3493 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3480 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10764,8 +15230,15 @@ yyreduce:
     break;
 
   case 651:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3502 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3489 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10777,8 +15250,15 @@ yyreduce:
     break;
 
   case 652:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3511 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3498 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10790,8 +15270,15 @@ yyreduce:
     break;
 
   case 653:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3520 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3507 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10803,8 +15290,15 @@ yyreduce:
     break;
 
   case 654:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3528 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3515 "pars.y"
+>>>>>>> .r440
     {
 	    int i;
 	    (yyval.ptr) = (double *) calloc(lxy, sizeof(double));
@@ -10816,24 +15310,45 @@ yyreduce:
     break;
 
   case 656:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3539 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3526 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (4)].ptr)[(int) (yyvsp[(3) - (4)].val)];
 	}
     break;
 
   case 657:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3542 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3529 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = ((yyvsp[(3) - (3)].pset) == X) ? *xx : *yy;
 	}
     break;
 
   case 658:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3545 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3532 "pars.y"
+>>>>>>> .r440
     {
 	    double *ptr = getvptr(cg, curset, (yyvsp[(1) - (4)].pset));
 	    if (ptr != NULL) {
@@ -10847,8 +15362,15 @@ yyreduce:
     break;
 
   case 659:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3555 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3542 "pars.y"
+>>>>>>> .r440
     {
 	    double *ptr = getvptr(cg, (yyvsp[(1) - (6)].pset), (yyvsp[(3) - (6)].pset));
 	    if (ptr != NULL) {
@@ -10862,8 +15384,15 @@ yyreduce:
     break;
 
   case 660:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3565 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3552 "pars.y"
+>>>>>>> .r440
     {
 	    double *ptr = getvptr((yyvsp[(1) - (8)].pset), (yyvsp[(3) - (8)].pset), (yyvsp[(5) - (8)].pset));
 	    if (ptr != NULL) {
@@ -10877,8 +15406,15 @@ yyreduce:
     break;
 
   case 661:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3575 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3562 "pars.y"
+>>>>>>> .r440
     {
 	    double *ptr = getvptr(cg, (yyvsp[(1) - (5)].pset), (yyvsp[(3) - (5)].pset));
 	    if (ptr == NULL) {
@@ -10897,8 +15433,15 @@ yyreduce:
     break;
 
   case 662:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3590 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3577 "pars.y"
+>>>>>>> .r440
     {
 	    double *ptr = getvptr((yyvsp[(1) - (7)].pset), (yyvsp[(3) - (7)].pset), (yyvsp[(5) - (7)].pset));
 	    if (ptr == NULL) {
@@ -10917,16 +15460,30 @@ yyreduce:
     break;
 
   case 663:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3605 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3592 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].p[(yyvsp[(1) - (3)].pset)].len;
 	}
     break;
 
   case 664:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3609 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3596 "pars.y"
+>>>>>>> .r440
     {
 	    double bar, sd;
 	    double *ptr = getvptr(cg, (yyvsp[(1) - (5)].pset), (yyvsp[(3) - (5)].pset));
@@ -10942,32 +15499,60 @@ yyreduce:
     break;
 
   case 665:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3621 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3608 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 666:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3624 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3611 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 667:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3627 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3614 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 668:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3631 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3618 "pars.y"
+>>>>>>> .r440
     {
 	    if ((yyvsp[(3) - (3)].val) != 0.0) {
 		(yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);
@@ -10979,432 +15564,810 @@ yyreduce:
     break;
 
   case 669:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3639 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3626 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = fmod((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val));
 	}
     break;
 
   case 670:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3642 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3629 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = pow((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val));
 	}
     break;
 
   case 671:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3645 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3632 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = fabs((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 672:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3648 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3635 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = acos((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 673:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3651 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3638 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = asin((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 674:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3654 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3641 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = atan((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 675:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3657 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3644 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = atan2((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].val));
 	}
     break;
 
   case 676:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3660 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3647 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = ceil((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 677:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3663 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3650 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = cos((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 678:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3666 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3653 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = 180.0 / M_PI;
 	}
     break;
 
   case 679:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3669 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3656 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = erf((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 680:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3672 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3659 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = erfc((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 681:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3675 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3662 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = exp((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 682:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3678 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3665 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = floor((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 683:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3681 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3668 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = my_hypot((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].val));
 	}
     break;
 
   case 684:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3684 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3671 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].v.xv1;
 	}
     break;
 
   case 685:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3687 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3674 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].v.xv2;
 	}
     break;
 
   case 686:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3690 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3677 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].v.yv1;
 	}
     break;
 
   case 687:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3693 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3680 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].v.yv2;
 	}
     break;
 
   case 688:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3696 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3683 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].w.xg1;
 	}
     break;
 
   case 689:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3699 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3686 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].w.xg2;
 	}
     break;
 
   case 690:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3702 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3689 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].w.yg1;
 	}
     break;
 
   case 691:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3705 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3692 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[(yyvsp[(1) - (3)].pset)].w.yg2;
 	}
     break;
 
   case 692:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3708 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3695 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].v.xv1;
 	}
     break;
 
   case 693:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3711 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3698 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].v.xv2;
 	}
     break;
 
   case 694:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3714 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3701 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].v.yv1;
 	}
     break;
 
   case 695:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3717 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3704 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].v.yv2;
 	}
     break;
 
   case 696:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3720 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3707 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].w.xg1;
 	}
     break;
 
   case 697:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3723 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3710 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].w.xg2;
 	}
     break;
 
   case 698:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3726 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3713 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].w.yg1;
 	}
     break;
 
   case 699:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3729 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3716 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].w.yg2;
 	}
     break;
 
   case 700:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3732 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3719 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].w.xg2 - g[cg].w.xg1;
 	}
     break;
 
   case 701:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3735 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3722 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = g[cg].w.yg2 - g[cg].w.yg1;
 	}
     break;
 
   case 702:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3738 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3725 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = setindex;
 	}
     break;
 
   case 703:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3741 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3728 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = setsetno;
 	}
     break;
 
   case 704:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3744 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3731 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (long) (yyvsp[(3) - (4)].val);
 	}
     break;
 
   case 705:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3747 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3734 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = lrand48() % (long) ((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 706:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3750 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3737 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = lgamma((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 707:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3753 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3740 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = log((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 708:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3756 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3743 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = log10((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 709:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3760 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3747 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = 1.0 / (1.0 + exp(-((yyvsp[(3) - (8)].val) - (yyvsp[(5) - (8)].val))/ (yyvsp[(7) - (8)].val)));
 	}
     break;
 
   case 710:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3763 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3750 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(3) - (6)].val) >= (yyvsp[(5) - (6)].val) ? (yyvsp[(3) - (6)].val) : (yyvsp[(5) - (6)].val);
 	}
     break;
 
   case 711:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3766 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3753 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(3) - (6)].val) <= (yyvsp[(5) - (6)].val) ? (yyvsp[(3) - (6)].val) : (yyvsp[(5) - (6)].val);
 	}
     break;
 
   case 712:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3769 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3756 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = fmod((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].val));
 	}
     break;
 
   case 713:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3772 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3759 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = fx((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 714:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3775 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3762 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = M_PI;
 	}
     break;
 
   case 715:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3778 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3765 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = M_PI / 180.0;
 	}
     break;
 
   case 716:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3781 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3768 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (double) drand48();
 	}
     break;
 
   case 717:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3784 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3771 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = rnorm((yyvsp[(3) - (6)].val), (yyvsp[(5) - (6)].val));
 	}
     break;
 
   case 718:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3787 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3774 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = sin((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 719:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3790 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3777 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = pow((yyvsp[(3) - (4)].val), 2.0);
 	}
     break;
 
   case 720:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3793 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3780 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = sqrt((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 721:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3796 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3783 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = tan((yyvsp[(3) - (4)].val));
 	}
     break;
 
   case 722:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3799 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3786 "pars.y"
+>>>>>>> .r440
     {
 	    if ((int) (yyvsp[(1) - (5)].val)) {
 		(yyval.val) = (yyvsp[(3) - (5)].val);
@@ -11415,109 +16378,183 @@ yyreduce:
     break;
 
   case 723:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3806 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3793 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) > (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 724:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3809 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3796 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) < (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 725:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3812 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3799 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) <= (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 726:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3815 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3802 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) >= (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 727:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3818 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3805 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) == (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 728:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3821 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3808 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) != (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 729:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3824 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3811 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) && (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 730:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3827 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3814 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(1) - (3)].val) || (yyvsp[(3) - (3)].val);
 	}
     break;
 
   case 731:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3830 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3817 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = !((yyvsp[(2) - (2)].val));
 	}
     break;
 
   case 732:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3833 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3820 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = (yyvsp[(2) - (3)].val);
 	}
     break;
 
   case 733:
-/* Line 1792 of yacc.c  */
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
 #line 3836 "pars.y"
+=======
+
+/* Line 1455 of yacc.c  */
+#line 3823 "pars.y"
+>>>>>>> .r440
     {
 	    (yyval.val) = -(yyvsp[(2) - (2)].val);
 	}
     break;
 
 
-/* Line 1792 of yacc.c  */
-#line 11508 "y.tab.c"
+<<<<<<< .mine
+
+/* Line 1464 of yacc.c  */
+#line 12230 "y.tab.c"
       default: break;
+=======
+
+/* Line 1455 of yacc.c  */
+#line 12210 "y.tab.c"
+      default: break;
+>>>>>>> .r440
     }
-  /* User semantic actions sometimes alter yychar, and that requires
-     that yytoken be updated with the new translation.  We take the
-     approach of translating immediately before every use of yytoken.
-     One alternative is translating here after every semantic action,
-     but that translation would be missed if the semantic action invokes
-     YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
-     if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
-     incorrect destructor might then be invoked immediately.  In the
-     case of YYERROR or YYBACKUP, subsequent parser actions might lead
-     to an incorrect destructor call or verbose syntax error message
-     before the lookahead is translated.  */
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
 
   YYPOPSTACK (yylen);
@@ -11545,10 +16582,6 @@ yyreduce:
 | yyerrlab -- here on detecting error |
 `------------------------------------*/
 yyerrlab:
-  /* Make sure we have latest lookahead translation.  See comments at
-     user semantic actions for why this is necessary.  */
-  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
-
   /* If not already recovering from an error, report this error.  */
   if (!yyerrstatus)
     {
@@ -11556,36 +16589,37 @@ yyerrlab:
 #if ! YYERROR_VERBOSE
       yyerror (YY_("syntax error"));
 #else
-# define YYSYNTAX_ERROR yysyntax_error (&yymsg_alloc, &yymsg, \
-                                        yyssp, yytoken)
       {
-        char const *yymsgp = YY_("syntax error");
-        int yysyntax_error_status;
-        yysyntax_error_status = YYSYNTAX_ERROR;
-        if (yysyntax_error_status == 0)
-          yymsgp = yymsg;
-        else if (yysyntax_error_status == 1)
-          {
-            if (yymsg != yymsgbuf)
-              YYSTACK_FREE (yymsg);
-            yymsg = (char *) YYSTACK_ALLOC (yymsg_alloc);
-            if (!yymsg)
-              {
-                yymsg = yymsgbuf;
-                yymsg_alloc = sizeof yymsgbuf;
-                yysyntax_error_status = 2;
-              }
-            else
-              {
-                yysyntax_error_status = YYSYNTAX_ERROR;
-                yymsgp = yymsg;
-              }
-          }
-        yyerror (yymsgp);
-        if (yysyntax_error_status == 2)
-          goto yyexhaustedlab;
+	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
+	if (yymsg_alloc < yysize && yymsg_alloc < YYSTACK_ALLOC_MAXIMUM)
+	  {
+	    YYSIZE_T yyalloc = 2 * yysize;
+	    if (! (yysize <= yyalloc && yyalloc <= YYSTACK_ALLOC_MAXIMUM))
+	      yyalloc = YYSTACK_ALLOC_MAXIMUM;
+	    if (yymsg != yymsgbuf)
+	      YYSTACK_FREE (yymsg);
+	    yymsg = (char *) YYSTACK_ALLOC (yyalloc);
+	    if (yymsg)
+	      yymsg_alloc = yyalloc;
+	    else
+	      {
+		yymsg = yymsgbuf;
+		yymsg_alloc = sizeof yymsgbuf;
+	      }
+	  }
+
+	if (0 < yysize && yysize <= yymsg_alloc)
+	  {
+	    (void) yysyntax_error (yymsg, yystate, yychar);
+	    yyerror (yymsg);
+	  }
+	else
+	  {
+	    yyerror (YY_("syntax error"));
+	    if (yysize != 0)
+	      goto yyexhaustedlab;
+	  }
       }
-# undef YYSYNTAX_ERROR
 #endif
     }
 
@@ -11644,7 +16678,7 @@ yyerrlab1:
   for (;;)
     {
       yyn = yypact[yystate];
-      if (!yypact_value_is_default (yyn))
+      if (yyn != YYPACT_NINF)
 	{
 	  yyn += YYTERROR;
 	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
@@ -11667,9 +16701,7 @@ yyerrlab1:
       YY_STACK_PRINT (yyss, yyssp);
     }
 
-  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
-  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
 
   /* Shift the error token.  */
@@ -11693,7 +16725,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#if !defined yyoverflow || YYERROR_VERBOSE
+#if !defined(yyoverflow) || YYERROR_VERBOSE
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -11705,13 +16737,8 @@ yyexhaustedlab:
 
 yyreturn:
   if (yychar != YYEMPTY)
-    {
-      /* Make sure we have latest lookahead translation.  See comments at
-         user semantic actions for why this is necessary.  */
-      yytoken = YYTRANSLATE (yychar);
-      yydestruct ("Cleanup: discarding lookahead",
-                  yytoken, &yylval);
-    }
+     yydestruct ("Cleanup: discarding lookahead",
+		 yytoken, &yylval);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -11735,7 +16762,14 @@ yyreturn:
 }
 
 
-/* Line 2055 of yacc.c  */
+<<<<<<< .mine
+=======
+
+/* Line 1675 of yacc.c  */
+#line 3827 "pars.y"
+>>>>>>> .r440
+
+/* Line 1684 of yacc.c  */
 #line 3840 "pars.y"
 
 
@@ -12538,3 +17572,4 @@ double *getvptr(int gno, int setno, int v)
     }
     return NULL;
 }
+

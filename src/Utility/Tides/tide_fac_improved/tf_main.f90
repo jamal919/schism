@@ -31,12 +31,12 @@ logical :: lselfe=.false.
 open(unit=11,file='tide_fac.out',status='unknown')
 if (iargc().eq.0) then
 !  write(*,*) 'Pass "-h" option for command line arguments instruction' 
-  write(*,*) 'SCHISM trunk/src/Utility/Tide/tf_main.f90 -- calculate nodal factors and re-write bctides.in'
+  write(*,*) 'SELFE trunk/src/Utility/Tide/tf_main.f90 -- calculate nodal factors and re-write bctides.in'
   write(*,*) 'enter length of run time (days)'
   read(*,*) xdays
   write(*,*) 'enter start time - bhr,iday,imo,iyr (iyr e.g. 1992)'
   read(*,*) bhr,iday,imo,iyr
-  write(*,*) 'generate "bctides.in.out" file for SCHISM? ( "bctides.in" is required for input )'
+  write(*,*) 'generate "bctides.in.out" file for SELFE? ( "bctides.in" is required for input )'
   read(*,*)tmp
   if (tmp=='y'.or.tmp=='Y') lselfe=.true.
 else

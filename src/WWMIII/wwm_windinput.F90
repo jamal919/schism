@@ -21,7 +21,7 @@
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE SET_FRICTION(IP,ACLOC,WIND10,WINDTH,FPM)
+      SUBROUTINE SET_FRICTION(IP,WALOC,WIND10,WINDTH,FPM)
 !
 !     Friction Velocities different formulations ....
 !
@@ -30,13 +30,11 @@
          INTEGER, INTENT(IN)  :: IP
          INTEGER              :: I
 
-         REAL(rkind)   , INTENT(IN)  :: ACLOC(MSC,MDC)
+         REAL(rkind)   , INTENT(IN)  :: WALOC(NUMSIG,NUMDIR)
          REAL(rkind)   , INTENT(IN)  :: WIND10, WINDTH
          REAL(rkind)   , INTENT(OUT) :: FPM
 
-         REAL(rkind)                 :: WINDX, WINDY
          REAL(rkind)                 :: CDRAG
-         REAL(rkind)                 :: VEC2RAD 
          REAL(rkind)                 :: EPS_D
          REAL(rkind)                 :: z00, z0_t, fU10, CD10
          REAL(rkind)                 :: ULur, Ur  , Lur
@@ -101,7 +99,7 @@
                 UFRIC(IP)  = WIND10 / 28.0_rkind ! First Guess
                 VISK   = 1.5E-5_rkind
 
-                CALL WINDSEASWELLSEP( IP, ACLOC, TM_W, CGP_W, CP_W, TP_W, LP_W, HS_W, KP_W )
+                CALL WINDSEASWELLSEP( IP, WALOC, TM_W, CGP_W, CP_W, TP_W, LP_W, HS_W, KP_W )
                 IF (HS_W .LT. THR) GOTO 101
 
                 EPS_D = MAX(THR,0.5_rkind*HS_W*KP_W)
@@ -179,42 +177,37 @@
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE SIN_LIN_CAV( IP, WIND10, WINDTH, FPM, IMATRA, SSINL )
+      SUBROUTINE SIN_LIN_CAV( IP, WINDTH, FPM, SSINL )
 !
 !     Linear growth term according to Cavaleri & Melanotte Rizolli ...
 !
-         USE DATAPOOL
-         IMPLICIT NONE
-
-         INTEGER, INTENT(IN)   :: IP
-         REAL(rkind)   , INTENT(OUT)  :: IMATRA(MSC,MDC)
-         REAL(rkind)   , INTENT(OUT)  :: SSINL(MSC,MDC)
-         REAL(rkind)   , INTENT(IN)   :: WINDTH, WIND10
-         REAL(rkind)   , INTENT(IN)   :: FPM
-
-         INTEGER                      :: IS, ID
-         REAL(rkind)                  :: AUX1, AUX2, AUX3, AUXH, DIFFWND
-         REAL(rkind)                  :: SWINA, TOLFIL, COSWIND, SINWIND
-
-         AUX1 = 0.0015 / ( PI2*G9**2 )                           
-         DO IS = 1, MSC
-           TOLFIL = EXP(-(MIN(2., FPM / SPSIG(IS))**4))                                        
-           AUX2  = AUX1 / SPSIG(IS)
-           DO ID = 1, MDC
-             IF (SPSIG(IS) .GE. (0.7 * FPM) ) THEN
-               AUX3  = ( WIND10/28. *  MAX( 0. , (COSTH(ID)*COS(WINDTH) + SINTH(ID)*SIN(WINDTH))))**4                     
-               IMATRA(IS,ID) = MAX( 0. , AUX2 * AUX3 * TOLFIL )
-               !WRITE(*,'(5F20.10)') AUX1, AUX2, AUX3, DIFFWND, TOLFIL, IMATRA(IS,ID)
-               SSINL(IS,ID)  = IMATRA(IS,ID)
-             ENDIF
-           ENDDO
-         ENDDO 
-
+      USE DATAPOOL
+      IMPLICIT NONE
+      INTEGER, INTENT(IN)   :: IP
+      REAL(rkind)   , INTENT(OUT)  :: SSINL(NUMSIG,NUMDIR)
+      REAL(rkind)   , INTENT(IN)   :: WINDTH
+      REAL(rkind)   , INTENT(IN)   :: FPM
+      INTEGER                      :: IS, ID
+      REAL(rkind)                  :: AUX, AUX1, AUX2, AUXH
+      REAL(rkind)                  :: SWINA
+      AUX = 0.0015_rkind / ( G9*G9*PI2 )
+      SSINL  = ZERO 
+      DO IS = 1, NUMSIG
+        AUX1 = MIN( 2.0_rkind, FPM / SPSIG(IS) )
+        AUXH = EXP( -1.0_rkind*(AUX1**4.0_rkind) )
+        DO ID = 1, NUMDIR
+          IF (SPSIG(IS) .GE. (0.7_rkind*FPM)) THEN
+            AUX2 = ( UFRIC(IP) * MAX( 0._rkind , MyCOS(SPDIR(ID)-WINDTH) ) )**4
+            SWINA = MAX(0._rkind,AUX * AUX2 * AUXH)
+            SSINL(IS,ID) = SWINA / SPSIG(IS)
+          ENDIF
+        END DO
+      END DO
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE SIN_EXP_KOMEN( IP, WINDTH, ACLOC, IMATRA, IMATDA, SSINE )
+      SUBROUTINE SIN_EXP_KOMEN( IP, WINDTH, WALOC, PHI, DPHIDN, SSINE )
          USE DATAPOOL
          IMPLICIT NONE
 !
@@ -222,126 +215,28 @@
 !
          INTEGER, INTENT(IN)          :: IP
          REAL(rkind)   , INTENT(IN)   :: WINDTH
-         REAL(rkind)   , INTENT(IN)   :: ACLOC(MSC,MDC)
-         REAL(rkind)   , INTENT(OUT)  :: SSINE(MSC,MDC)
-         REAL(rkind)   , INTENT(INOUT):: IMATRA(MSC,MDC), IMATDA(MSC,MDC)
+         REAL(rkind)   , INTENT(IN)   :: WALOC(NUMSIG,NUMDIR)
+         REAL(rkind)   , INTENT(OUT)  :: SSINE(NUMSIG,NUMDIR)
+         REAL(rkind)   , INTENT(INOUT):: PHI(NUMSIG,NUMDIR), DPHIDN(NUMSIG,NUMDIR)
 
          INTEGER                      :: IS, ID
          REAL(rkind)                  :: AUX1, AUX2, AUX3
-         REAL(rkind)                  :: SWINB, CINV, COSDIF, SFIE(MSC,MDC)
+         REAL(rkind)                  :: SWINB, CINV, COSDIF
 
          AUX1 = 0.25_rkind * RHOAW 
          AUX2 = 28._rkind * UFRIC(IP)
 
-         DO IS = 1, MSC
+         DO IS = 1, NUMSIG
             CINV = WK(IS,IP)/SPSIG(IS)
             AUX3 = AUX2 * CINV
-            DO ID = 1, MDC
+            DO ID = 1, NUMDIR
               COSDIF = MyCOS(SPDIR(ID)-WINDTH)
               SWINB = AUX1 * ( AUX3  * COSDIF - 1.0_rkind )
               SWINB = MAX( 0.0_rkind, SWINB * SPSIG(IS) )
-              SSINE(IS,ID) = SWINB * ACLOC(IS,ID)
+              SSINE(IS,ID) = SWINB * WALOC(IS,ID)
               !WRITE(DBG%FHNDL,'(2I10,4F15.8)') IS, ID, SSINE(IS,ID), AUX3, AUX2, AUX1
-              IMATRA(IS,ID) = IMATRA(IS,ID) + SSINE(IS,ID)
+              PHI(IS,ID) = PHI(IS,ID) + SSINE(IS,ID)
             END DO
-         END DO
-
-         RETURN
-      END SUBROUTINE
-!**********************************************************************
-!*                                                                    *
-!**********************************************************************
-      SUBROUTINE SIN_MAKIN(IP, WIND10, WINDTH, KMESPC, ETOT, ACLOC, IMATRA, IMATDA, SSINE)
-         USE DATAPOOL
-         IMPLICIT NONE
-
-         INTEGER, INTENT(IN)    :: IP
-         REAL(rkind)   , INTENT(IN)    :: WIND10, WINDTH
-         REAL(rkind)   , INTENT(IN)    :: ACLOC(MSC,MDC)
-         REAL(rkind)   , INTENT(OUT)   :: SSINE(MSC,MDC)
-         REAL(rkind)   , INTENT(INOUT) :: IMATRA(MSC,MDC), IMATDA(MSC,MDC)
-
-         INTEGER             :: IS, ID
-         REAL(rkind)                :: AUX1, AUX2
-         REAL(rkind)                :: SWINB, CINV, SIGMA
-         REAL(rkind)                :: COSWW, THETA
-         REAL(rkind)                :: NC_MK, MC_MK, MBETA, RMK
-         REAL(rkind)                :: KMESPC, ETOT, DS, ELOCAL
-         REAL(rkind)                :: STEEPLOCAL
-         REAL(rkind)                :: ALOCAL, CPHASE, CYS, ATTC
-
-         LOGICAL             :: LATT, LOPP
-!
-! PARAMETER FROM MAKIN 1999
-!
-         MC_MK = 0.3_rkind
-         NC_MK = 5.0_rkind
-         LOPP  = .FALSE.
-         CYS   = -25._rkind  ! Opposing wind attenuation.
-         LATT  = .FALSE.
-         ATTC  = -10.0_rkind  ! Attenuation coefficient
-         MBETA =  32.0_rkind   ! See orignial Paper A GU OCEANS VOL. 104, No.: C4, April 1999 and see Makin & Stam 2003 (KNMI)
-
-         DO IS = 1, MSC
-           CINV =  WK(IS,IP) / SPSIG(IS) 
-           SIGMA = SPSIG(IS)
-           IF (WIND10 .LE. THR) THEN
-             AUX1 = 0.0_rkind
-           ELSE
-             AUX1  = 1._rkind/CINV/WIND10
-           END IF
-           AUX2  = UFRIC(IP)*CINV
-           RMK = 1 - MC_MK * AUX1 ** NC_MK
-           DO ID = 1, MDC
-             THETA  = SPDIR(ID)
-             COSWW  = MyCOS(THETA-WINDTH)
-             IF (LATT) THEN
-               IF (RMK .GE. 0.0_rkind) THEN
-                 SWINB = MBETA * RMK * RHOAW * AUX2**2 * COSWW * ABS(COSWW) * SIGMA
-               END IF
-               IF (COSWW * ABS(COSWW) .GE. 0.0_rkind .AND. RMK .LT. 0.0_rkind) THEN
-                 SWINB = MAX(ATTC,MBETA*RMK) * RHOAW *  AUX2**2 * COSWW * ABS(COSWW) * SIGMA
-               END IF
-             ELSE
-               IF (RMK .GT. ZERO) THEN
-                 SWINB = MBETA * RMK * RHOAW * AUX2**2 * COSWW * ABS(COSWW) * SIGMA
-               ELSE
-                 SWINB = ZERO
-               END IF
-             END IF
-             IF (COSWW * ABS(COSWW) .LE. ZERO) THEN
-               IF (LOPP) THEN
-                 CPHASE      = 0.0_rkind/CINV
-                 IF (IS .EQ. 1) DS = SPSIG(IS)
-                 IF (IS .GT. 1) DS = SPSIG(IS) - SPSIG(IS-1)
-                 IF (IS .EQ. 1) ELOCAL = ONEHALF * ACLOC(IS,ID) * SPSIG(IS) * SPSIG(IS) ! Simpson
-                 IF (IS .GT. 1) ELOCAL = ONEHALF * ( ACLOC(IS,ID) * SPSIG(IS) + ACLOC(IS-1,ID) * SPSIG(IS-1) ) * DS 
-                 ALOCAL      = SQRT(8.0_rkind*ELOCAL)
-                 STEEPLOCAL  = ALOCAL  * WK(IS,IP)
-                 SWINB       = CYS * RHOAW * STEEPLOCAL * STEEPLOCAL * (ONE - ((WIND10 * COSWW)/CPHASE) ) **2 * SIGMA
-               ELSE
-                 SWINB = ZERO
-               END IF
-             END IF
-
-             SSINE(IS,ID)   = SWINB * ACLOC(IS,ID)
-
-             IF (ICOMP .GE. 2) THEN
-               IF (SWINB .LT. 0) THEN
-                 IMATDA(IS,ID) = - SWINB
-               ELSE
-                 IMATRA(IS,ID) =  IMATRA(IS,ID) + SSINE(IS,ID)
-               END IF
-             ELSE IF (ICOMP .LT. 2) THEN
-               IF (SWINB .LT. 0) THEN
-                 IMATDA(IS,ID) = SWINB
-                 IMATRA(IS,ID) = IMATRA(IS,ID) + SSINE(IS,ID)
-               ELSE
-                 IMATRA(IS,ID) = IMATRA(IS,ID) + SSINE(IS,ID)
-               END IF
-             END IF
-
-           END DO
          END DO
 
          RETURN

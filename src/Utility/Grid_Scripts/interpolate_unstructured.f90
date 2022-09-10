@@ -16,15 +16,13 @@
 !     Interpolate based on an unstructured (tri or quad) grid background grid
 !     Search for parent elements along x- or y- strips (use small mne_bin for efficiency)
 !     Inputs: fg.gr3 (foreground grid with initial depths; triangular or quads)
-!             include.gr3 (based on fg.gr3): depths \in [0,1] indicate the weights
-!                                            (0: use original depth; 1:
-!                                            use interpolated depth if successful).
-!                                            Can also be used to avoid interpolation in bad
+!             include.gr3 (based on fg.gr3): depths indicate if the node depth should be interpolated (=1)
+!                                            or unchanged (=0); used to avoid interpolation in bad
 !                                            parent triangles (in addition to ar_bgmax below);
-!             bg.gr3 (bg grid that has bathymetry (DEM); triangular or quads; triangulation need not
+!             bg.gr3 (bg grid that has bathymetry; triangular or quads; triangulation need not
 !                     be properly formed!);
 !             interpolate_unstructured.in (see sample below): 
-!                                         (1) is_xy: search bins varies along x (1) or y (2) axis;
+!                                         (1) is_xy: search bins along x (1) or y (2);
 !                                         (2) nbin,mne_bin: # of bins & max # of elements in each bin; 
 !                                         (3) ar_bgmax: threshold for aspect ratio etc. 
 !                                                       Note that this threshold only applies
@@ -249,18 +247,17 @@
       write(13,*)nefg,npfg
 !     Interpolate and output
       do i=1,npfg
-        read(14,*)j,xfg,yfg,weight
+        read(14,*)j,xfg,yfg,tmp
+        ifl=tmp
         read(12,*)j,xfg,yfg,dpfg
         call binsearch(i,xfg,yfg,iparen,arco)
 !        write(19,*)i,iparen,arco(1:4)
-        if(iparen/=0) then
-          dpfg2=h_off
+        if(ifl/=0.and.iparen/=0) then
+          dpfg=h_off
           do j=1,i34bg(iparen)
             nd=nmbg(iparen,j)
-            dpfg2=dpfg2+dpbg(nd)*arco(j)
+            dpfg=dpfg+dpbg(nd)*arco(j)
           enddo !j
-
-          dpfg=dpfg2*weight+(1-weight)*dpfg
         endif
         write(13,'(i10,2(1x,e20.12),1x,f12.4)')i,xfg,yfg,dpfg
       enddo !i=1,npfg
@@ -312,7 +309,7 @@
         do k=1,ne_bin(l)
           ie=ie_bin(l,k)
           suma=0
-          do j=1,3 !compute 3 area coordinates of tri (1,2,3)
+          do j=1,3
             j_1=j+1
             j_2=j+2
             if(j_1>3) j_1=j_1-3
@@ -330,10 +327,10 @@
             exit loop1
           endif
 
-          if(i34bg(ie)==4) then 
+          if(i34bg(ie)==4) then
             nind(1)=1; nind(2)=3; nind(3)=4
             suma=0
-            do j=1,3 !compute 3 area coordinates of tri (1,3,4)
+            do j=1,3
               j_1=j+1
               j_2=j+2
               if(j_1>3) j_1=j_1-3

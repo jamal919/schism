@@ -10,9 +10,9 @@
       real(rkind), intent(out) :: eJD
       real(rkind) :: eJDbase, eFracDay
       integer a, y, m
-      a = floor((MyREAL(14) - MyREAL(month))/MyREAL(12));
-      y = year + 4800 - a;
-      m = month + 12*a - 3;
+      a = floor((MyREAL(14) - MyREAL(month))/MyREAL(12))
+      y = year + 4800 - a
+      m = month + 12*a - 3
       ! For a date in the Gregorian calendar:
       eJDbase = MyREAL(day)                                            &
      & + MyREAL(floor((MyREAL(153)*MyREAL(m) + MyREAL(2))/MyREAL(5)))  &
@@ -47,8 +47,8 @@
 
 !      CALL DATE2JD(1968, 5, 23, 0, 0, 0, eJD2)
       CALL DATE2JD(1858, 11, 17, 0, 0, 0, eJD2)
-      eMJD = eJD1 - eJD2
-      IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL, *) 'eMJD =', eMJD
+      eMJD=eJD1-eJD2
+!      WRITE(STAT%FHNDL, *) 'eMJD =', eMJD
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
@@ -143,15 +143,15 @@
       real(rkind) :: fjd, second
       ijd = floor(eJD + 0.5_rkind)
       !
-      a = ijd + 32044;
+      a = ijd + 32044
       b = floor((MyREAL(4)*MyREAL(a) + MyREAL(3)) / MyREAL(146097))
-      c = a - floor((MyREAL(b) * MyREAL(146097)) / MyREAL(4));
+      c = a - floor((MyREAL(b) * MyREAL(146097)) / MyREAL(4))
       !
       d = floor((MyREAL(4)*MyREAL(c) + MyREAL(3)) / MyREAL(1461))
-      e = c - floor((MyREAL(1461)*MyREAL(d)) / MyREAL(4));
+      e = c - floor((MyREAL(1461)*MyREAL(d)) / MyREAL(4))
       m = floor((MyREAL(5) * MyREAL(e) + MyREAL(2)) / MyREAL(153))
       !
-      day   = e - floor((MyREAL(153) * MyREAL(m) + MyREAL(2)) / MyREAL(5)) + 1;
+      day   = e - floor((MyREAL(153) * MyREAL(m) + MyREAL(2)) / MyREAL(5)) + 1
       month = m + 3 - 12 * floor(MyREAL(m) / MyREAL(10))
       year  = b * 100 + d - 4800 + floor(MyREAL(m) / MyREAL(10))
       !
@@ -196,7 +196,6 @@
       CHARACTER(LEN=15), INTENT(IN) :: STIME
       real(rkind), INTENT(OUT) :: XMJD
       integer year, month, day, hour, min, sec
-      real(rkind) XMJD_1858
       CALL DATE_ConvertString2six(year, month, day, hour, min, sec, STIME)
       CALL DATE_ConvertSix2mjd(year, month, day, hour, min, sec, XMJD)
       END SUBROUTINE
@@ -219,66 +218,8 @@
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE CT2MJD_V1(STIME,XMJD)
-         USE DATAPOOL, ONLY : RKIND
-         IMPLICIT NONE
-         CHARACTER(LEN=15), INTENT(IN) :: STIME
-         real(rkind), INTENT(INOUT)    :: XMJD
-!
-! ... FORMAT IS YYYYMMDD.HHMMSS , LENGTH IS 15
-!
-         INTEGER :: IY = 0
-         INTEGER :: IM = 0
-         INTEGER :: ID = 0
-         INTEGER :: IH = 0
-         INTEGER :: IMIN  = 0
-         INTEGER :: ISEC  = 0
-         INTEGER :: IFLAG = 1
-
-         READ(STIME(1:4),  *,END=100,ERR=100) IY
-         READ(STIME(5:6),  *,END=100,ERR=100) IM
-         READ(STIME(7:8),  *,END=100,ERR=100) ID
-         READ(STIME(10:11),*,END=100,ERR=100) IH
-         READ(STIME(12:13),*,END=100,ERR=100) IMIN
-         READ(STIME(14:15),*,END=100,ERR=100) ISEC
-
-         CALL MJDYMD(XMJD  , IY    , IM    , ID    , IH    ,   &
-     &               IMIN  , ISEC  , IFLAG                    )
-         RETURN
-
-100      XMJD = 0.0
-         RETURN
-      END SUBROUTINE
-!**********************************************************************
-!*                                                                    *
-!**********************************************************************
-      SUBROUTINE MJD2CT_V1(XMJD,STIME)
-         USE DATAPOOL, ONLY : RKIND
-         IMPLICIT NONE
-         CHARACTER(LEN=15), INTENT(OUT) :: STIME
-         real(rkind), INTENT(IN) :: XMJD
-         real(rkind)             :: TMJD
-         INTEGER                 :: IY, IM, ID, IH, IMIN, ISEC
-
-         INTEGER :: IFLAG = 2
-
-         TMJD = XMJD
-
-         CALL MJDYMD( TMJD, IY, IM, ID, IH, IMIN, ISEC, IFLAG )
-
-         WRITE(STIME(1:4),'(I4.4)') IY
-         WRITE(STIME(5:6),'(I2.2)') IM
-         WRITE(STIME(7:8),'(I2.2)') ID
-         WRITE(STIME(9:9),'(A)') '.'
-         WRITE(STIME(10:11),'(I2.2)') IH
-         WRITE(STIME(12:13),'(I2.2)') IMIN
-         WRITE(STIME(14:15),'(I2.2)') ISEC
-      END SUBROUTINE
-!**********************************************************************
-!*                                                                    *
-!**********************************************************************
       SUBROUTINE CU2SEC(UNITT, DT)
-      USE DATAPOOL, ONLY : DBG, RKIND, WRITEDBGFLAG
+      USE DATAPOOL, ONLY : DBG, RKIND
       IMPLICIT NONE
       CHARACTER(LEN=*), INTENT(IN) :: UNITT
       real(rkind), INTENT(INOUT) :: DT
@@ -290,7 +231,7 @@
          CASE ('S', 's', 'SEC', 'sec')
             DT = DT
          CASE DEFAULT
-            IF (WRITEDBGFLAG == 1) WRITE(DBG%FHNDL,*) 'ERROR WRONG UNIT, UNIT = ', UNITT
+            WRITE(DBG%FHNDL,*) 'ERROR WRONG UNIT, UNIT = ', UNITT
             DT = 0.0
       END SELECT
       END SUBROUTINE

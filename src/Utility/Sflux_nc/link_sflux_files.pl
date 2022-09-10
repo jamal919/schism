@@ -1,12 +1,12 @@
 #! /usr/bin/perl -w
 
-#Link sflux_air* etc to nc files generated from other programs for SCHISM runs. 
+#Link sflux_air* etc to nc files generated from other programs for SELFE runs. 
 #Only works within a year; only a prototype.
 @month_day=(31,28,31,30,31,30,31,31,30,31,30,31);
 $year=2011;
 $start_mon=7;
 $start_day=1;
-$days=2; #no. of SCHISM run days +1
+$days=2; #no. of SELFE run days +1
 
 if($year % 4 ==0) {$month_day[1]=29;}
 

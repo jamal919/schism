@@ -1,8 +1,9 @@
+#include "wwm_functions.h"
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
       SUBROUTINE SINGLE_READ_SPATIAL_GRID_TOTAL(eGrid, DimMode, LVAR1D, Lsphe, eGRD, iGridType)
-      USE DATAPOOL, only : rkind, istat, GridInformation, FILEDEF, DBG, WRITEDBGFLAG
+      USE DATAPOOL, only : rkind, istat, GridInformation, FILEDEF, DBG
 #ifdef NCDF
       USE NETCDF
 #endif
@@ -34,7 +35,7 @@
            !
           OPEN(eGRD % FHNDL, FILE = eGRD % FNAME, STATUS = 'OLD')
           allocate(eGrid % XPtotal(eGrid % np_total), eGrid % DEPtotal(eGrid % np_total), stat=istat)
-          IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 3')
+          IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 1')
           DO IP = 1, eGrid % NP_TOTAL
             READ(eGRD % FHNDL, *, IOSTAT = ISTAT) eGrid % XPtotal(IP), eGrid % DEPtotal(IP)
             IF ( ISTAT /= 0 ) CALL WWM_ABORT('error in the grid configuration file')
@@ -68,7 +69,7 @@
             IF ( ISTAT /= 0 ) CALL WWM_ABORT('IGRIDTYPE=1 error in read mnp/mne')
             EGRID%NP_TOTAL = ITMP + JTMP
             allocate(eGrid % XPtotal(eGrid%np_total), eGrid % YPtotal(eGrid%np_total), eGrid % DEPtotal(eGrid%np_total), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 4')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 2')
             DO I = 1, 7
               READ(eGRD % FHNDL, '(A)') RHEADER
             END DO
@@ -84,7 +85,7 @@
             END DO
             READ(eGRD % FHNDL, *, IOSTAT = ISTAT) eGrid % NE_TOTAL
             allocate(eGrid % INEtotal(3, eGrid%ne_total), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 5')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 3')
             DO I = 1, 3
               READ(eGRD % FHNDL, '(A)') RHEADER
             END DO
@@ -100,13 +101,13 @@
             OPEN(eGRD%FHNDL, FILE = eGRD%FNAME, STATUS = 'OLD')
             READ(eGRD%FHNDL,*) EGRID%NE_TOTAL, EGRID%NP_TOTAL
             allocate(eGrid % DEPtotal(EGRID%NP_TOTAL), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 6')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 4')
             DO IP = 1, EGRID%NP_TOTAL
               READ(eGRD%FHNDL, *, IOSTAT = ISTAT) eGrid % DEPtotal(IP)
               IF ( ISTAT /= 0 ) CALL WWM_ABORT('IGRIDTYPE=2 error in grid read 1')
             END DO
             allocate(eGrid%TRIAtotal(EGRID%NE_TOTAL), eGrid % INEtotal(3,eGrid%ne_total), eGrid % IENtotal(6,eGrid%ne_total), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 7')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 5')
             DO IE = 1, EGRID%NE_TOTAL
               READ(eGRD%FHNDL, *, IOSTAT = ISTAT) eGrid % TRIAtotal(IE)
               IF ( ISTAT /= 0 )  CALL WWM_ABORT('IGRIDTYPE=2 error in grid read 2')
@@ -130,7 +131,7 @@
             READ(eGRD%FHNDL,*, IOSTAT = ISTAT) EGRID%NE_TOTAL, EGRID%NP_TOTAL
             IF ( ISTAT /= 0 ) CALL WWM_ABORT('IGRIDTYPE=3 error in read mnp/mne')
             allocate(eGrid % XPtotal(eGrid%np_total), eGrid % YPtotal(eGrid%np_total), eGrid % DEPtotal(eGrid%np_total), eGrid % INEtotal(3, eGrid%ne_total), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 8')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 6')
             DO IP=1,EGRID%NP_TOTAL
               READ(eGRD%FHNDL, *, IOSTAT = ISTAT) KTMP, XPDTMP, YPDTMP, ZPDTMP
               eGrid % XPtotal(IP)  = XPDTMP
@@ -148,7 +149,7 @@
             READ(eGRD%FHNDL, *, IOSTAT = ISTAT) EGRID%NE_TOTAL 
             READ(eGRD%FHNDL, *, IOSTAT = ISTAT) EGRID%NP_TOTAL 
             allocate(eGrid % XPtotal(eGrid%np_total), eGrid % YPtotal(eGrid%np_total), eGrid % DEPtotal(eGrid%np_total), eGrid%INEtotal(3, eGrid%ne_total), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('allocate error 9')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 7')
             DO IP=1,EGRID%NP_TOTAL
               READ(eGRD%FHNDL, *, IOSTAT = ISTAT) eGrid % XPtotal(IP), eGrid % YPtotal(IP), eGrid % DEPtotal(IP)
               IF ( ISTAT /= 0 ) CALL WWM_ABORT('IGRIDTYPE=4 error in grid read 1')
@@ -171,11 +172,9 @@
 
             ISTAT = nf90_inquire_dimension(ncid, dimidsB(2), name=MNEstr, len=eGrid%ne_total)
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 4, ISTAT)
-            IF (WRITEDBGFLAG == 1) THEN
-              WRITE(DBG%FHNDL,*) 'EGRID%NE_TOTAL=', EGRID%NE_TOTAL
-              WRITE(DBG%FHNDL,*) 'MNEstr=', TRIM(MNEstr)
-              FLUSH(DBG%FHNDL)
-            END IF
+            WRITE(DBG%FHNDL,*) 'EGRID%NE_TOTAL=', EGRID%NE_TOTAL
+            WRITE(DBG%FHNDL,*) 'MNEstr=', TRIM(MNEstr)
+            FLUSH(DBG%FHNDL)
 
             ISTAT = nf90_inq_varid(ncid, 'depth', var_id)
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 5, ISTAT)
@@ -185,14 +184,12 @@
 
             ISTAT = nf90_inquire_dimension(ncid, dimidsA(1), name=MNPstr, len=eGrid%np_total)
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 7, ISTAT)
-            IF (WRITEDBGFLAG == 1) THEN
-              WRITE(DBG%FHNDL,*) 'EGRID%NP_TOTAL=', EGRID%NP_TOTAL
-              WRITE(DBG%FHNDL,*) 'MNPstr=', TRIM(MNPstr)
-              FLUSH(DBG%FHNDL)
-            END IF
+            WRITE(DBG%FHNDL,*) 'EGRID%NP_TOTAL=', EGRID%NP_TOTAL
+            WRITE(DBG%FHNDL,*) 'MNPstr=', TRIM(MNPstr)
+            FLUSH(DBG%FHNDL)
 
             allocate(eGrid % XPtotal(eGrid%np_total), eGrid % YPtotal(eGrid%np_total), eGrid % DEPtotal(eGrid%np_total), eGrid%INEtotal(3, eGrid%ne_total), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('allocate error 9')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 8')
 
             ISTAT = nf90_inq_varid(ncid, 'depth', var_id)
             CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 8, ISTAT)
@@ -249,7 +246,11 @@
 !*                                                                    *
 !**********************************************************************
       SUBROUTINE READ_SPATIAL_GRID_TOTAL_KERNEL(eGrid, DimMode, LVAR1D, Lsphe, eGRD, iGridType)
-      USE DATAPOOL, only : rkind, istat, GridInformation, FILEDEF
+      USE DATAPOOL, only : INEtotal, rkind, istat, GridInformation, FILEDEF, np_total
+      USE DATAPOOL, only : MULTIPLE_IN_GRID
+#ifdef MPI_PARALL_GRID
+      USE DATAPOOL, only : ierr, itype, rtype, istatus, myrank, comm, nproc
+#endif
       IMPLICIT NONE
       type(GridInformation), intent(out) :: eGrid
       integer, intent(in) :: DimMode
@@ -260,7 +261,8 @@
       !
       integer :: rbuf_int(2)
       real(rkind), allocatable :: rbuf_real(:)
-      integer iProc, IP, IE, nb_real, idx
+      integer nb_real
+      integer idx, ie, IP, iProc
 #ifdef MPI_PARALL_GRID
       IF (MULTIPLE_IN_GRID) THEN
         CALL SINGLE_READ_SPATIAL_GRID_TOTAL(eGrid, DimMode, LVAR1D, Lsphe, eGRD, iGridType)
@@ -273,15 +275,15 @@
           rbuf_int(1)=eGrid % np_total
           rbuf_int(2)=eGrid % ne_total
           DO iProc=2,nproc
-            CALL MPI_SEND(rbuf_int,2,itype, iProc-1, 30, comm, ierr)
+            CALL MPI_SEND(rbuf_int,2,itype, iProc-1, 30, comm, istatus, ierr)
           END DO
           DO iProc=2,nproc
-            CALL MPI_SEND(INEtotal,3*eGrid % ne_total,itype, iProc-1, 32, comm, ierr)
+            CALL MPI_SEND(INEtotal,3*eGrid % ne_total,itype, iProc-1, 32, comm, istatus, ierr)
           END DO
           IF (IGRIDTYPE .eq. 2) THEN
             nb_real=eGrid % np_total + 7*eGrid % ne_total
             allocate(rbuf_real(nb_real), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('allocate error 10')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 9')
             idx=0
             DO IP=1,NP_TOTAL
               idx=idx+1
@@ -300,7 +302,7 @@
           ELSE
             nb_real=3*eGrid % np_total
             allocate(rbuf_real(nb_real), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('allocate error 11')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 10')
             idx=0
             DO IP=1,NP_TOTAL
               rbuf_real(idx+1)=eGrid % XPtotal(IP)
@@ -310,7 +312,7 @@
             END DO
           END IF
           DO iProc=2,nproc
-            CALL MPI_SEND(rbuf_real,nb_real,rtype, iProc-1, 34, comm, ierr)
+            CALL MPI_SEND(rbuf_real,nb_real,rtype, iProc-1, 34, comm, istatus, ierr)
           END DO
           deallocate(rbuf_real)
         ELSE
@@ -318,15 +320,15 @@
           eGrid % np_total=rbuf_int(1)
           eGrid % ne_total=rbuf_int(2)
           allocate(eGrid % INEtotal(3,eGrid % ne_total), stat=istat)
-          IF (istat/=0) CALL WWM_ABORT('allocate error 12')
+          IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 11')
           CALL MPI_RECV(eGrid % INEtotal,3*eGrid % ne_total,itype, 0, 32, comm, istatus, ierr)
           IF (IGRIDTYPE .eq. 2) THEN
             nb_real=eGrid % np_total + 7*eGrid % ne_total
             allocate(rbuf_real(nb_real), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('allocate error 13')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 12')
             CALL MPI_RECV(rbuf_real,nb_real,rtype, 0, 34, comm, istatus, ierr)
             allocate(eGrid % DEPtotal(eGrid % np_total), eGrid % TRIAtotal(eGrid % ne_total), eGrid % IENtotal(6,eGrid % ne_total), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('allocate error 14')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 13')
             idx=0
             DO IP=1,eGrid % NP_TOTAL
               idx=idx+1
@@ -345,9 +347,9 @@
           ELSE
             nb_real=3*np_total
             allocate(rbuf_real(nb_real), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('allocate error 15')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 14')
             allocate(eGrid % DEPtotal(np_total), eGrid % XPtotal(np_total), eGrid % YPtotal(np_total), stat=istat)
-            IF (istat/=0) CALL WWM_ABORT('allocate error 16')
+            IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 15')
             CALL MPI_RECV(rbuf_real,nb_real,rtype, 0, 34, comm, istatus, ierr)
             idx=0
             DO IP=1,NP_TOTAL
@@ -367,6 +369,56 @@
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
+      SUBROUTINE GRID_EXPORT_WAM(eFileOut, FieldExport)
+      USE DATAPOOL
+      IMPLICIT NONE
+      character(len=*), intent(in) :: eFileOut
+      real(rkind), intent(in) :: FieldExport(np_total)
+      real(rkind), allocatable :: XPout(:), YPout(:)
+      logical LFLIVE
+      CHARACTER(LEN=512) :: ErrMsg
+      INQUIRE( FILE = TRIM(eFileOut), EXIST = LFLIVE )
+      IF (LFLIVE) THEN
+         WRITE(ErrMsg,10) TRIM(eFileOut)
+10       FORMAT('GRID_EXPORT_WAM: Please remove file before overwrite file = ', a)
+         CALL WWM_ABORT(ErrMsg)
+      END IF
+      IF (LSPHE) THEN
+        CALL EXPORT_GRID_SYSTEM_DAT_FORMAT(eFileOut, np_total, ne_total, XPtotal, YPtotal, FieldExport, INEtotal)
+      ELSE
+        allocate(XPout(np_total), YPout(np_total), stat=istat)
+        IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 16')
+        XPout = XPtotal / 111111.
+        YPout = YPtotal / 111111.
+        CALL EXPORT_GRID_SYSTEM_DAT_FORMAT(eFileOut, np_total, ne_total, XPout, YPout, FieldExport, INEtotal)
+        deallocate(XPout, YPout)
+      END IF
+      END SUBROUTINE
+!**********************************************************************
+!*                                                                    *
+!**********************************************************************
+      SUBROUTINE GRID_EXPORT_FUNCTION
+      USE DATAPOOL
+      IMPLICIT NONE
+      character(len=*), parameter :: eFile = "system_wam_grd.dat"
+#ifdef MPI_PARALL_GRID
+      IF (myrank .eq. 0) THEN
+#endif
+        IF (LEXPORT_GRID_MOD_OUT) THEN
+          IF (TRIM(MODEL_OUT_TYPE) .eq. 'WW3') THEN
+            CALL EXPORT_GRID_WW3_FORMAT
+          END IF
+          IF (TRIM(MODEL_OUT_TYPE) .eq. 'WAM') THEN
+            CALL GRID_EXPORT_WAM(eFile, DEPtotal)
+          END IF
+        END IF
+#ifdef MPI_PARALL_GRID
+      END IF
+#endif
+      END SUBROUTINE
+!**********************************************************************
+!*                                                                    *
+!**********************************************************************
       SUBROUTINE READ_SPATIAL_GRID_TOTAL
       USE DATAPOOL
       IMPLICIT NONE
@@ -377,7 +429,7 @@
       ne_total = eGrid % ne_total
       IF (DIMMODE .eq. 1) THEN
         allocate(XPtotal(np_total), DEPtotal(np_total), DX1total(0:np_total+1), DX2total(0:np_total+1), stat=istat)
-        IF (istat/=0) CALL WWM_ABORT('allocate error')
+        IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 16')
         DO IP=1,np_total
           XPtotal(IP)  = eGrid % XPtotal(IP)
           DEPtotal(IP) = eGrid % DEPtotal(IP)
@@ -389,7 +441,7 @@
       ELSE
         IF (IGRIDTYPE .eq. 2) THEN
           allocate(DEPtotal(NP_TOTAL), TRIAtotal(NE_TOTAL), INEtotal(3,ne_total), IENtotal(6,ne_total), stat=istat)
-          IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 6')
+          IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 17')
           DO IP=1,np_total
             DEPtotal(IP) = eGrid % DEPtotal(IP)
           END DO
@@ -400,7 +452,7 @@
           END DO
         ELSE
           allocate(XPtotal(np_total), YPtotal(np_total), DEPtotal(np_total), INEtotal(3, eGrid%ne_total), stat=istat)
-          IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 4')
+          IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 18')
           DO IP=1,np_total
             XPtotal(IP) = eGrid % XPtotal(IP)
             YPtotal(IP) = eGrid % YPtotal(IP)
@@ -409,8 +461,24 @@
           DO IE=1,ne_total
             INEtotal(:,IE) = eGrid % INEtotal(:,IE)
           END DO
+          IF (CART2LATLON) THEN
+            XPtotal = XPtotal / 111111.11
+            YPtotal = YPtotal / 111111.11
+            IF (LSPHE .eqv. .FALSE.) THEN
+              CALL WWM_ABORT('For CART2LATLON we need LSPHE = T')
+            END IF
+          ELSE IF (LATLON2CART) THEN
+            XPtotal = XPtotal * 111111.11
+            YPtotal = YPtotal * 111111.11
+            IF (LSPHE .eqv. .TRUE.) THEN
+              CALL WWM_ABORT('For LATLON2CART we need LSPHE = F')
+            END IF
+          ELSE IF (CART2LATLON .AND. LATLON2CART) THEN
+            CALL  WWM_ABORT('CART2LATLON .AND. LATLON2CART cannot be T')
+          END IF
         END IF
       END IF
+      CALL GRID_EXPORT_FUNCTION
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
@@ -419,6 +487,8 @@
       USE DATAPOOL
       IMPLICIT NONE
       INTEGER nbDirichlet, nbIsland
+!      INTEGER :: MapDirect(np_total)
+!      INTEGER :: MapRevert(np_total)
       INTEGER, allocatable :: IPbound(:), IPisland(:), ACTIVE(:)
       INTEGER IP, IE2, eVal, IE, idxDirichlet, idxIsland
 #ifdef MPI_PARALL_GRID      
@@ -438,8 +508,8 @@
         END IF
       END DO
       allocate(IPbound(nbDirichlet), IPisland(nbIsland), ACTIVE(nbDirichlet), stat=istat)
+      IF (istat/=0) CALL WWM_ABORT('wwm_input, allocate error 19')
       ACTIVE(:)=1    ! right now we are proceding this way. Maybe there is work here to improve
-      IF (istat/=0) CALL WWM_ABORT('allocate error 17')
       idxDirichlet=0
       idxIsland=0
       DO IP=1,np_total
@@ -494,4 +564,26 @@
       CLOSE(FHNDL_EXPORT_GRID_WW3)
       deallocate(IPbound, IPisland, ACTIVE)
       END SUBROUTINE
-      
+!**********************************************************************
+!*                                                                    *
+!**********************************************************************
+      SUBROUTINE EXPORT_GRID_SYSTEM_DAT_FORMAT(eFile, MNPout, MNEout, XPout, YPout, DEPout, INEout)
+      USE DATAPOOL
+      IMPLICIT NONE
+      character(len=*), intent(in) :: eFile
+      integer, intent(in) :: MNPout, MNEout
+      real(rkind), intent(in) :: XPout(MNPout), YPout(MNPout), DEPout(MNPout)
+      integer, intent(in) :: INEout(3,MNEout)
+      integer :: FHNDL_EXPORT = 4347
+      integer I
+      OPEN(FHNDL_EXPORT, FILE = TRIM(eFile), STATUS='unknown')
+      CALL XFNHEADER_1(FHNDL_EXPORT, 0, MNPout)
+      DO I=1,MNPout
+        WRITE(FHNDL_EXPORT,'(I10,2F20.8,F15.4)') I-1, XPout(I), YPout(I), DEPout(I)
+      END DO
+      CALL XFNHEADER_2(FHNDL_EXPORT, MNEout)
+      DO I=1,MNEout
+        WRITE(FHNDL_EXPORT,'(5I10)') INEout(1,I)-1, INEout(2,I)-1, INEout(3,I)-1, 0, I-1
+      END DO
+      CLOSE(FHNDL_EXPORT)
+      END SUBROUTINE

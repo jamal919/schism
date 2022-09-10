@@ -42,7 +42,7 @@ program convert_nudge_nc
   read*, nond0
   print*, 'Input # of levels (1 for 2D, nvrt for 3D):'
   read*, nvrt
-  print*, 'Input # of components (1-scalar; 2-vector; # of tracers for modules):'
+  print*, 'Input ivs (1-scalar; 2-vector):'
   read*, ivs
   print*, 'Input # of days in file:'
   read*, rnday
@@ -76,12 +76,9 @@ program convert_nudge_nc
   do it=0,ntime-1
     read(17,rec=it+1)timeout,th
 !    write(98,*)timeout,th
-    if(it==1) then
-      if(abs(dt0-timeout)>1.e-4) then
-        print*, 'time step mismatch:',dt0,timeout
-        stop
-      endif
-      iret=nf90_put_var(ncid,idt,dt0)
+    if(it==1.and.abs(dt0-timeout)>1.e-4) then
+      print*, 'time step mismatch:',dt0,timeout
+      stop
     endif
 
     a1(1)=timeout
@@ -89,6 +86,7 @@ program convert_nudge_nc
     iret=nf90_put_var(ncid,ivarid,th,(/1,1,1,it+1/),(/ivs,nvrt,nond0,1/))
   enddo !it
 
+  iret=nf90_put_var(ncid,idt,dt0)
   close(17)
   iret=nf90_close(ncid)
 end program convert_nudge_nc

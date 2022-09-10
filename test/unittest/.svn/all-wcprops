@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest
+END
+test_mpi_assert.F90
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest/test_mpi_assert.F90
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/schism/!svn/ver/4542/tags/v5.6.1/test/unittest/CMakeLists.txt
+END

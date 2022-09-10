@@ -857,7 +857,7 @@ CONTAINS
       !- Airy waves
       tmp=dsinh(kpeak*htot)
       if(tmp==0.d0) call parallel_abort('wl14_tot(1)')
-      Uw = dmax1(pi*hs/tp/tmp,0.001d0)
+      Uw = pi*hs/tp/tmp !>0
       U_crest = Uw !>0
       T_crest = tp/2.d0 !>0
       T_trough = T_crest !>0
@@ -1498,10 +1498,9 @@ CONTAINS
 
 ! vertical dicretization
   z(:) = 0.d0
-  do i=1,ndz-1
-     z(i) = z_a*(htot/z_a)**(dfloat(i-1)/dfloat(ndz-1))
+  do i=1,ndz
+     z(i) = z_a*(htot/z_a)**((i-1)/(ndz-1))
   enddo
-  z(ndz) = htot
 
 ! vertical profile of current velocity
   Uc_z(:) = 0.d0
@@ -1630,19 +1629,11 @@ CONTAINS
     if(ds>0.2d0) ds=0.2d0
 
     u_star_w = dsqrt(tau_b_w/rho0)
-!    if (u_star_w>0.d0) then
-!      beta_w_class = 1.d0+2.d0*(Ws_class/u_star_w)**2.d0
-!      beta_w_class = min(beta_w_class,1.5d0)
-!    else
-!      call parallel_abort('u_star_w <= 0')
-!    endif
     if (u_star_w>0.d0) then
       beta_w_class = 1.d0+2.d0*(Ws_class/u_star_w)**2.d0
       beta_w_class = min(beta_w_class,1.5d0)
-    elseif (u_star_w==0.d0) then
-      beta_w_class = 1.5d0
     else
-      call parallel_abort('u_star_w < 0')
+      call parallel_abort('u_star_w <= 0')
     endif
 
     epsi_s_w_bed_class = 0.018d0*beta_w_class*gama_br*ds*U_d_w_r
@@ -1749,7 +1740,7 @@ CONTAINS
     !vertical integration
     qs_w_class = z_a*c_a_class
     i=2
-    do while(z(i)<=0.5d0.and.i<=ndz)
+    do while(z(i)<=0.5d0)
        qs_w_class = qs_w_class + (z(i)-z(i-1))*(c_z_class(i)+c_z_class(i-1))/2.d0
        i=i+1
        if (z(i-1)>0.5d0) then

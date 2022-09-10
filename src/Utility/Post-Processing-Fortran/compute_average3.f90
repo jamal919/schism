@@ -14,55 +14,46 @@
 
 !
 !********************************************************************************
-!										
-!	Read (combined or uncombined) nc outputs and compute average field 
+!										*
+!	Read nc outputs and compute average field 
 !       at a particular Z-level (use above surface/below bottom to get surface/bottom).
 !       Skip dry times for 3D variables.
-!       Works for mixed quad/tri on NODE based variables only.
-!       Input: schout*.nc (combined or uncombined); local_to_global*; vgrid.in; screen
+!       Works for mixed quad/tri.
+!       Input: schout*.nc (combined); vgrid.in; screen
 !       Output: average.out (gredit for scalar or xmgr5 format for vector)
-!										
-!       ifort -O2 -mcmodel=medium -assume byterecl -CB -o compute_average3.exe ../UtilLib/extract_mod.f90 ../UtilLib/compute_zcor.f90 compute_average3.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
+!										*
+!       ifort -O2 -mcmodel=medium -assume byterecl -o compute_average3 ../UtilLib/extract_mod.f90 compute_average3.f90 ../UtilLib/compute_zcor.f90 -I$NETCDF/include -L$NETCDF/lib -lnetcdf
 !********************************************************************************
 !
       program read_out
       use netcdf
       use extract_mod
-      use compute_zcor
       parameter(nbyte=4)
       character(len=30) :: file63,varname
       character(len=12) :: it_char
+!      character(len=48) :: start_time,version,variable_nm,variable_dim
       character(len=48) :: data_format
   
 !      integer,allocatable :: i34(:),elnode(:,:)
-      integer :: iday1, iday2, iskipst
       allocatable :: sigma(:),cs(:),ztot(:)
-      allocatable :: outvar(:,:,:,:),icum(:,:,:),eta2(:,:),ztmp(:,:)
+      allocatable :: outvar(:,:,:),icum(:,:,:),eta2(:),ztmp(:,:)
       allocatable :: xcj(:),ycj(:),dps(:),kbs(:),xctr(:),yctr(:),dpe(:),kbe(:)
       allocatable :: idry(:),outs(:,:,:),residual(:,:),icounter(:)
       allocatable :: ic3(:,:),isdel(:,:),isidenode(:,:),kbp(:),sigma_lcl(:,:)
       real*8,allocatable :: timeout(:)
+      integer :: dimids(100),idims(100), &
+     &start_2d(2),start_3d(3),start_4d(4), &
+     &count_2d(2),count_3d(3),count_4d(4)
 
-      pi=3.1415926
-
-!...  Set max array size for system memory
-      print*, 'Input max array size (e.g., <=2.e9):'
-      read(*,*)max_array_size
-      print*, 'max_array_size read in=',max_array_size
-
-      print*, 'Do you work on uncombined (0) or combined (1) nc?'
-      read(*,*)icomb
-      if(icomb/=0.and.icomb/=1) stop 'Unknown icomb'
-
+      !long int for large files
+!      integer(kind=8) :: irec
+      
       print*, 'Input variable name (e.g. salt):'
       read(*,'(a30)')varname
       varname=adjustl(varname); len_var=len_trim(varname)
       
       print*, 'Input start and end stack #s to read:'
       read(*,*) iday1,iday2
-
-      print*, 'Input stride in stacks (1 to include all):'
-      read(*,*) iskipst
 
       print*, 'Input start and end record #s in start|end stack respectively:'
 !'
@@ -71,40 +62,26 @@
       print*, 'Input z-coord. (<=0 below MSL):'
       read(*,*) z00
 
-!      if(mod(iday2-iday1,iskipst)/=0) then
-!        write(*,*)'should be n skips over stack1 and stack2:',iday1,iday2,iskipst
-!        stop
-!      endif
-
-!      file63=adjustl(file63)
-!      len_file63=len_trim(file63)
+      file63=adjustl(file63)
+      len_file63=len_trim(file63)
 
 !...  Header
-      !Returned vars: ne,np,ns,nrec,[x y dp](np),
-      !elnode,i34,nvrt,h0,dtout
-      !If icomb=0, additonal vars:
-      !nproc,iegl_rank,iplg,ielg,islg,np_lcl(:),ne_lcl(:),ns_lcl(:)
-      if(icomb==0) then !uncombined
-        call get_global_geo
-      else
-        call readheader(iday1)
-      endif
+!...
+      write(it_char,'(i12)')iday1
+      it_char=adjustl(it_char)
+      leng=len_trim(it_char)
+      file63='schout_'//it_char(1:leng)//'.nc'
+      call readheader(file63)
+      !Returned vars: ne,np,ns,nrec,start_time,[x y dp ](np),
+      !elnode,i34,nvrt,itime_id,ielev_id,h0,dtout
 
-      print*, 'After header:',ne,np,nrec,i34(ne), &
-     &elnode(1:i34(ne),ne),nvrt,h0,x(np),y(np),dp(np) !,start_time
+      print*, 'After header:',ne,np,nrec,i34(ne),itime_id,ielev_id, &
+     &elnode(1:i34(ne),ne),nvrt,h0,x(np),y(np),dp(np),start_time
       
-!...  Read in time records in segments for mem
-      last_dim=np
-      nrec3=max_array_size/(2*nvrt*last_dim)-1
-      nrec3=min(nrec,max(nrec3,1))
-      print*, '# of records in each stack is: ',nrec, &
-     &'; actual # of records that can be read in each time is:',nrec3
-
+!     Read vgrid.in
       allocate(timeout(nrec),ztot(nvrt),sigma(nvrt),sigma_lcl(nvrt,np),kbp(np), &
-     &outvar(2,nvrt,last_dim,nrec3),eta2(np,nrec3),ztmp(nvrt,np),residual(np,2),icounter(np),idry(np))
-      outvar=-huge(1.0) !test mem
-
-      call get_vgrid_single('vgrid.in',np,nvrt,ivcor,kz,h_s,h_c,theta_b,theta_f,ztot,sigma,sigma_lcl,kbp)
+     &outvar(2,nvrt,np),eta2(np),ztmp(nvrt,np),residual(np,2),icounter(np),idry(np))
+      call get_vgrid('vgrid.in',np,nvrt,ivcor,kz,h_s,h_c,theta_b,theta_f,ztot,sigma,sigma_lcl,kbp)
 
       print*, 'last element',elnode(1:i34(ne),ne)
 
@@ -115,63 +92,85 @@
       residual=0
 !      ndays=iday2-iday1+1
       icounter=0 !counter for each node (wet/dry)
-      do iday=iday1,iday2,iskipst
+      do iday=iday1,iday2
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-!      write(it_char,'(i12)')iday
-!      it_char=adjustl(it_char)
-!      leng=len_trim(it_char)
-!      file63='schout_'//it_char(1:leng)//'.nc'
-!      iret=nf90_open(trim(adjustl(file63)),NF90_NOWRITE,ncid)
-!      !time is double
-!      iret=nf90_inq_varid(ncid,'time',itime_id)
-!      iret=nf90_get_var(ncid,itime_id,timeout,(/1/),(/nrec/))
-      if(icomb==0) then !uncombined
-        call get_timeout(iday,nrec,timeout,icomb)
-      else
-        call get_timeout(iday,nrec,timeout)
-      endif
+      write(it_char,'(i12)')iday
+      it_char=adjustl(it_char)
+      leng=len_trim(it_char)
+      file63='schout_'//it_char(1:leng)//'.nc'
+      iret=nf90_open(trim(adjustl(file63)),NF90_NOWRITE,ncid)
+      !time is double
+      iret=nf90_inq_varid(ncid,'time',itime_id)
+      iret=nf90_get_var(ncid,itime_id,timeout,(/1/),(/nrec/))
 !      print*, 'time=',timeout
 
-      irec1=1 !start record
-      loop1: do
-        irec2=min(nrec,irec1+nrec3-1)
+      do irec=1,nrec
+        !Get elev
+        start_2d(1)=1; start_2d(2)=irec
+        count_2d(1)=np; count_2d(2)=1
+        iret=nf90_get_var(ncid,ielev_id,eta2,start_2d,count_2d)
+      
+        iret=nf90_inq_varid(ncid,varname(1:len_var),ivarid1)
+        if(iret/=nf90_NoErr) stop 'Var not found'
+        iret=nf90_Inquire_Variable(ncid,ivarid1,ndims=ndims,dimids=dimids)
+        if(ndims>100) stop 'increase dimension of dimids & idims'
+        do i=1,ndims
+          iret=nf90_Inquire_Dimension(ncid,dimids(i),len=idims(i))
+        enddo !i
+        if(idims(ndims-1)/=np) stop 'can only handle node-based'
+        if(idims(ndims)/=nrec) stop 'last dim is not time'
 
-        if(icomb==0) then !uncombined
-          do irank=0,nproc-1
-            call get_outvar_multirecord(iday,varname,irec1,irec2,np,last_dim,nvrt,nrec3,outvar,i23d,ivs,eta2,irank)
-          enddo !irank
-        else
-          call get_outvar_multirecord(iday,varname,irec1,irec2,np,last_dim,nvrt,nrec3,outvar,i23d,ivs,eta2)
-        endif
-!        print*, 'done reading records:',irec1,irec2
+        iret=nf90_get_att(ncid,ivarid1,'i23d',i23d)
+        iret=nf90_get_att(ncid,ivarid1,'ivs',ivs)
+        !print*, 'i23d:',i23d,ivs,idims(1:ndims)
 
-        !Available now: outvar(2,nvrt,np|ne,irec2-irec1+1),i23d,ivs,eta2(np,irec2-irec1+1)
+        if(ivs==1) then !scalar
+          if(mod(i23d-1,3)==0) then !2D
+            start_2d(1)=1; start_2d(2)=irec
+            count_2d(1)=np; count_2d(2)=1
+            iret=nf90_get_var(ncid,ivarid1,outvar(1,1,:),start_2d,count_2d)
+          else !3D
+            start_3d(1:2)=1; start_3d(3)=irec
+            count_3d(2)=np; count_3d(1)=nvrt; count_3d(3)=1
+            iret=nf90_get_var(ncid,ivarid1,outvar(1,:,:),start_3d,count_3d)
+          endif
+        else !vector
+          if(mod(i23d-1,3)==0) then !2D
+            start_3d(1:2)=1; start_3d(3)=irec
+            count_3d(2)=np; count_3d(1)=2; count_3d(3)=1
+            iret=nf90_get_var(ncid,ivarid1,outvar(1:2,1,:),start_3d,count_3d)
+          else if(ndims-1==3) then !3D vector
+            start_4d(1:3)=1; start_4d(4)=irec
+            count_4d(3)=np; count_4d(2)=nvrt; count_4d(1)=2; count_4d(4)=1
+            iret=nf90_get_var(ncid,ivarid1,outvar(:,:,:),start_4d,count_4d)
+          else
+            stop 'Unknown type(2)'
+          endif
+        endif !ivs
 
-        do irec=1,irec2-irec1+1 !offeset record #
-!----------------------------------------------------------------------------
-        irec_real=irec1+irec-1 !actual record #
+        !Available now: outvar(2,nvrt,np)
+
         if(mod(i23d-1,3)==0) then !2D
-          !print*,'irec=',irec,iday1,irec_start,iday2,irec_end
-          if(.not.(iday==iday1.and.irec_real<irec_start.or.iday==iday2.and.irec_real>irec_end)) then
+          if(.not.(it1==iday1.and.it1<irec_start.or.it1==iday2.and.it1>irec_end)) then
             do i=1,np
               icounter(i)=icounter(i)+1
-              residual(i,1:ivs)=residual(i,1:ivs)+outvar(1:ivs,1,i,irec)
+              residual(i,1:ivs)=residual(i,1:ivs)+outvar(1:ivs,1,i)
             enddo !i
           endif
         else !3D
           !Compute z coordinates
           do i=1,np
             if(ivcor==1) then !localized
-              if(dp(i)+eta2(i,irec)<=h0) then
+              if(dp(i)+eta2(i)<=h0) then
                 idry(i)=1
               else !wet
                 idry(i)=0
                 do k=kbp(i),nvrt
-                  ztmp(k,i)=(eta2(i,irec)+dp(i))*sigma_lcl(k,i)+eta2(i,irec)
+                  ztmp(k,i)=(eta2(i)+dp(i))*sigma_lcl(k,i)+eta2(i)
                 enddo !k
               endif !dp
             else if(ivcor==2) then !SZ
-              call zcor_SZ_single(dp(i),eta2(i,irec),h0,h_s,h_c,theta_b,theta_f,kz,nvrt,ztot, &
+              call zcor_SZ(dp(i),eta2(i),h0,h_s,h_c,theta_b,theta_f,kz,nvrt,ztot, &
      &sigma,ztmp(:,i),idry(i),kbpl)
               kbp(i)=kbpl
             endif !ivcor
@@ -194,25 +193,21 @@
               endif !ztmp
 
               if(k0==0) then
-                write(*,*)'failed to find a vertical level:',irec_real,i,ifs,z2,ztmp(:,i)
+                write(*,*)'failed to find a vertical level:',it1,i,ifs,z2,ztmp(:,i)
                 stop
               endif
-              if(.not.(iday==iday1.and.irec_real<irec_start.or.iday==iday2.and.irec_real>irec_end)) then
+
+              if(.not.(it1==iday1.and.it1<irec_start.or.it1==iday2.and.it1>irec_end)) then
                 icounter(i)=icounter(i)+1
                 do m=1,ivs
-                  tmp=outvar(m,k0,i,irec)*(1-rat)+outvar(m,k0+1,i,irec)*rat
+                  tmp=outvar(m,k0,i)*(1-rat)+outvar(m,k0+1,i)*rat
                   residual(i,m)=residual(i,m)+tmp
                 enddo !m
               endif !not
             endif !idry
           enddo !i=1,np
         endif !2/3D
-!----------------------------------------------------------------------------
-        enddo !irec
-
-        if(irec2==nrec) exit loop1
-        irec1=irec1+nrec3
-      end do loop1
+      enddo !it1=1,nrec
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       enddo !iday
@@ -229,23 +224,23 @@
       open(65,file='average.out')
 
       !For wave dir
-      if(varname(1:len_var).eq.'WWM_18') then
+      if(varname(1:len_var).eq.'wwm_16') then
         !Read in sub-samples
         open(20,file='nodeflags.bp',status='old')
         read(20,*); read(20,*)
 
-        eta2(:,1)=residual(:,1) !temp save
+        eta2=residual(:,1) !temp save
         do i=1,np
           read(20,*)j,tmp,tmp,tmp2
-          residual(i,1)=-sin(eta2(i,1)/180*pi)
-          residual(i,2)=-cos(eta2(i,1)/180*pi)
+          residual(i,1)=-sin(eta2(i)/180*pi)
+          residual(i,2)=-cos(eta2(i)/180*pi)
           if(nint(tmp2)==0) residual(i,1:2)=0
         enddo !i
         ivs=2 !xyuv format
       endif !file63
 
       if(ivs==1) then
-        write(65,*)iday1,iday2
+        write(65,*)
         write(65,*)ne,np
         do i=1,np
           write(65,*)i,x(i),y(i),residual(i,1)

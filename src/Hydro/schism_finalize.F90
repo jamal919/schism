@@ -39,7 +39,7 @@
       real(rkind) :: wtmp2
 
 !...  Output max. diffusion number reached
-      if(difnum_max_l2>0.5_rkind) write(12,*)'MAIN: max. diffusion # exceeds 0.5:',difnum_max_l2
+      if(difnum_max_l2>0.5) write(12,*)'MAIN: max. diffusion # exceeds 0.5:',difnum_max_l2
 !'
 
 !...  Output max. # of iterations for all ranks for WBL (Grant-Madsen formulation)
@@ -51,20 +51,20 @@
 #endif /*USE_WWM*/
 
 !...  Output max. elevations & dahv
-      fdb='maxelev_000000'
+      fdb='maxelev_0000'
       lfdb=len_trim(fdb)
-      write(fdb(lfdb-5:lfdb),'(i6.6)') myrank
-      open(10,file=out_dir(1:len_out_dir)//fdb,status='replace')
+      write(fdb(lfdb-3:lfdb),'(i4.4)') myrank
+      open(10,file='outputs/'//fdb,status='replace')
       write(10,*)np,nproc
       do i=1,np
         write(10,'(i11,3(1x,e20.12))')iplg(i),xnd(i),ynd(i),elevmax(i)
       enddo !i
       close(10)
 
-      fdb='maxdahv_000000'
+      fdb='maxdahv_0000'
       lfdb=len_trim(fdb)
-      write(fdb(lfdb-5:lfdb),'(i6.6)') myrank
-      open(10,file=out_dir(1:len_out_dir)//fdb,status='replace')
+      write(fdb(lfdb-3:lfdb),'(i4.4)') myrank
+      open(10,file='outputs/'//fdb,status='replace')
       write(10,*)np,nproc
       do i=1,np
         write(10,'(i11,5(1x,e20.12))')iplg(i),xnd(i),ynd(i),dav_maxmag(i),dav_max(1:2,i)
@@ -83,7 +83,7 @@
 !...Compute means and variances for checking the harmonic analysis results
 !...Accumulate mean and variance at each node.
         if (CHARMV) then
-          IF (FMV.NE.0._rkind) THEN
+          IF (FMV.NE.0.) THEN
             DO I=1,np
               ELAV(I)   = ELAV(I)/NTSTEPS
               XVELAV(I) = XVELAV(I)/NTSTEPS
@@ -93,8 +93,8 @@
               YVELVA(I) = YVELVA(I)/NTSTEPS - YVELAV(I)*YVELAV(I)
             END DO
             TIMEBEG=ITMV*dt
-            write(it_char(1:6),'(i6.6)') myrank
-            open(55,file=out_dir(1:len_out_dir)//'harme.55'//it_char(1:6))
+            write(it_char(1:4),'(i4.4)') myrank
+            open(55,file='outputs/harme.55'//it_char(1:4))
             WRITE(55,*) np
           ENDIF
         endif

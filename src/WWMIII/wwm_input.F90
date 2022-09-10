@@ -15,7 +15,7 @@
      &        ILOUTS, OUT, DAY2SEC, FRHIGH, DBG, LINES, VAROUT_HISTORY, &
      &        VAROUT_STATION, GRIDWRITE, RKIND, LVAR_READ,              &
      &        PARAMWRITE_HIS, PARAMWRITE_STAT, wwmerr, LCFL, myrank,    &
-     &        istat,WRITEDBGFLAG
+     &        istat, TEXT_OUTPUT_PRINT
 #ifdef NCDF
          USE NETCDF
          USE DATAPOOL, only : USE_SINGLE_OUT_STAT, USE_SINGLE_OUT_HIS,  &
@@ -24,14 +24,16 @@
 #endif
          USE DATAPOOL, only : STATION_P => STATION
          USE DATAPOOL, only : IOBPD => IOBPD_HISTORY
+         USE DATAPOOL, only : CG => CG_HISTORY
          USE DATAPOOL, only : MAIN, PRINTMMA, ZERO
          USE DATAPOOL, only : WriteOutputProcess_hot
          USE DATAPOOL, only : WriteOutputProcess_his
          USE DATAPOOL, only : WriteOutputProcess_stat
+         USE DATAPOOL, only : HISTORY_XFN, HISTORY_NC, HISTORY_SHP
 
          IMPLICIT NONE
          CHARACTER(LEN=40)  :: FILEOUT
-         INTEGER, PARAMETER :: INUMOUTS = 200 
+         INTEGER, PARAMETER :: INUMOUTS = 30 
          CHARACTER(LEN=20)  :: BEGTC, UNITC, ENDTC, NOUTS(INUMOUTS), NLOUTS(INUMOUTS)
          REAL(rkind)        :: XOUTS(INUMOUTS), YOUTS(INUMOUTS), CUTOFF(INUMOUTS)
          REAL(rkind)        :: XLOUTS(INUMOUTS), YLOUTS(INUMOUTS)
@@ -42,6 +44,7 @@
          INTEGER     :: I
          LOGICAL     :: PARAMWRITE
          LOGICAL     :: AC, WK, ACOUT_1D, ACOUT_2D
+         LOGICAL     :: OutputOptionsSet
          LOGICAL     ::   HS, TM01, TM02, TM10, KLM, WLM,               &
      &      ETOTC, ETOTS, DM, DSPR,                                     &
      &      TPPD, CPPD, KPPD, CGPD,                                     &
@@ -52,12 +55,14 @@
      &      WINDMAG, TAUW, TAUWX, TAUWY, TAUHF, TAUTOT,                 &
      &      STOKESBOTTX, STOKESBOTTY,                                   &
      &      STOKESSURFX, STOKESSURFY, STOKESBAROX, STOKESBAROY,         &
-     &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP
+     &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP,             &
+     &      CFL_CASD1, CFL_CASD2, CFL_CASD3, CFL_CASD4, NB_ITER_SOLV,   &
+     &      HMAX
 
          NAMELIST /HISTORY/ BEGTC, DELTC, UNITC, ENDTC, DEFINETC,       &
-     &      OUTSTYLE, FILEOUT, LOUTITER, IOBPD,                         &
+     &      OUTSTYLE, FILEOUT, LOUTITER, IOBPD, CG,                     &
      &      LENERGY, LWXFN, GRIDWRITE, PARAMWRITE,                      &
-     &      MULTIPLEOUT, USE_SINGLE_OUT, PRINTMMA,                      &
+     &      MULTIPLEOUT, USE_SINGLE_OUT, PRINTMMA, TEXT_OUTPUT_PRINT,   &
      &      HS, TM01, TM02, TM10, KLM, WLM,                             &
      &      ETOTC, ETOTS, DM, DSPR,                                     &
      &      TPPD, CPPD, KPPD, CGPD,                                     &
@@ -68,7 +73,9 @@
      &      WINDMAG, TAUW, TAUWX, TAUWY, TAUHF, TAUTOT,                 &
      &      STOKESBOTTX, STOKESBOTTY,                                   &
      &      STOKESSURFX, STOKESSURFY, STOKESBAROX, STOKESBAROY,         &
-     &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP
+     &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP,             &
+     &      CFL_CASD1, CFL_CASD2, CFL_CASD3, CFL_CASD4, NB_ITER_SOLV,   &
+     &      HMAX
 
          NAMELIST /STATION/ BEGTC, DELTC, UNITC, ENDTC, DEFINETC,       &
      &      OUTSTYLE, USE_SINGLE_OUT, MULTIPLEOUT, PARAMWRITE,          &
@@ -82,9 +89,10 @@
      &      URSELL, UFRIC, Z0, ALPHA_CH, WINDX, WINDY, CD,              &
      &      CURRTX, CURRTY, WATLEV, WATLEVOLD, DEPDT, DEP,              &
      &      WINDMAG, TAUW, TAUWX, TAUWY, TAUHF, TAUTOT,                 &
-     &      STOKESBOTTX, STOKESBOTTY,                                   &
      &      STOKESSURFX, STOKESSURFY, STOKESBAROX, STOKESBAROY,         &
-     &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP
+     &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP,             &
+     &      CFL_CASD1, CFL_CASD2, CFL_CASD3, CFL_CASD4, NB_ITER_SOLV,   &
+     &      HMAX
 
          XOUTS = 0.
          YOUTS = 0.
@@ -102,7 +110,7 @@
          USE_SINGLE_OUT=.TRUE.
          DEFINETC=-1
 #endif
-         FILEOUT = "zorglub"
+         FILEOUT = "zorglub_history"
          HS=.FALSE.
          TM01=.FALSE.
          TM02=.FALSE.
@@ -162,6 +170,12 @@
          CFL2=.FALSE.
          CFL3=.FALSE.
          ZETA_SETUP=.FALSE.
+         CFL_CASD1=.FALSE.
+         CFL_CASD2=.FALSE.
+         CFL_CASD3=.FALSE.
+         CFL_CASD4=.FALSE.
+         NB_ITER_SOLV=.FALSE.
+         HMAX=.FALSE.
          BEGTC = MAIN%BEGT
          DELTC = -1
          UNITC = MAIN%UNIT
@@ -232,18 +246,31 @@
 !
 ! set the output flag
 !
-         VAROUT_HISTORY%IOUTP = 1
+         OutputOptionsSet=.FALSE.
          IF (     TRIM(OUTSTYLE) == 'NO') THEN
-            VAROUT_HISTORY%IOUTP = 0
-         ELSE IF (TRIM(OUTSTYLE) == 'XFN') THEN
-            VAROUT_HISTORY%IOUTP = 1
-         ELSE IF (TRIM(OUTSTYLE) == 'NC') THEN
-            VAROUT_HISTORY%IOUTP = 2
-         ELSE IF (TRIM(OUTSTYLE) == 'SHP') THEN
-            VAROUT_HISTORY%IOUTP = 3
+           OutputOptionsSet=.TRUE.
          END IF
-
-         IF (   TRIM(FILEOUT) == 'zorglub') THEN
+         IF (     TRIM(OUTSTYLE) == 'XFN') THEN
+           OutputOptionsSet=.TRUE.
+           HISTORY_XFN = .TRUE.
+         END IF
+         IF (     TRIM(OUTSTYLE) == 'NC') THEN
+           OutputOptionsSet=.TRUE.
+           HISTORY_NC  = .TRUE.
+         END IF
+         IF (     TRIM(OUTSTYLE) == 'NCXFN') THEN
+           OutputOptionsSet=.TRUE.
+           HISTORY_XFN = .TRUE.
+           HISTORY_NC  = .TRUE.
+         END IF
+         IF (     TRIM(OUTSTYLE) == 'SHP') THEN
+           OutputOptionsSet=.TRUE.
+           HISTORY_SHP = .TRUE.
+         END IF
+         IF (OutputOptionsSet .eqv. .FALSE.) THEN
+           CALL WWM_ABORT('OUTSTYLE badly set. allowed choices: NO, NC, XFN and SHP')
+         END IF
+         IF (   TRIM(FILEOUT) == 'zorglub_history') THEN
            IF (     TRIM(OUTSTYLE) == 'XFN') THEN
               FILEOUT='XFNout'
            ELSE IF (TRIM(OUTSTYLE) == 'NC') THEN
@@ -314,6 +341,12 @@
          LVAR_READ(57)=CFL2
          LVAR_READ(58)=CFL3
          LVAR_READ(59)=ZETA_SETUP
+         LVAR_READ(60)=CFL_CASD1
+         LVAR_READ(61)=CFL_CASD2
+         LVAR_READ(62)=CFL_CASD3
+         LVAR_READ(63)=CFL_CASD4
+         LVAR_READ(64)=NB_ITER_SOLV
+         LVAR_READ(65)=HMAX
          VAROUT_HISTORY%LVAR=LVAR_READ
          CALL DETERMINE_NEEDED_COMPUTATION(VAROUT_HISTORY)
          IF (.not. LCFL) THEN
@@ -329,7 +362,7 @@
          USE_SINGLE_OUT=.TRUE.
          DEFINETC=-1
 #endif
-         FILEOUT = "zorglub"
+         FILEOUT = "zorglub_station"
          AC=.FALSE.
          WK=.FALSE.
          ACOUT_1D=.FALSE.
@@ -393,6 +426,12 @@
          CFL2=.FALSE.
          CFL3=.FALSE.
          ZETA_SETUP=.FALSE.
+         CFL_CASD1=.FALSE.
+         CFL_CASD2=.FALSE.
+         CFL_CASD3=.FALSE.
+         CFL_CASD4=.FALSE.
+         NB_ITER_SOLV=.FALSE.
+         HMAX=.FALSE.
          BEGTC = MAIN%BEGT
          DELTC = MAIN%DELT
          UNITC = MAIN%UNIT
@@ -474,7 +513,7 @@
          IF (IOUTS.eq.0) THEN
            LOUTS=.FALSE.
          END IF
-         IF (   TRIM(FILEOUT) == 'zorglub') THEN
+         IF (   TRIM(FILEOUT) == 'zorglub_station') THEN
            IF (     TRIM(OUTSTYLE) == 'STE') THEN
               FILEOUT='STEout'
            ELSE IF (TRIM(OUTSTYLE) == 'NC') THEN
@@ -483,10 +522,8 @@
          ENDIF
          OUT_STATION%FNAME = FILEOUT
          IF ( TRIM(OUT_STATION%FNAME) == TRIM(OUT_HISTORY%FNAME) ) THEN
-           IF (WRITEDBGFLAG == 1) THEN
-             WRITE(DBG%FHNDL,*) 'OUT_STATION%FNAME=', TRIM(OUT_STATION%FNAME)
-             WRITE(DBG%FHNDL,*) 'OUT_HISTORY%FNAME=', TRIM(OUT_HISTORY%FNAME)
-           END IF
+           WRITE(DBG%FHNDL,*) 'OUT_STATION%FNAME=', TRIM(OUT_STATION%FNAME)
+           WRITE(DBG%FHNDL,*) 'OUT_HISTORY%FNAME=', TRIM(OUT_HISTORY%FNAME)
            CALL WWM_ABORT('You cannot have same name for history and station')
          END IF
          VAROUT_STATION%AC=AC
@@ -552,6 +589,12 @@
          LVAR_READ(57)=CFL2
          LVAR_READ(58)=CFL3
          LVAR_READ(59)=ZETA_SETUP
+         LVAR_READ(60)=CFL_CASD1
+         LVAR_READ(61)=CFL_CASD2
+         LVAR_READ(62)=CFL_CASD3
+         LVAR_READ(63)=CFL_CASD4
+         LVAR_READ(64)=NB_ITER_SOLV
+         LVAR_READ(65)=HMAX
          VAROUT_STATION%LVAR=LVAR_READ
          CALL DETERMINE_NEEDED_COMPUTATION(VAROUT_STATION)
          IF (.not. LCFL) THEN
@@ -588,14 +631,12 @@
              STATION_P(1:IOUTS)%CUTOFF = FRHIGH
            END IF
 
-           IF (WRITEDBGFLAG == 1) THEN
-             WRITE(DBG%FHNDL,*) 'STATION X and Y Coordinates'
-             WRITE(DBG%FHNDL,*) STATION_P%XCOORD
-             WRITE(DBG%FHNDL,*) STATION_P%YCOORD
-             WRITE(DBG%FHNDL,*) 'STATION Names'
-             WRITE(DBG%FHNDL,*) STATION_P%NAME
-             FLUSH(DBG%FHNDL)
-           END IF
+           WRITE(DBG%FHNDL,*) 'STATION X and Y Coordinates'
+           WRITE(DBG%FHNDL,*) STATION_P%XCOORD
+           WRITE(DBG%FHNDL,*) STATION_P%YCOORD
+           WRITE(DBG%FHNDL,*) 'STATION Names'
+           WRITE(DBG%FHNDL,*) STATION_P%NAME
+           FLUSH(DBG%FHNDL)
 
          END IF
 
@@ -624,14 +665,12 @@
              STATION_P(1:IOUTS)%CUTOFF = FRHIGH
            END IF
 
-           IF (WRITEDBGFLAG == 1) THEN
-             WRITE(DBG%FHNDL,*) 'STATION X and Y Coordinates'
-             WRITE(DBG%FHNDL,*) STATION_P%XCOORD
-             WRITE(DBG%FHNDL,*) STATION_P%YCOORD
-             WRITE(DBG%FHNDL,*) 'STATION Names'
-             WRITE(DBG%FHNDL,*) STATION_P%NAME
-             FLUSH(DBG%FHNDL)
-           END IF
+           WRITE(DBG%FHNDL,*) 'STATION X and Y Coordinates'
+           WRITE(DBG%FHNDL,*) STATION_P%XCOORD
+           WRITE(DBG%FHNDL,*) STATION_P%YCOORD
+           WRITE(DBG%FHNDL,*) 'STATION Names'
+           WRITE(DBG%FHNDL,*) STATION_P%NAME
+           FLUSH(DBG%FHNDL)
 
          END IF
       END SUBROUTINE
@@ -644,7 +683,7 @@
 #endif
          USE DATAPOOL
 #ifdef SCHISM
-         use schism_glbl, only : ics,isav
+         use schism_glbl, only : ics
 #endif
          IMPLICIT NONE
 
@@ -661,18 +700,19 @@
          REAL(rkind) :: DEFINETC
          LOGICAL     :: USE_SINGLE_OUT
          LOGICAL     :: EXTRAPOLATION_ALLOWED
+         LOGICAL     :: PARAMWRITE
          NAMELIST /PROC/ PROCNAME, DIMMODE, LSTEA, LQSTEA, LSPHE,       &
      &      LNAUTIN, LNAUTOUT, LMONO_OUT, LMONO_IN,                     &
-     &      BEGTC, DELTC, UNITC, ENDTC, DMIN,                           &
-     &      WRITEDBGFLAG,WRITESTATFLAG,WRITEWINDBGFLAG
+     &      BEGTC, DELTC, UNITC, ENDTC, DMIN, MULTIPLE_OUT_INFO,        &
+     &      MODEL_OUT_TYPE, ABORT_BLOWUP, LEVEL_HS_BLOW
 
          NAMELIST /COUPL/ LCPL, LROMS, LTIMOR, LSHYFEM, RADFLAG,        &
-     &      LPP_FILT_FLAG, LPP_FRAC, LETOT, NLVT, DTCOUP, IMET_DRY
+     &      LETOT, NLVT, DTCOUP, IMET_DRY
 
-         NAMELIST /GRID/ LCIRD, LSTAG, MINDIR, MAXDIR, MDC, FRLOW,      &
-     &      FRHIGH, MSC, FILEGRID, IGRIDTYPE, LSLOP, SLMAX, LVAR1D,     &
+         NAMELIST /GRID/ LCIRD, LSTAG, MINDIR, MAXDIR, NUMDIR, FRLOW,      &
+     &      FRHIGH, NUMSIG, FILEGRID, IGRIDTYPE, LSLOP, SLMAX, LVAR1D,     &
      &      LOPTSIG, CART2LATLON, LATLON2CART, APPLY_DXP_CORR,          &
-     &      USE_EXACT_FORMULA_SPHERICAL_AREA, LEXPORT_GRID_WW3
+     &      USE_EXACT_FORMULA_SPHERICAL_AREA, LEXPORT_GRID_MOD_OUT
 
          NAMELIST /INIT/ LHOTR, LINID, INITSTYLE
 
@@ -685,52 +725,50 @@
      &      NETCDF_OUT_SPECTRA, NETCDF_OUT_FILE, USE_SINGLE_OUT,        &
      &      BEGTC_OUT, DELTC_OUT, UNITC_OUT, ENDTC_OUT,                 &
      &      EXTRAPOLATION_ALLOWED,                                      &
-     &      HACK_HARD_SET_IOBP,                                         &
-     &      NETCDF_IN_FILE, LEXPORT_BOUC_WW3, EXPORT_BOUC_DELTC
+     &      HACK_HARD_SET_IOBP, PARAMWRITE,                             &
+     &      NETCDF_IN_FILE, LEXPORT_BOUC_MOD_OUT, EXPORT_BOUC_DELTC
 
          NAMELIST /WIND/ LSEWD, LSTWD, LCWIN, LWDIR, BEGTC, DELTC,      &
      &      UNITC, ENDTC, LINTERWD, WDIR, WVEL, CWINDX, CWINDY,         &
      &      FILEWIND, WINDFAC, IWINDFORMAT, LWINDFROMWWM,               &
      &      GRIB_FILE_TYPE, EXTRAPOLATION_ALLOWED, USE_STEPRANGE,       &
-     &      MULTIPLE_IN, LEXPORT_WIND_WW3, EXPORT_WIND_DELTC,           &
+     &      MULTIPLE_IN, LEXPORT_WIND_MOD_OUT, EXPORT_WIND_DELTC,       &
      &      LSAVE_INTERP_ARRAY
 
          NAMELIST /CURR/ LSECU, BEGTC, DELTC, UNITC, ENDTC,             &
      &      LINTERCU, LSTCU, LCCUR, CCURTX, CCURTY, FILECUR,            &
      &      LERGINP, CURFAC, ICURRFORMAT, MULTIPLE_IN,                  &
-     &      LEXPORT_CURR_WW3, EXPORT_CURR_DELTC
+     &      LEXPORT_CURR_MOD_OUT, EXPORT_CURR_DELTC
 
          NAMELIST /WALV/ LSEWL, BEGTC, DELTC, UNITC, ENDTC,             &
      &      LINTERWL, LSTWL, LCWLV, CWATLV, FILEWATL, LERGINP,          &
-     &      WALVFAC, IWATLVFORMAT, MULTIPLE_IN, LEXPORT_WALV_WW3,       &
+     &      WALVFAC, IWATLVFORMAT, MULTIPLE_IN, LEXPORT_WALV_MOD_OUT,   &
      &      EXPORT_WALV_DELTC
 
-     ! MP: Change BRHD into BRCR and ALPBJ into B_ALP
-     !     Add a_BRCR, b_BRCR, min_BRCR, max_BRCR and a_BIPH
-         NAMELIST /ENGS/ MESNL, MESIN, IFRIC, MESBF, FRICC,             &
-     &      MESBR, MEVEG, IBREAK, ICRIT, BRCR,                          &
-     &      a_BRCR, b_BRCR, min_BRCR, max_BRCR, a_BIPH,                 &
-     &      BR_COEF_METHOD, B_ALP,                                      &
-     &      ZPROF_BREAK, BC_BREAK, IROLLER, ALPROL,                     &
+         NAMELIST /ENGS/ ISOURCE, MESNL, MESIN, IFRIC, MESBF, FRICC,    &
+     &      MESBR, MEVEG, ICRIT, IBREAK, ALPBJ, BRHD,            &
      &      LMAXETOT, MESDS, MESTR, TRICO, TRIRA, TRIURS
 
          NAMELIST /NUMS/ ICOMP, AMETHOD, SMETHOD, DMETHOD,              &
+     &      IMPL_GEOADVECT,                                             &
      &      LITERSPLIT, LFILTERTH, MAXCFLTH, LTHBOUND, FMETHOD,         &
      &      LFILTERCXY, MAXCFLCXY, LFILTERSIG, MAXCFLSIG, LSIGBOUND,    &
-     &      LLIMT, LIMFAK, MELIM, LDIFR, IDIFFR, LADVTEST, LSOUBOUND,   &
-     &      LCFL, RTHETA, LEXPIMP, FREQEXP, LVECTOR,IVECTOR,            &
+     &      MELIM, LIMFAK, &
+     &      LDIFR, IDIFFR, LADVTEST, LSOUBOUND, LGSE,                   &
+     &      LCFL, LCFL_CASD, RTHETA, LEXPIMP, FREQEXP, LVECTOR,IVECTOR, &
      &      DTMIN_DYN, NDYNITER, DTMIN_SIN, DTMIN_SNL4,                 &
      &      DTMIN_SDS, DTMIN_SNL3, DTMIN_SBR, DTMIN_SBF,                &
      &      NDYNITER_SIN, NDYNITER_SNL4, NDYNITER_SDS, NDYNITER_SBR,    &
      &      NDYNITER_SNL3, NDYNITER_SBF, NB_BLOCK, MAXITER,             &
-     &      LNANINFCHK, LSOURCESWAM, PMIN,                              &
-     &      LSOURCESWWIII, BLOCK_GAUSS_SEIDEL, LNONL,                   &
+     &      LNANINFCHK, PMIN,                              &
+     &      BLOCK_GAUSS_SEIDEL, LNONL,                   &
      &      L_SOLVER_NORM, WAE_SOLVERTHR, ASPAR_LOCAL_LEVEL,            &
+     &      WAE_JGS_CFL_LIM,                                            &
      &      JGS_CHKCONV, JGS_DIFF_SOLVERTHR,                            &
      &      LCONV, LCHKCONV, NQSITER, QSCONV1, QSCONV2,                 &
      &      QSCONV3, QSCONV4, QSCONV5, EPSH1, EPSH2, EPSH3, EPSH4,      &
      &      EPSH5,                                                      &
-     &      LZETA_SETUP, ZETA_METH, STP_SOLVERTHR, LACCEL
+     &      LZETA_SETUP, ZETA_METH, STP_SOLVERTHR
 
          NAMELIST /HOTFILE/ BEGTC, DELTC, UNITC, ENDTC, LHOTF,          &
      &      LCYCLEHOT, FILEHOT_OUT, HOTSTYLE_IN, HOTSTYLE_OUT,          &
@@ -739,7 +777,7 @@
          NAMELIST /NESTING/ L_NESTING, NB_GRID_NEST,                    &
      &      ListBEGTC, ListDELTC, ListUNITC, ListENDTC,                 &
      &      ListIGRIDTYPE, ListFILEGRID, ListFILEBOUND,                 &
-     &      L_HOTFILE, L_BOUC_PARAM, L_BOUC_SPEC
+     &      ListPrefix, L_HOTFILE, L_BOUC_PARAM, L_BOUC_SPEC
      
          READ( INP%FHNDL,  NML = PROC)
          wwm_print_namelist(PROC)
@@ -747,18 +785,14 @@
 #ifdef SCHISM
          IF (LSPHE) THEN
            IF (ics /= 2) THEN
-             IF (WRITEDBGFLAG == 1) THEN
-               WRITE(DBG%FHNDL,*) LSPHE, ICS
-               FLUSH(DBG%FHNDL)
-             END IF
+             WRITE(DBG%FHNDL,*) LSPHE, ICS
+             FLUSH(DBG%FHNDL)
              CALL WWM_ABORT('You set LSPHE=T but then you need ics=2')
            END IF
          ELSE
            IF (ics /= 1) THEN
-             IF (WRITEDBGFLAG == 1) THEN
-               WRITE(DBG%FHNDL,*) LSPHE, ICS
-               FLUSH(DBG%FHNDL)
-             END IF
+             WRITE(DBG%FHNDL,*) LSPHE, ICS
+             FLUSH(DBG%FHNDL)
              CALL WWM_ABORT('You set LSPHE=F but then you need ics=1')
            END IF
          END IF
@@ -799,13 +833,13 @@
          wwm_print_namelist(GRID)
          FLUSH(CHK%FHNDL)
 #if defined MPI_PARALL_GRID && !defined PDLIB
-         IF (TRIM(FILEGRID) /= 'hgrid_WWM.gr3') THEN
-           CALL WWM_ABORT('With SCHISM parallelization you need FILEGRID=hgrid_WWM.gr3 in wwminput.nml')
+         IF (TRIM(FILEGRID) /= 'hgrid.gr3') THEN
+           CALL WWM_ABORT('With SCHISM parallelization you need FILEGRID=hgrid.gr3 in wwminput.nml')
          END IF
 #endif
          GRD%FNAME = FILEGRID
 
-         NSPEC=MDC*MSC
+         NSPEC=NUMDIR*NUMSIG
          IF (LCIRD) THEN
             MINDIR = 0.0
             MAXDIR = PI2
@@ -839,7 +873,7 @@
          wwm_print_namelist(INIT)
          FLUSH(CHK%FHNDL)
 
-         IF (LHOTR .AND. WRITESTATFLAG == 1) THEN
+         IF (LHOTR) THEN
            WRITE(STAT%FHNDL,'("+TRACE...",A)') 'HOTFILE is used as Initital Condition'
          END IF
 !
@@ -873,10 +907,12 @@
          NETCDF_OUT_FILE=BOUC_NETCDF_OUT_FILE
 #endif
          EXTRAPOLATION_ALLOWED = EXTRAPOLATION_ALLOWED_BOUC
+         PARAMWRITE = PARAMWRITE_BOUC
          READ(INP%FHNDL,  NML = BOUC )
          wwm_print_namelist(BOUC)
          FLUSH(CHK%FHNDL)
          MULTIPLE_IN_BOUND=MULTIPLE_IN
+         PARAMWRITE_BOUC = PARAMWRITE
          EXTRAPOLATION_ALLOWED_BOUC = EXTRAPOLATION_ALLOWED
 #ifdef NCDF
          BOUC_NETCDF_OUT_PARAM  =NETCDF_OUT_PARAM
@@ -896,11 +932,16 @@
          OUT_BOUC % ENDT=ENDTC_OUT
          OUT_BOUC % UNIT=UNITC_OUT
          OUT_BOUC % DELT=DELTC_OUT
+!         Print *, '3: DELTC_OUT=', DELTC_OUT
          OUT_BOUC % DEFINETC=DEFINETC
          OUT_BOUC % FNAME = NETCDF_OUT_FILE
          CALL CT2MJD(OUT_BOUC % BEGT, OUT_BOUC % BMJD)
          CALL CT2MJD(OUT_BOUC % ENDT, OUT_BOUC % EMJD)
          CALL CU2SEC(OUT_BOUC % UNIT, OUT_BOUC % DELT)
+         OUT_BOUC % TMJD = OUT_BOUC % BMJD
+!         Print *, 'OUT_BOUC % BMJD = ', OUT_BOUC % BMJD
+!         Print *, 'OUT_BOUC % EMJD = ', OUT_BOUC % EMJD
+!         Print *, 'OUT_BOUC % TMJD = ', OUT_BOUC % TMJD
          IF (DEFINETC .lt. 0) THEN
            OUT_BOUC % IDEF = -1
          ELSE
@@ -915,13 +956,15 @@
            ! Inhomogenous in space
            ! Steady in time
            IF (WBTP*FRLOW .gt. 1) THEN
+             Print *, 'WBTP=', WBTP, ' FRLOW=', FRLOW
              CALL WWM_ABORT('FRLOW is too high with respect to WBTP')
            END IF
            IF (WBTP*FRHIGH .lt. 1) THEN
+             Print *, 'WBTP=', WBTP, ' FRHIGH=', FRHIGH
              CALL WWM_ABORT('FRHIGH is too low with respect to WBTP')
            END IF
          END IF
-         IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,'("+TRACE...",A10,I5)') 'BOUNDARY FILE FORMAT IS', IBOUNDFORMAT
+         WRITE(STAT%FHNDL,'("+TRACE...",A10,I5)') 'BOUNDARY FILE FORMAT IS', IBOUNDFORMAT
 
          SEBO%BEGT = BEGTC
          SEBO%DELT = DELTC
@@ -984,6 +1027,7 @@
 !     *** CURR section
 !
          MULTIPLE_IN=MULTIPLE_IN_CURR
+         FILECUR =''
          READ(INP%FHNDL, NML = CURR)
          wwm_print_namelist(CURR)
          FLUSH(CHK%FHNDL)
@@ -1019,6 +1063,7 @@
 !     *** water level section
 !
          MULTIPLE_IN_WATLEV=MULTIPLE_IN
+         FILEWATL=''
          READ(INP%FHNDL, NML = WALV)
          wwm_print_namelist(WALV)
          FLUSH(CHK%FHNDL)
@@ -1055,7 +1100,10 @@
          READ(INP%FHNDL, NML = ENGS)
          wwm_print_namelist(ENGS)
          FLUSH(CHK%FHNDL)
-
+!
+!     *** Source term ST4 parameterization
+!
+         CALL READ_SIN4_SDS4()
 !
 !     *** NUMS section
 !
@@ -1063,7 +1111,7 @@
          wwm_print_namelist(NUMS)
          FLUSH(CHK%FHNDL)
          CALL READ_HISTORY_STATION_NAMELIST()
-
+!AR: There is no reason for this switches ... 
          IF (ICOMP .eq. 3) THEN
            IF (DMETHOD .GT. 0) THEN
              REFRACTION_IMPL=.TRUE.
@@ -1159,15 +1207,96 @@
 !
 ! NESTING section
 !
+      ListBEGTC =''
+      ListDELTC = ZERO
+      ListUNITC =''
+      ListENDTC =''
+      ListIGRIDTYPE =0
+      ListFILEGRID =''
+      ListFILEBOUND =''
+      ListPrefix =''
+
          READ(INP%FHNDL, NML = NESTING)
          wwm_print_namelist(NESTING)
          FLUSH(CHK%FHNDL)
          
-! Check consistency with SCHISM inputs here
-#ifdef SCHISM
-         IF(MEVEG/=0.and.isav==0) CALL WWM_ABORT('WWM: MEVEG/=0.and.isav==0')
-#endif
-
+      END SUBROUTINE
+!**********************************************************************
+!*                                                                    *
+!**********************************************************************
+      SUBROUTINE READ_SIN4_SDS4()
+      USE DATAPOOL
+      IMPLICIT NONE
+      NAMELIST /SIN4/ ZWND, ALPHA0, Z0MAX, BETAMAX, SINTHP, ZALP,     &
+                      TAUWSHELTER, SWELLFPAR, SWELLF,                 &
+                      SWELLF2, SWELLF3, SWELLF4, SWELLF5, SWELLF6,    &
+                      SWELLF7, Z0RAT, SINBR
+      NAMELIST /SDS4/ SDSC1, FXPM3, FXFM3,                            &
+                      FXFMAGE, SDSC2, SDSCUM, SDSSTRAIN, SDSC4,       &
+                      SDSC5, SDSC6, SDSBR, SDSBR2, SDSP, SDSISO,      &
+                      SDSBCK, SDSABK, SDSPBK, SDSBINT, SDSHCK,        &
+                      SDSDTH, SDSCOS, SDSBRF1, SDSBRFDF,              &
+                      SDSBM0, SDSBM1, SDSBM2, SDSBM3, SDSBM4,         &
+                      SDSHFGEN, SDSLFGEN, WHITECAPWIDTH, FXINCUT,     &
+                      FXDSCUT
+      ZWND   =   10.
+      ALPHA0 = 0.0095
+      Z0MAX = 0.0
+      Z0RAT = 0.04
+      BETAMAX   = 1.43
+      SINTHP    = 2.
+      SWELLF    = 0.66
+      SWELLFPAR = 1
+      SWELLF2 = -0.018
+      SWELLF3 = 0.022
+      SWELLF4 = 1.5E5
+      SWELLF5 = 1.2
+      SWELLF6 = 0.
+      SWELLF7 = 360000.
+      TAUWSHELTER = 0.3
+      ZALP   = 0.006
+      SINBR   = 0.
+      READ(INP%FHNDL, NML = SIN4)
+      wwm_print_namelist(SIN4)
+      FLUSH(CHK%FHNDL)
+      SDSC1  = 0.0     ! not used in ST4, should be cleaned up
+      FXFM3 = 2.5
+      FXFMAGE = 0.
+      FXINCUT = 0.
+      FXDSCUT = 0.
+      FXPM3 = 4.
+      SDSC2     = -2.2E-5
+      SDSCUM     = -0.40344
+      SDSC4     = 1.
+      SDSC5     = 0.
+      SDSC6     = 0.3
+      SDSBR     = 0.90E-3
+      SDSBRFDF  = 0
+      SDSBRF1   = 0.5
+      SDSP      = 2.   ! this is now fixed in w3sds4, should be cleaned up
+      SDSDTH    = 80.
+      SDSCOS    = 2.
+      SDSISO    = 2
+      SDSBM0    = 1.
+      SDSBM1    = 0.
+      SDSBM2    = 0.
+      SDSBM3    = 0.
+      SDSBM4    = 0.
+      SDSBR2    = 0.8
+      SDSBCK    = 0.
+      SDSABK    = 1.5
+      SDSPBK    = 4.
+      SDSBINT   = 0.3
+      SDSHCK    = 1.5
+      WHITECAPWIDTH = 0.3
+      SDSSTRAIN = 0.
+      SDSHFGEN  = 0.
+      SDSLFGEN  = 0.
+      READ(INP%FHNDL, NML = SDS4)
+      wwm_print_namelist(SDS4)
+      FLUSH(CHK%FHNDL)
+      
+      
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
@@ -1177,21 +1306,20 @@
          IMPLICIT NONE
 
          REAL(rkind) :: TEST
+         REAL(rkind) :: tolDay = MyREAL(1) / MyREAL(10000)
 
 !        Check timings ...
 
          IF (OUT_HISTORY%BMJD .GE. OUT_HISTORY%EMJD) THEN
-           IF (WRITESTATFLAG == 1) THEN
-             WRITE(STAT%FHNDL,*) 'MAIN%BEGT=',MAIN%BEGT
-             WRITE(STAT%FHNDL,*) 'MAIN%ENDT=',MAIN%ENDT
-             WRITE(STAT%FHNDL,*) 'MAIN%BMJD=',MAIN%BMJD
-             WRITE(STAT%FHNDL,*) 'MAIN%EMJD=',MAIN%EMJD
-  
-             WRITE(STAT%FHNDL,*) 'OUT_HISTORY%BEGT=',OUT_HISTORY%BEGT
-             WRITE(STAT%FHNDL,*) 'OUT_HISTORY%ENDT=',OUT_HISTORY%ENDT
-             WRITE(STAT%FHNDL,*) 'OUT_HISTORY%BMJD=',OUT_HISTORY%BMJD
-             WRITE(STAT%FHNDL,*) 'OUT_HISTORY%EMJD=',OUT_HISTORY%EMJD
-           END IF
+           WRITE(STAT%FHNDL,*) 'MAIN%BEGT=',MAIN%BEGT
+           WRITE(STAT%FHNDL,*) 'MAIN%ENDT=',MAIN%ENDT
+           WRITE(STAT%FHNDL,*) 'MAIN%BMJD=',MAIN%BMJD
+           WRITE(STAT%FHNDL,*) 'MAIN%EMJD=',MAIN%EMJD
+
+           WRITE(STAT%FHNDL,*) 'OUT_HISTORY%BEGT=',OUT_HISTORY%BEGT
+           WRITE(STAT%FHNDL,*) 'OUT_HISTORY%ENDT=',OUT_HISTORY%ENDT
+           WRITE(STAT%FHNDL,*) 'OUT_HISTORY%BMJD=',OUT_HISTORY%BMJD
+           WRITE(STAT%FHNDL,*) 'OUT_HISTORY%EMJD=',OUT_HISTORY%EMJD
 
 !           Print *, 'OUT_HISTORY%BMJD=', OUT_HISTORY%BMJD
 !           Print *, 'OUT_HISTORY%EMJD=', OUT_HISTORY%EMJD
@@ -1208,7 +1336,7 @@
            IF (SECU%BMJD .GE. SECU%EMJD) CALL WWM_ABORT('CHECK CURRENT TIME STEPS BEGINN TIME STEP IS SMALLER THAN END TIME STEP')
          END IF
          IF (LHOTF) THEN
-           IF (HOTF%BMJD .GE. HOTF%EMJD) CALL WWM_ABORT('CHECK HOTFILE TIME STEPS BEGINN TIME STEP IS SMALLER THAN END TIME STEP')
+           IF (HOTF%BMJD .GE. HOTF%EMJD + tolDay) CALL WWM_ABORT('CHECK HOTFILE TIME STEPS BEGINN TIME STEP IS SMALLER THAN END TIME STEP')
          END IF
          IF (SEBO%BMJD .GE. SEBO%EMJD) CALL WWM_ABORT('CHECK BOUNDARY TIME STEPS BEGINN TIME STEP IS SMALLER THAN END TIME STEP')
          
@@ -1235,17 +1363,17 @@
            END IF
          END IF
 !
-!        Check MSC,MDC for exchange
+!        Check NUMSIG,NUMDIR for exchange
 !
-         if(MSC<1.or.MDC<1) call wwm_abort('MSC,MDC too small')
+         if(NUMSIG<1.or.NUMDIR<1) call wwm_abort('NUMSIG,NUMDIR too small')
 
          IF (SMETHOD .GT. 0) THEN
 
-           IF (MESIN .GT. 6) THEN
+           IF (MESIN .GT. 1) THEN
              call wwm_abort('CHECK NUMS - MESIN OUT OF RANGE')
            END IF
 
-           IF (MESBR .GT. 1) THEN
+           IF (MESBR .GT. 2) THEN
              call wwm_abort('CHECK NUMS - MESBR OUT OF RANGE')
            END IF
 #ifdef ROMS_WWM_PGMCL_COUPLING
@@ -1260,14 +1388,8 @@
              CALL WWM_ABORT('LCPL=T if running with SCHISM')
            ENDIF
 #endif
-           IF (MESBF .eq. 1 .AND. FRICC .LT. 0.) THEN
+           IF (FRICC .LT. 0.) THEN
              call wwm_abort('CHECK NUMS - FRICTION COEFFICIENT HAS WRONG SIGN')
-           END IF
-           IF (MESBF .eq. 2 .AND. FRICC .LT. 0.) THEN
-             call wwm_abort('CHECK NUMS - FRICTION COEFFICIENT HAS WRONG SIGN')
-           END IF
-           IF (MESBF .eq. 3) THEN
-             call ALLOCATE_D50
            END IF
 
 #ifndef PETSC
@@ -1283,20 +1405,20 @@
              call wwm_abort('If AMETHOD=6 then you need MPI')
            ENDIF
 #endif
-           IF (MESTR .GT. 7) THEN
+           IF (MESTR .GT. 1) THEN
              call wwm_abort('CHECK NUMS - MESTR OUT OF RANGE')
            END IF
 
-           IF (MESNL .GT. 6) THEN
+           IF (MESNL .GT. 2) THEN
              call wwm_abort('CHECK NUMS - MESNL OUT OF RANGE')
            END IF
 
-           IF (MESDS .GT. 6) THEN
+           IF (MESDS .GT. 1) THEN
              call wwm_abort('CHECK NUMS - MESDS OUT OF RANGE')
            END IF
 
-           IF (MESNL .GT. 0 .AND. .NOT. LLIMT ) THEN
-!AR: this will be a warning ...
+           IF (MESNL .GT. 0 .AND. MELIM .EQ. 0 ) THEN
+             WRITE(*,*) 'WARNING:', 'YOU ARE USING SNL WITHOUT LIMITER'
              !call wwm_abort('YOU ARE USING SNL WITHOUT LIMITER CODE WILL STOP NOW')
            END IF
 
@@ -1309,7 +1431,7 @@
            MESTR = 0
            MESBR = 0
            MESBF = 0
-           LLIMT = .FALSE.
+           MELIM = 0
 
          END IF
 
@@ -1320,7 +1442,6 @@
          END IF
 
          IF (LBCWA .OR. LBCSP) THEN
-           PGIVE = 0.0
            IF (PGIVE(7) .LT. THR) THEN
              PGIVE(7) = 0.1
            ELSE IF (PGIVE(8) .LT. THR) THEN
@@ -1345,12 +1466,10 @@
            TEST = MAIN%DTCOUP - NINT(MAIN%DTCOUP/MAIN%DELT)*MAIN%DELT
 !2do ... check where else you do some nint stuff ... like that one ...
            IF (ABS(TEST) .GT. THR) THEN
-             IF (WRITEDBGFLAG == 1) THEN
-               WRITE(DBG%FHNDL,*) 'MAIN%DTCOUP=', MAIN%DTCOUP
-               WRITE(DBG%FHNDL,*) 'MAIN%DELT=', MAIN%DELT
-               WRITE(DBG%FHNDL,*) 'TEST=', TEST
-               WRITE(DBG%FHNDL,*) 'TIME STEP OF THE WAVEMODELL CANNOT BE DiVIDIED WITHOUT A REST'
-             END IF             
+             WRITE(DBG%FHNDL,*) 'MAIN%DTCOUP=', MAIN%DTCOUP
+             WRITE(DBG%FHNDL,*) 'MAIN%DELT=', MAIN%DELT
+             WRITE(DBG%FHNDL,*) 'TEST=', TEST
+             WRITE(DBG%FHNDL,*) 'TIME STEP OF THE WAVEMODELL CANNOT BE DiVIDIED WITHOUT A REST'
              CALL WWM_ABORT('TIME STEP OF THE WAVEMODELL CANNOT BE DiVIDIED WITHOUT A REST')
            ELSE
              MAIN%ICPLT = INT(MAIN%DTCOUP/MAIN%DELT)
@@ -1359,46 +1478,36 @@
 #ifndef ROMS_WWM_PGMCL_COUPLING
          END IF
 #endif
-         IF (WRITESTATFLAG == 1) THEN
-           WRITE(STAT%FHNDL,'("+TRACE...",A)') 'SWTICHES FOR THE LIMTER'
-           WRITE(STAT%FHNDL,*) 'LLIMT', LLIMT
-           WRITE(STAT%FHNDL,'("+TRACE...",A)') 'ACTIVATED SOURCE TERMS'
-           WRITE(STAT%FHNDL,*) 'MESIN', MESIN
-           WRITE(STAT%FHNDL,*) 'MESNL', MESNL
-           WRITE(STAT%FHNDL,*) 'MESBR', MESBR
-           WRITE(STAT%FHNDL,*) 'MESDS', MESDS
-           WRITE(STAT%FHNDL,*) 'MESTR', MESTR
-         END IF
+         WRITE(STAT%FHNDL,'("+TRACE...",A)') 'SWTICHES FOR THE LIMTER'
+         WRITE(STAT%FHNDL,'("+TRACE...",A)') 'ACTIVATED SOURCE TERMS'
+         WRITE(STAT%FHNDL,*) 'MESIN', MESIN
+         WRITE(STAT%FHNDL,*) 'MESNL', MESNL
+         WRITE(STAT%FHNDL,*) 'MESBR', MESBR
+         WRITE(STAT%FHNDL,*) 'MESDS', MESDS
+         WRITE(STAT%FHNDL,*) 'MESTR', MESTR
+         WRITE(STAT%FHNDL,*) 'MELIM', MELIM
 
          IF (LSEWD .AND. LSTWD) THEN
-           IF (WRITEDBGFLAG == 1) THEN
-             WRITE(DBG%FHNDL,*) 'YOU MUST USE EITHER UNSTEADY OR STEADY WIND'
-             WRITE(DBG%FHNDL,*) 'PLEASE CHECK CODE EXITS'
-           END IF
-           CALL WWM_ABORT('CHECK LSEWL OR LSTDW')
+           WRITE(DBG%FHNDL,*) 'YOU MUST USE EITHER UNSTEADY OR STEADY WIND'
+           WRITE(DBG%FHNDL,*) 'PLEASE CHECK CODE EXITS'
+           CALL WWM_ABORT('CHECK LSEWD OR LSTDW')
          END IF
 
          IF (LSTCU .AND. LSECU) THEN
-           IF (WRITEDBGFLAG == 1) THEN
-             WRITE(DBG%FHNDL,*) 'YOU MUST USE EITHER UNSTEADY OR STEADY CURRENTS'
-             WRITE(DBG%FHNDL,*) 'PLEASE CHECK CODE EXITS'
-           END IF
+           WRITE(DBG%FHNDL,*) 'YOU MUST USE EITHER UNSTEADY OR STEADY CURRENTS'
+           WRITE(DBG%FHNDL,*) 'PLEASE CHECK CODE EXITS'
            CALL WWM_ABORT('CHECK LSTCU .AND. LSECU')
          END IF
 
          IF (LSTCU .AND. LSECU) THEN
-           IF (WRITEDBGFLAG == 1) THEN
-             WRITE(DBG%FHNDL,*) 'YOU MUST USE EITHER UNSTEADY OR STEADY CURRENTS'
-             WRITE(DBG%FHNDL,*) 'PLEASE CHECK CODE EXITS'
-           END IF
+           WRITE(DBG%FHNDL,*) 'YOU MUST USE EITHER UNSTEADY OR STEADY CURRENTS'
+           WRITE(DBG%FHNDL,*) 'PLEASE CHECK CODE EXITS'
            CALL WWM_ABORT('CHECK LSTCU .AND. LSECU')
          END IF
 
          IF (LSTWL .AND. LSEWL) THEN
-           IF (WRITEDBGFLAG == 1) THEN
-             WRITE(DBG%FHNDL,*) 'YOU MUST USE EITHER UNSTEADY OR STEADY CURRENTS'
-             WRITE(DBG%FHNDL,*) 'PLEASE CHECK CODE EXITS'
-           END IF
+           WRITE(DBG%FHNDL,*) 'YOU MUST USE EITHER UNSTEADY OR STEADY CURRENTS'
+           WRITE(DBG%FHNDL,*) 'PLEASE CHECK CODE EXITS'
            CALL WWM_ABORT('CHECK LSTCU .AND. LSECU')
          END IF
 
@@ -1411,12 +1520,6 @@
          IF (AMETHOD .GE. 4 .AND. LVECTOR .EQV. .TRUE.) THEN
            call wwm_abort('LVECTOR must be FALSE to use PETSc')
          END IF
-
-         IF (LSOURCESWAM .AND. MELIM .NE. 3) THEN
-           call wwm_abort('FOR WAM YOU NEED MELIM == 3')
-         ELSE IF (.NOT. LSOURCESWAM .AND. MELIM .EQ. 3) THEN
-           call wwm_abort('FOR WWM SOURCES YOU NEED MELIM .LT. 3') 
-         ENDIF
 
 #ifndef GRIB_API_ECMWF 
          IF (IWINDFORMAT == 7) CALL wwm_abort('you need to compile with grib')
@@ -1488,10 +1591,8 @@
           SECU%ISTP = NINT( SECU%TOTL / SECU%DELT ) + 1
           SECU%TMJD = SECU%BMJD
           LSECN = .FALSE.
-          IF (WRITESTATFLAG == 1) THEN
-            WRITE(STAT%FHNDL,*) 'Serial current Condition -----------'
-            WRITE(STAT%FHNDL,*) SECU%BEGT, SECU%ENDT, SECU%ISTP, SECU%TOTL/3600.0, SECU%DELT
-          END IF
+          WRITE(STAT%FHNDL,*) 'Serial current Condition -----------'
+          WRITE(STAT%FHNDL,*) SECU%BEGT, SECU%ENDT, SECU%ISTP, SECU%TOTL/3600.0, SECU%DELT
           IF (LERGINP) CALL ERG2WWM(SECU%ISTP)
           CALL TEST_FILE_EXIST_DIE("3: Missing current file : ", CUR%FNAME)
           LSECN = .TRUE.
@@ -1533,13 +1634,12 @@
           CALL CSEVAL( CUR%FHNDL, CUR%FNAME, .TRUE., 2, TMP_CUR, MULTIPLE_IN_CURR)
           DVCURT=(TMP_CUR - CURTXY)/SECU%DELT*MAIN%DELT
           SECU%TMJD = SECU%TMJD + SECU%DELT*SEC2DAY
-          LCALC = .TRUE.
         END IF
         CURTXY = CURTXY + DVCURT
+        LCALC = .TRUE.
       END IF
       IF (ICURRFORMAT .eq. 2) THEN
 #ifdef NCDF
-!        Print *, 'Begin ICURRFORMAT = 2'
         IF (K.EQ.1) THEN
           REC1_curr_old = 0
           REC2_curr_old = 0
@@ -1558,7 +1658,7 @@
         END IF
         REC1_curr_old = REC1_curr_new
         REC2_curr_old = REC2_curr_new
-!        Print *, 'End ICURRFORMAT = 2'
+        LCALC = .TRUE.
 #else
         CALL WWM_ABORT('Need to compile with netcdf for ICURRFORMAT = 2')
 #endif
@@ -1650,11 +1750,11 @@
           CALL CSEVAL( WAT%FHNDL, WAT%FNAME, .TRUE., 1, TMP_WAT, MULTIPLE_IN_WATLEV)
           DVWALV=(TMP_WAT - WATLEV)/SEWL%DELT*MAIN%DELT
           SEWL%TMJD = SEWL%TMJD + SEWL%DELT*SEC2DAY
-          LCALC = .TRUE.
         END IF
         WATLEVOLD = WATLEV
         WATLEV    = WATLEV + DVWALV
         DEPDT     = DVWALV / MAIN%DELT
+        LCALC = .TRUE.
       END IF
       IF (IWATLVFORMAT .eq. 2) THEN
 #ifdef NCDF
@@ -1683,31 +1783,9 @@
         END IF
         REC1_watlev_old = REC1_watlev_new
         REC2_watlev_old = REC2_watlev_new
+        LCALC = .TRUE.
 #else
         CALL WWM_ABORT('Need to compile with netcdf for IWATLVFORMAT = 2')
 #endif
-      END IF
-      END SUBROUTINE
-!**********************************************************************
-!*                                                                    *
-!**********************************************************************
-      SUBROUTINE ALLOCATE_D50
-      ! MP
-      USE DATAPOOL
-      IMPLICIT NONE
-      INTEGER :: I
-      REAL(rkind) :: TMP1,TMP2,TMP3,TMP4
-      IF (FRICC .LT. 0) THEN
-        OPEN(32, FILE='D50_SHOWEX.gr3', STATUS='OLD')
-        READ(32,*)
-        DO I = 1, NP_GLOBAL
-          READ(32,*)TMP1,TMP2,TMP3,TMP4
-          IF(ipgl(I)%rank==myrank) D50_SHOWEX(ipgl(I)%id)=TMP4
-        END DO
-        CLOSE(32)
-      ELSE
-        DO I = 1, NP_GLOBAL
-          IF(ipgl(I)%rank==myrank) D50_SHOWEX(ipgl(I)%id)=FRICC
-        END DO
       END IF
       END SUBROUTINE

@@ -42,10 +42,11 @@
 !       uu2
 !       vv2
 !       tr_nd
+!       kfp
 !       idry
 !       nvrt
 !       ivcor
-!       xlon, bounds_lon(1:2)
+!       xlon
 !       ylat
 !       ipgl()
 !       errmsg
@@ -79,6 +80,16 @@
 !
 ! The fourth (surf_fluxes) calculates the various components of the
 ! surface fluxes of heat, momentum, and fresh water (when enabled).
+!
+! Two versions of get_wind, get_rad, and get_precip_flux are provided
+! here.  The first set (in the block in which USE_NETCDF is not defined)
+! is supplied here primarily as guidance for users to write their own
+! versions. One could specify time- and space-varying values, or
+! constant values, etc.
+!
+! The second set (with the USE_NETCDF preprocessing conditional
+! defined) uses the ELCIRC/SCHISM netCDF I/O component to specify the
+! time- and space-varying forcing quantities.
 !
 ! The precipitation and evaporation fluxes of fresh water through the
 ! surface (and the get_precip_flux subroutine) are enabled/disabled
@@ -140,7 +151,7 @@
 !-----------------------------------------------------------------------
 !
 ! The standard get_wind, get_rad, and get_precip_flux subroutines (and
-! supporting code) depend upon the use of netCDF libraries 
+! supporting code) depend upon the use of netCDF libraries (Version 3.x)
 ! and netCDF files written using a specific (though fairly standard)
 ! format.
 !
@@ -267,10 +278,7 @@
 ! List of all routines in this file:
 !   surf_fluxes
 !   turb_fluxes:  Calculate bulk aerodynamic surface fluxes over water using method of
-!                 Zeng et al or Fairall (computes the bulk parameterization of surface wind stress and
-!                 surface net heat fluxes using method of Fairall et al.
-!                 as adapted from ROMS/Rutgers by jerome lefevre, IRD Noumea).
-
+!                 Zeng et al
 !   esat_flat_r (function): Calculate saturation vapor pressure
 !   psi_m (function): 
 !   rotate_winds:
@@ -279,7 +287,6 @@
 !   get_wind
 !   get_rad
 !   get_precip_flux
-!   get_precsnow_flux
 !   get_dataset_info
 !   char_num (function): convert number to char
 !   get_file_name (fucntion):
@@ -304,13 +311,13 @@
 !   combine_sflux_data: combine from 2 sources;
 
 !Joseph Z.'s notes:
-!   (0) Of all attributes in nc file, only 'base_date' is required ('hour' is not read in);
+!   (0) Of all attributes in nc file, only 'base_date' is required;
 !   (1) air, rad and prc each can have up to 2 sources;
 !   (2) grids for air, rad and prc can be different (but must be the same within
 !       each type and each source). Additional requirements for the structured grid in .nc:
-!       [lon,lat](nx,ny) give x,y coord; 
-!       orientation of the structured grids can be either clock or counter-clockwise 
-!       (but must be self consistent within each set); 
+!       [lon,lat](nx,ny) give x,y coord., nx is # of pts in x. Suppose a node in the grid is
+!       given by (i,j) (1<=i<=nx), then the quad (i,j), (i+1,j), (i+1,j+1,i,j+1) must be along
+!       counter-clockwise direction;
 !   (3) search for "relative_weight" (inside netcdf_io) to 
 !       change relative weights of the 2 sources for air, rad and prc if needed. All weights must > 0!
 !   (4) in case of 2 sources/grids for a variable, use "1" as larger grid (i.e. encompassing hgrid.ll)
@@ -319,18 +326,12 @@
 !       will be done on grid "1" only (see combine_sflux_data, in particular, bad_node_2
 !       based on area coordinates outside [0,1]). Both grids must start from stack
 !       1 and may have different # of stacks for each variable (and starting times of 
-!       '1' and '2' may be different). Also, within each nc file #
-!       of time steps can vary. The cumulative time window of '2' does
-!       not need to cover the entire simulation (code will use values
-!       from '1' only if '2' time is missing), but window of '1' must;
+!       '1' and '2' may be different). However, within each nc file #
+!       of time steps can vary;
 !   (5) air_1_max_window_hours (etc) are set in netcdf_io to define the max. time stamp
-!       (offset from start time in each) within each nc file (the actual offset should 
-!        not equal air_1_max_window_hours); these constants can be
-!        adjusted in sflux_inputs.txt. Besides those in netcdf_io, 
+!       (offset from start time in each) within each nc file. Besides those in netcdf_io, 
 !        max_file_times (max. # of time records in each nc file) in routine get_times_etc () 
-!        may need to be adjusted as well. Actual of time records>=2.
-!   (6) make sure the longitude range is consistent btw hgrid.ll and the
-!   sflux grid! (e.g. both in [-180,180])
+!        may need to be adjusted as well.
 
 !-----------------------------------------------------------------------
 !
@@ -345,17 +346,17 @@
      &                   sen_flux, lat_flux, longwave_u, longwave_d, &
      &                   tau_xz, tau_yz, &
 #ifdef PREC_EVAP
-     &                   precip_flux, evap_flux, prec_snow, &
+     &                   precip_flux, evap_flux, &
 #endif
-     &                   nws) !, fluxsu00, srad00)
+     &                   nws, fluxsu00, srad00)
 
         use schism_glbl, only : rkind, npa, uu2, vv2, tr_nd, & !tnd, snd, &
-     &                     idry, nvrt, ivcor,ipgl,fdb,lfdb
+     &                     kfp, idry, nvrt, ivcor,ipgl,fdb,lfdb
         use schism_msgp, only : myrank,parallel_abort
         implicit none
 
 ! input/output variables
-        real(rkind), intent(in) :: time !, fluxsu00, srad00
+        real(rkind), intent(in) :: time, fluxsu00, srad00
         real(rkind), dimension(npa), intent(in) :: &
      &    u_air, v_air, p_air, t_air, q_air
         real(rkind), dimension(npa), intent(out) :: &
@@ -364,15 +365,15 @@
         integer, intent(in) :: nws
 #ifdef PREC_EVAP
         real(rkind), dimension(npa), intent(out) :: &
-     &    precip_flux, evap_flux,prec_snow
+     &    precip_flux, evap_flux
 #endif
         
 ! local variables
         integer num_nodes, i_node, sfc_lev,ne_global,np_global,itmp
         logical dry
-        real(rkind), parameter :: t_freeze = 273.15d0
-        real(rkind), parameter :: stefan = 5.67d-8
-        real(rkind), parameter :: emissivity = 1.0d0
+        real(rkind), parameter :: t_freeze = 273.15
+        real(rkind), parameter :: stefan = 5.67e-8
+        real(rkind), parameter :: emissivity = 1.0
         integer, parameter :: printit = 1000
         character, parameter :: grid_file*50 = 'sflux.gr3'
         real(rkind) :: x_tmp, y_tmp, sflux_frac
@@ -393,11 +394,6 @@
 #ifdef PREC_EVAP
 ! retrieve the surface precipitation flux
         call get_precip_flux (time, precip_flux)
-#ifdef USE_MICE
-        call get_precsnow_flux (time, prec_snow)
-#else
-        prec_snow=0.d0 !not used
-#endif
 #endif
 
 ! output info to debug file
@@ -412,11 +408,11 @@
         do i_node = 1, num_nodes !=npa
 
 ! specify the surface level at this node (depends on coordinate system)
-!          if (ivcor .eq. -1) then         ! z
-!            sfc_lev = kfp(i_node)
-!          else                            ! sigma
-          sfc_lev = nvrt
-!          endif
+          if (ivcor .eq. -1) then         ! z
+            sfc_lev = kfp(i_node)
+          else                            ! sigma
+            sfc_lev = nvrt
+          endif
 
 #ifdef DEBUG
           if (mod(i_node-1,printit) .eq. 0) then
@@ -438,17 +434,6 @@
         write(38,*) 'above turb_fluxes'
 #endif
 
-#ifdef USE_BULK_FAIRALL
-        call FAIRALL(num_nodes, &
-     &                    u_air, v_air, p_air, t_air, q_air, &
-     &                    sen_flux, lat_flux, &
-#ifdef PREC_EVAP
-     &                    evap_flux, &
-#endif
-     &                    tau_xz, tau_yz)
-
-#else
-        !Zeng's 
         call turb_fluxes (num_nodes, &
      &                    u_air, v_air, p_air, t_air, q_air, &
      &                    sen_flux, lat_flux, &
@@ -456,7 +441,6 @@
      &                    evap_flux, &
 #endif
      &                    tau_xz, tau_yz)
-#endif /*USE_BULK_FAIRALL*/
 
 #ifdef DEBUG
         write(38,*) 'below turb_fluxes'
@@ -472,50 +456,50 @@
         do i_node = 1, num_nodes !npa
 
 ! specify the surface level at this node (depends on coordinate system)
-!          if (ivcor .eq. -1) then         ! z
-!            sfc_lev = kfp(i_node)
-!          else                            ! sigma
-          sfc_lev = nvrt
-!          endif
+          if (ivcor .eq. -1) then         ! z
+            sfc_lev = kfp(i_node)
+          else                            ! sigma
+            sfc_lev = nvrt
+          endif
 
           longwave_u(i_node) = emissivity * stefan * &
-     &( t_freeze + tr_nd(1,sfc_lev,i_node) ) ** 4.d0
+     &( t_freeze + tr_nd(1,sfc_lev,i_node) ) ** 4
 
         enddo !i_node
 !$OMP end parallel do 
 
 ! reset flux values if the nws flag is set
-!        if (nws .eq. 3) then
-!          open(31,file=in_dir(1:len_in_dir)//grid_file, status='old')
-!          read(31,*)
-!          read(31,*) ne_global,np_global
-!          do i_node = 1, np_global
-!            read(31,*) i_node_tmp, x_tmp, y_tmp, sflux_frac
-!            if(ipgl(i_node)%rank==myrank) then
-!              itmp=ipgl(i_node)%id
-!              sen_flux(itmp)    = sflux_frac * fluxsu00
-!              shortwave_d(itmp) = sflux_frac * srad00
-!              lat_flux(itmp) = 0.0
-!              longwave_u(itmp) = 0.0
-!              longwave_d(itmp) = 0.0
-!#ifdef PREC_EVAP
-!              precip_flux(itmp) = 0.0
-!              evap_flux(itmp) = 0.0
-!#endif
-!            endif
-!          enddo
-!          close(31)
-!        endif
+        if (nws .eq. 3) then
+          open(31,file=grid_file, status='old')
+          read(31,*)
+          read(31,*) ne_global,np_global
+          do i_node = 1, np_global
+            read(31,*) i_node_tmp, x_tmp, y_tmp, sflux_frac
+            if(ipgl(i_node)%rank==myrank) then
+              itmp=ipgl(i_node)%id
+              sen_flux(itmp)    = sflux_frac * fluxsu00
+              shortwave_d(itmp) = sflux_frac * srad00
+              lat_flux(itmp) = 0.0
+              longwave_u(itmp) = 0.0
+              longwave_d(itmp) = 0.0
+#ifdef PREC_EVAP
+              precip_flux(itmp) = 0.0
+              evap_flux(itmp) = 0.0
+#endif
+            endif
+          enddo
+          close(31)
+        endif
 
 #ifdef DEBUG
         do i_node = 1, num_nodes
           if (mod(i_node-1,printit) .eq. 0) then
 
 ! define whether this node is dry or not (depends on coordinate system)
-            dry = idry(i_node) .eq. 1
-!     &          ( (ivcor .eq. -1) .and. (kfp(i_node)  .eq. -1) ) & ! z
-!     &        .or. &
-!     &          ( (ivcor .ne. -1) .and. (idry(i_node) .eq. 1) )   !sigma
+            dry = &
+     &          ( (ivcor .eq. -1) .and. (kfp(i_node)  .eq. -1) ) & ! z
+     &        .or. &
+     &          ( (ivcor .ne. -1) .and. (idry(i_node) .eq. 1) )   !sigma
 
             if (.not. dry) then
               write(38,*)
@@ -565,7 +549,7 @@
      &                        tau_xz, tau_yz)
 
         use schism_glbl, only : rkind, uu2, vv2,tr_nd, & !tnd, snd, &
-     &                      idry, nvrt, ivcor,errmsg
+     &                     kfp, idry, nvrt, ivcor,errmsg
         use schism_msgp, only : myrank,parallel_abort
         implicit none
 
@@ -579,29 +563,29 @@
 
 ! local variables
         integer, parameter :: max_iter = 10
-        real(rkind), parameter :: speed_air_warn = 50.0d0
-        real(rkind), parameter :: speed_air_stop = 100.0d0
-        real(rkind), parameter :: speed_water_warn = 5.0d0
-        real(rkind), parameter :: speed_water_stop = 20.0d0
-        real(rkind), parameter :: z_t = 2.0d0
-        real(rkind), parameter :: z_u = 10.0d0
-        real(rkind), parameter :: a1 = 0.013d0
-        real(rkind), parameter :: a2 = 0.11d0
-        real(rkind), parameter :: b1 = 2.67d0
-        real(rkind), parameter :: b2 = -2.57d0
-        real(rkind), parameter :: nu = 1.46d-5
-        real(rkind), parameter :: beta = 1.0d0
-        real(rkind), parameter :: g = 9.81d0
-        real(rkind), parameter :: z_i = 1000.0d0
-        real(rkind), parameter :: karman = 0.4d0
-        real(rkind), parameter :: zeta_m = -1.574d0
-        real(rkind), parameter :: zeta_h = -0.465d0
-        real(rkind), parameter :: t_freeze = 273.15d0
-        real(rkind), parameter :: epsilon_r = 0.6220d0
-        real(rkind), parameter :: c_p_air = 1004.0d0
-        real(rkind), parameter :: latent = 2.501d6
-        real(rkind), parameter :: r_air = 287.0d0
-        integer, parameter :: printit = 1000.d0
+        real(rkind), parameter :: speed_air_warn = 50.0
+        real(rkind), parameter :: speed_air_stop = 100.0
+        real(rkind), parameter :: speed_water_warn = 5.0
+        real(rkind), parameter :: speed_water_stop = 20.0
+        real(rkind), parameter :: z_t = 2.0
+        real(rkind), parameter :: z_u = 10.0
+        real(rkind), parameter :: a1 = 0.013
+        real(rkind), parameter :: a2 = 0.11
+        real(rkind), parameter :: b1 = 2.67
+        real(rkind), parameter :: b2 = -2.57
+        real(rkind), parameter :: nu = 1.46e-5
+        real(rkind), parameter :: beta = 1.0
+        real(rkind), parameter :: g = 9.81
+        real(rkind), parameter :: z_i = 1000.0
+        real(rkind), parameter :: karman = 0.4
+        real(rkind), parameter :: zeta_m = -1.574
+        real(rkind), parameter :: zeta_h = -0.465
+        real(rkind), parameter :: t_freeze = 273.15
+        real(rkind), parameter :: epsilon_r = 0.6220
+        real(rkind), parameter :: c_p_air = 1004.0
+        real(rkind), parameter :: latent = 2.501e6
+        real(rkind), parameter :: r_air = 287.0
+        integer, parameter :: printit = 1000
 
         integer :: i_node, iter, sfc_lev
         real(rkind) :: u_star, theta_star, q_star, z_0, monin
@@ -618,11 +602,7 @@
 #endif
 
 ! precalculate constants
-        one_third = 1.0d0 / 3.0d0
-
-! Init tau_xz for dry
-!        tau_xz=0.d0
-!        tau_yz=0.d0
+        one_third = 1.0 / 3.0
 
 ! now loop over all points
 !$OMP parallel do default(shared) private(i_node,dry,sfc_lev,e_sfc,q_sfc,mix_ratio, &
@@ -639,41 +619,41 @@
 #endif
 
 ! define whether this node is dry or not (depends on coordinate system)
-          dry = idry(i_node) .eq. 1
-!     &        ( (ivcor .eq. -1) .and. (kfp(i_node)  .eq. -1) ) & ! z
-!     &      .or. &
-!     &        ( (ivcor .ne. -1) .and. (idry(i_node) .eq. 1) )   !sigma
+          dry = &
+     &        ( (ivcor .eq. -1) .and. (kfp(i_node)  .eq. -1) ) & ! z
+     &      .or. &
+     &        ( (ivcor .ne. -1) .and. (idry(i_node) .eq. 1) )   !sigma
 
 ! if this point isn't dry, then calculate fluxes (if dry, then skip)
         if (.not. dry) then
 
 ! specify the surface level at this node (depends on coordinate system)
-!          if (ivcor .eq. -1) then         ! z
-!            sfc_lev = kfp(i_node)
-!          else                            ! sigma
-          sfc_lev = nvrt
-!          endif
+          if (ivcor .eq. -1) then         ! z
+            sfc_lev = kfp(i_node)
+          else                            ! sigma
+            sfc_lev = nvrt
+          endif
 
 ! calculate q_sfc from e_sfc
 ! (e_sfc reduced for salinity using eqn from Smithsonian Met Tables)
-          e_sfc = (1.0d0 - 0.000537d0 * tr_nd(2,sfc_lev,i_node)) &
+          e_sfc = (1.0 - 0.000537 * tr_nd(2,sfc_lev,i_node)) &
      &          * esat_flat_r(tr_nd(1,sfc_lev,i_node) + t_freeze)
           q_sfc = epsilon_r * e_sfc &
-     &          / ( p_air(i_node) - e_sfc * (1.0d0 - epsilon_r) )
+     &          / ( p_air(i_node) - e_sfc * (1.0 - epsilon_r) )
 
 ! calculate the water vapor mixing ratio of the air
-          mix_ratio = q_air(i_node) / (1.0d0 - q_air(i_node))
+          mix_ratio = q_air(i_node) / (1.0 - q_air(i_node))
 
 ! calculate theta_air, theta_v_air, delta_theta, delta_q,
 ! and delta_theta_v
-          theta_air = (t_air(i_node) + t_freeze) + 0.0098d0*z_t
-          theta_v_air = theta_air * (1.0d0 + 0.608d0 * mix_ratio)
+          theta_air = (t_air(i_node) + t_freeze) + 0.0098*z_t
+          theta_v_air = theta_air * (1.0 + 0.608 * mix_ratio)
           delta_theta = theta_air -(tr_nd(1,sfc_lev,i_node) + t_freeze)
           delta_q = q_air(i_node) - q_sfc
-          delta_theta_v = delta_theta * (1.0d0 + 0.608d0 * mix_ratio)+0.608 * theta_air * delta_q
+          delta_theta_v = delta_theta * (1.0 + 0.608 * mix_ratio)+0.608 * theta_air * delta_q
 
 ! calculate the air virtual temperature and density
-          t_v = (t_air(i_node) + t_freeze) * (1.0d0 + 0.608d0 * mix_ratio)
+          t_v = (t_air(i_node) + t_freeze) * (1.0 + 0.608 * mix_ratio)
           rho_air = p_air(i_node) / (r_air * t_v)
 
 #ifdef DEBUG
@@ -692,13 +672,14 @@
 ! excessive values
           speed_air = sqrt( u_air(i_node)*u_air(i_node) + &
      &                      v_air(i_node)*v_air(i_node) )
-!          speed_water &
-!#ifndef SCHISM
-!     &      = sqrt( uu2(i_node, sfc_lev)*uu2(i_node, sfc_lev) + &
-!     &              vv2(i_node, sfc_lev)*vv2(i_node, sfc_lev) )
-!#else /* SCHISM */
-          speed_water=sqrt(uu2(sfc_lev,i_node)*uu2(sfc_lev,i_node)+vv2(sfc_lev,i_node)*vv2(sfc_lev,i_node))
-!#endif /* SCHISM */
+          speed_water &
+#ifndef SCHISM
+     &      = sqrt( uu2(i_node, sfc_lev)*uu2(i_node, sfc_lev) + &
+     &              vv2(i_node, sfc_lev)*vv2(i_node, sfc_lev) )
+#else /* SCHISM */
+     &      = sqrt( uu2(sfc_lev,i_node)*uu2(sfc_lev,i_node) + &
+     &              vv2(sfc_lev,i_node)*vv2(sfc_lev,i_node) )
+#endif /* SCHISM */
 
           if (speed_air .gt. speed_air_stop) then
             write(errmsg,*) 'speed_air exceeds ', speed_air_stop
@@ -717,30 +698,30 @@
           endif
 
 ! begin with initial values of u_star, w_star, and speed
-          u_star = 0.06d0
-          w_star = 0.5d0
-          if (delta_theta_v .ge. 0) then  ! stable
-            speed=max(sqrt((u_air(i_node)-uu2(sfc_lev,i_node))**2.d0+ &
-                          &(v_air(i_node)-vv2(sfc_lev,i_node))**2.d0),0.1_rkind)
-!#ifndef SCHISM
-!     &               (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
-!     &               (v_air(i_node) - vv2(i_node, sfc_lev))**2 ), &
-!#else /* SCHISM */
-!     &               (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
-!     &               (v_air(i_node) - vv2(sfc_lev,i_node))**2 ), &
-!#endif /* SCHISM */
-!     &             0.1_rkind)
-          else  ! unstable
-            speed =sqrt((u_air(i_node)-uu2(sfc_lev,i_node))**2+(v_air(i_node)-vv2(sfc_lev,i_node))**2+(beta * w_star)**2) 
-!#ifndef SCHISM
-!     &        sqrt( (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
-!     &              (v_air(i_node) - vv2(i_node, sfc_lev))**2 + &
-!#else /* SCHISM */
-!     &        sqrt((u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
-!     &              (v_air(i_node) - vv2(sfc_lev,i_node))**2 + &
-!#endif /* SCHISM */
-!     &              (beta * w_star)**2)
-          endif !stable
+          u_star = 0.06
+          w_star = 0.5
+          if (delta_theta_v .ge. 0) then                    ! stable
+            speed = &
+     &        max( sqrt( &
+#ifndef SCHISM
+     &               (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
+     &               (v_air(i_node) - vv2(i_node, sfc_lev))**2 ), &
+#else /* SCHISM */
+     &               (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
+     &               (v_air(i_node) - vv2(sfc_lev,i_node))**2 ), &
+#endif /* SCHISM */
+     &             0.1_rkind)
+          else                                              ! unstable
+            speed = &
+#ifndef SCHISM
+     &        sqrt( (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
+     &              (v_air(i_node) - vv2(i_node, sfc_lev))**2 + &
+#else /* SCHISM */
+     &        sqrt( (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
+     &              (v_air(i_node) - vv2(sfc_lev,i_node))**2 + &
+#endif /* SCHISM */
+     &              (beta * w_star)**2 )
+          endif
 
 ! now loop to obtain good initial values for u_star and z_0
           do iter = 1, 5
@@ -752,9 +733,9 @@
           rb = g * z_u * delta_theta_v / (theta_v_air * speed * speed)
 
 ! calculate initial values for zeta_u, monin, zeta_t
-          if (rb .ge. 0.d0) then                      ! neutral or stable
+          if (rb .ge. 0) then                      ! neutral or stable
             zeta_u = rb * log(z_u/z_0) &
-     &             / (1.0d0 - 0.5d0*min(rb,0.19_rkind))
+     &             / (1.0 - 0.5*min(rb,0.19_rkind))
           else
             zeta_u = rb * log(z_u/z_0)
           endif
@@ -773,15 +754,13 @@
 ! iterate a maximum of max_iter times
           iter = 0
           converged = .false.
-!100       continue
-
-          do
+100       continue
             iter = iter + 1
 
 ! Calculate the roughness lengths
             z_0 = a1 * u_star * u_star / g + a2 * nu / u_star
             re = u_star * z_0 / nu
-            z_0_t = z_0 / exp(b1 * (re**0.25d0) + b2)
+            z_0_t = z_0 / exp(b1 * (re**0.25) + b2)
 
 #ifdef DEBUG
             if (mod(i_node-1,printit) .eq. 0) then
@@ -795,9 +774,9 @@
             zeta_t = z_t / monin
 
 ! apply asymptotic limit to stable conditions
-            if (zeta_t .gt. 2.5d0) then
+            if (zeta_t .gt. 2.5) then
               converged = .true.
-              zeta_t = 2.5d0
+              zeta_t = 2.5
               monin = z_t / zeta_t
               zeta_u = z_u / monin
 
@@ -811,33 +790,33 @@
             if(zeta_u .lt. zeta_m) then ! very unstable
 ! extra term?
               u_star = speed * karman/(log(zeta_m*monin/z_0)-psi_m(zeta_m)+ psi_m(z_0/monin) &
-     &+1.14d0*((-zeta_u)**(one_third)-(-zeta_m)**(one_third)))
-            else if (zeta_u .lt. 0.0d0) then ! unstable
+     &+1.14*((-zeta_u)**(one_third)-(-zeta_m)**(one_third)))
+            else if (zeta_u .lt. 0.0) then ! unstable
               u_star = speed*karman/(log(z_u/z_0)-psi_m(zeta_u)+psi_m(z_0/monin))
-            else if (zeta_u .le. 1.0d0) then ! neutral/stable
-              u_star = speed*karman/(log(z_u/z_0)+5.0d0*zeta_u-5.0d0*z_0/monin)
+            else if (zeta_u .le. 1.0) then ! neutral/stable
+              u_star = speed*karman/(log(z_u/z_0)+5.0*zeta_u-5.0*z_0/monin)
             else  ! very stable
-              u_star = speed*karman/(log(monin/z_0)+5.0d0+5.0d0*log(zeta_u)-5.0d0*z_0/monin+zeta_u-1.0d0)
+              u_star = speed*karman/(log(monin/z_0)+5.0+5.0*log(zeta_u)-5.0*z_0/monin+zeta_u-1.0)
             endif
 
 ! caulculate theta_star and q_star, depending on zeta
             if(zeta_t.lt.zeta_h) then ! very unstable
               tmp=karman/(log(zeta_h*monin/z_0_t)-psi_h(zeta_h) &
-     &+ psi_h(z_0_t/monin)+0.8d0*((-zeta_h)**(-one_third)-(-zeta_t)**(-one_third)))
+     &+ psi_h(z_0_t/monin)+0.8*((-zeta_h)**(-one_third)-(-zeta_t)**(-one_third)))
 !              theta_star = karman*delta_theta/(log(zeta_h*monin/z_0_t)-psi_h(zeta_h) &
 !     &+ psi_h(z_0_t/monin)+0.8*((-zeta_h)**(-one_third)-(-zeta_t)**(-one_third)))
 !              q_star = karman*delta_q/(log(zeta_h*monin/z_0_t)- psi_h(zeta_h) &
 !     &+ psi_h(z_0_t/monin)+0.8*((-zeta_h)**(-one_third) -(-zeta_t)**(-one_third)))
-            else if(zeta_t.lt.0.0d0) then ! unstable
+            else if(zeta_t.lt.0.0) then ! unstable
               tmp=karman/(log(z_t/z_0_t)-psi_h(zeta_t)+psi_h(z_0_t/monin))
 !              theta_star = karman * delta_theta/(log(z_t/z_0_t)-psi_h(zeta_t)+psi_h(z_0_t/monin))
 !              q_star = karman*delta_q/(log(z_t/z_0_t)-psi_h(zeta_t)+psi_h(z_0_t/monin))
-            else if(zeta_t.lt.1.0d0) then ! neutral/stable
-              tmp=karman/(log(z_t/z_0_t)+5.0d0*zeta_t-5.0d0*z_0_t/monin)
+            else if(zeta_t.lt.1.0) then ! neutral/stable
+              tmp=karman/(log(z_t/z_0_t)+5.0*zeta_t-5.0*z_0_t/monin)
 !              theta_star = karman * delta_theta/(log(z_t/z_0_t)+5.0*zeta_t-5.0*z_0_t/monin)
 !              q_star = karman*delta_q/(log(z_t/z_0_t)+5.0*zeta_t-5.0*z_0_t/monin)
             else ! very stable
-              tmp=karman/(log(monin/z_0_t) + 5.0d0+5.0d0*log(zeta_t)-5.0d0*z_0_t/monin+zeta_t-1.0d0)
+              tmp=karman/(log(monin/z_0_t) + 5.0+5.0*log(zeta_t)-5.0*z_0_t/monin+zeta_t-1.0)
 !              theta_star = karman * delta_theta/(log(monin/z_0_t) + 5.0+5.0*log(zeta_t)-5.0*z_0_t/monin+zeta_t-1.0)
 !              q_star = karman*delta_q/(log(monin/z_0_t)+5.0+5.0*log(zeta_t)-5.0*z_0_t/monin+zeta_t-1.0)
             endif
@@ -846,41 +825,40 @@
             q_star=tmp*delta_q
 
 ! calculate theta_v_star and monin
-            theta_v_star = theta_star*(1.0d0+0.608d0*mix_ratio)+0.608d0*theta_air*q_star
+            theta_v_star = theta_star*(1.0+0.608*mix_ratio)+0.608*theta_air*q_star
             monin = theta_v_air*u_star*u_star/(karman*g*theta_v_star)
 
 ! depending on surface layer stability, calculate the effective
 ! near-surface wind speed
 ! (ie relative to the flowing water surface)
-            if (delta_theta_v .ge. 0.0d0) then ! stable
-              speed =max(sqrt((u_air(i_node)-uu2(sfc_lev,i_node))**2.d0+ &
-                             &(v_air(i_node)-vv2(sfc_lev,i_node))**2.d0),0.1_rkind) 
-!#ifndef SCHISM
-!     &                 (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
-!     &                 (v_air(i_node) - vv2(i_node, sfc_lev))**2 ), &
-!#else /* SCHISM */
-!     &                 (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
-!     &                 (v_air(i_node) - vv2(sfc_lev,i_node))**2 ), &
-!#endif /* SCHISM */
-!     &               0.1_rkind)
+            if (delta_theta_v .ge. 0.0) then                  ! stable
+              speed = &
+     &          max( sqrt( &
+#ifndef SCHISM
+     &                 (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
+     &                 (v_air(i_node) - vv2(i_node, sfc_lev))**2 ), &
+#else /* SCHISM */
+     &                 (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
+     &                 (v_air(i_node) - vv2(sfc_lev,i_node))**2 ), &
+#endif /* SCHISM */
+     &               0.1_rkind)
 
-            else ! unstable
+            else                                              ! unstable
 
 ! calculate the convective velocity scale
               w_star = (-g*theta_v_star*u_star*z_i/theta_v_air)**one_third
 
-              speed =sqrt((u_air(i_node)-uu2(sfc_lev,i_node))**2.d0+ &
-                         &(v_air(i_node)-vv2(sfc_lev,i_node))**2.d0+(beta * w_star)**2.d0)
-!#ifndef SCHISM
-!     &          sqrt( (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
-!     &                (v_air(i_node) - vv2(i_node, sfc_lev))**2 + &
-!#else /* SCHISM */
-!     &          sqrt( (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
-!     &                (v_air(i_node) - vv2(sfc_lev,i_node))**2 + &
-!#endif /* SCHISM */
-!     &                (beta * w_star)**2 )
+              speed = &
+#ifndef SCHISM
+     &          sqrt( (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
+     &                (v_air(i_node) - vv2(i_node, sfc_lev))**2 + &
+#else /* SCHISM */
+     &          sqrt( (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
+     &                (v_air(i_node) - vv2(sfc_lev,i_node))**2 + &
+#endif /* SCHISM */
+     &                (beta * w_star)**2 )
 
-            endif !stable||unstable
+            endif
 
 #ifdef DEBUG
             if (mod(i_node-1,printit) .eq. 0) then
@@ -894,9 +872,7 @@
 #endif
 
 ! bottom of main iteration loop
-!          if (.not. converged .and. iter .lt. max_iter) goto 100
-            if (converged.or.iter>= max_iter) exit
-          enddo
+          if (.not. converged .and. iter .lt. max_iter) goto 100
 
 ! calculate fluxes
           sen_flux(i_node) = - rho_air * c_p_air * u_star * theta_star
@@ -906,34 +882,33 @@
 #endif
 
 ! calculate wind stresses
-          speed_res =sqrt((u_air(i_node)-uu2(sfc_lev,i_node))**2.d0+(v_air(i_node)-vv2(sfc_lev,i_node))**2.d0)
-!#ifndef SCHISM
-!     &          sqrt( (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
-!     &                (v_air(i_node) - vv2(i_node, sfc_lev))**2 )
-!#else /* SCHISM */
-!     &          sqrt( (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
-!     &                (v_air(i_node) - vv2(sfc_lev,i_node))**2 )
-!#endif /* SCHISM */
-
-          if(speed_res>0.0d0.and.speed>0.1d0) then
+          speed_res = &
+#ifndef SCHISM
+     &          sqrt( (u_air(i_node) - uu2(i_node, sfc_lev))**2 + &
+     &                (v_air(i_node) - vv2(i_node, sfc_lev))**2 )
+#else /* SCHISM */
+     &          sqrt( (u_air(i_node) - uu2(sfc_lev,i_node))**2 + &
+     &                (v_air(i_node) - vv2(sfc_lev,i_node))**2 )
+#endif /* SCHISM */
+          if (speed_res .gt. 0.0) then
             tau = rho_air * u_star * u_star * speed_res / speed
-            tau_xz(i_node) =-tau*(u_air(i_node)-uu2(sfc_lev,i_node))/speed_res
-!#ifndef SCHISM
-!     &                     * (u_air(i_node) - uu2(i_node, sfc_lev)) &
-!#else /* SCHISM */
-!     &                     * (u_air(i_node) - uu2(sfc_lev,i_node)) &
-!#endif /* SCHISM */
-!     &                     / speed_res
-            tau_yz(i_node) =-tau*(v_air(i_node)-vv2(sfc_lev,i_node))/speed_res
-!#ifndef SCHISM
-!     &                     * (v_air(i_node) - vv2(i_node, sfc_lev)) &
-!#else /* SCHISM */
-!     &                     * (v_air(i_node) - vv2(sfc_lev,i_node)) &
-!#endif /* SCHISM */
-!     &                     / speed_res
+            tau_xz(i_node) = - tau &
+#ifndef SCHISM
+     &                     * (u_air(i_node) - uu2(i_node, sfc_lev)) &
+#else /* SCHISM */
+     &                     * (u_air(i_node) - uu2(sfc_lev,i_node)) &
+#endif /* SCHISM */
+     &                     / speed_res
+            tau_yz(i_node) = - tau &
+#ifndef SCHISM
+     &                     * (v_air(i_node) - vv2(i_node, sfc_lev)) &
+#else /* SCHISM */
+     &                     * (v_air(i_node) - vv2(sfc_lev,i_node)) &
+#endif /* SCHISM */
+     &                     / speed_res
           else
-            tau_xz(i_node) = 0.0d0
-            tau_yz(i_node) = 0.0d0
+            tau_xz(i_node) = 0.0
+            tau_yz(i_node) = 0.0
           endif
 
 #ifdef DEBUG
@@ -950,7 +925,7 @@
 
 !=================================================================
 ! end of loop over points
-        enddo !i_node= 1, num_nodes !=npa
+        enddo !i_node
 !$OMP end parallel do 
 
 #ifdef DEBUG
@@ -972,16 +947,16 @@
         real(rkind), intent(in) :: t
         real(rkind)             :: t_eff
         real(rkind), parameter :: &
-     &        c0= 6.11583699d+02,  c1= 0.444606896d+02, &
-     &        c2= 0.143177157d+01, c3= 0.264224321d-01, &
-     &        c4= 0.299291081d-03, c5= 0.203154182d-05, &
-     &        c6= 0.702620698d-08, c7= 0.379534310d-11, &
-     &        c8=-0.321582393d-13
+     &        c0= 6.11583699e+02,  c1= 0.444606896e+02, &
+     &        c2= 0.143177157e+01, c3= 0.264224321e-01, &
+     &        c4= 0.299291081e-03, c5= 0.203154182e-05, &
+     &        c6= 0.702620698e-08, c7= 0.379534310e-11, &
+     &        c8=-0.321582393e-13
 
 ! t     : temperature in K
 ! t_eff : effective temperature in C
 
-        t_eff = max(-85._rkind,t-273.16_rkind)
+        t_eff = max(-85._rkind,t-273.16)
 
         esat_flat_r = c0+t_eff*(c1+t_eff*(c2+t_eff*(c3+t_eff*(c4+t_eff*&
      &                         (c5+t_eff*(c6+t_eff*(c7+t_eff*c8)))))))
@@ -996,11 +971,11 @@
         real(rkind), intent(in) :: zeta
         real(rkind) :: chi, half_pi
 
-        half_pi = 2.0d0 * atan(1._rkind)
-        chi = (1.0d0 - 16.0d0 * zeta)**0.25d0
-        psi_m = 2.0d0 * log( 0.5d0 * (1.0d0 + chi) ) + &
-     &          log( 0.5d0 * (1.0d0 + chi*chi) ) - &
-     &          2.0d0 * atan(chi) + half_pi
+        half_pi = 2.0 * atan(1._rkind)
+        chi = (1.0 - 16.0 * zeta)**0.25
+        psi_m = 2.0 * log( 0.5 * (1.0 + chi) ) + &
+     &          log( 0.5 * (1.0 + chi*chi) ) - &
+     &          2.0 * atan(chi) + half_pi
 
       return
       end
@@ -1012,8 +987,8 @@
         real(rkind), intent(in) :: zeta
         real(rkind) :: chi
 
-        chi = (1.0d0 - 16.0d0 * zeta)**0.25d0
-        psi_h = 2.0d0 * log( 0.5d0 * (1.0d0 + chi*chi) )
+        chi = (1.0 - 16.0 * zeta)**0.25
+        psi_h = 2.0 * log( 0.5 * (1.0 + chi*chi) )
 
       return
       end
@@ -1035,71 +1010,64 @@
 !-----------------------------------------------------------------------
       subroutine rotate_winds (u, v, num_nodes_out)
 
-        use schism_glbl, only : rkind,ipgl,in_dir,out_dir,len_in_dir,len_out_dir,wind_rotate_angle
+        use schism_glbl, only : rkind,ipgl
         use schism_msgp, only : myrank
         implicit none
-        include 'mpif.h'
 
 ! input/output variables
-        integer :: num_nodes_out
-        real(rkind) :: u(num_nodes_out), v(num_nodes_out)
+        integer num_nodes_out
+        real(rkind) u(num_nodes_out), v(num_nodes_out)
 
 ! local variables
-        integer :: i_node, i_node_tmp, alloc_stat !,ne_global,np_global
-        real(rkind) :: x_tmp, y_tmp, speed, dir,tmp
-        real(rkind) :: pi, deg_to_rad
-!        real(rkind), save, allocatable, dimension(:) :: rotate_angle
-!        character, parameter :: rot_file*50 = 'windrot_geo2proj.gr3'
+        integer i_node, i_node_tmp, alloc_stat,ne_global,np_global
+        real(rkind) x_tmp, y_tmp, speed, dir,tmp
+        real(rkind) pi, deg_to_rad
+        real(rkind), save, allocatable, dimension(:) :: &
+     &    rotate_angle
+        character, parameter :: rot_file*50 = 'windrot_geo2proj.gr3'
         logical, save :: first_call = .true.
 
-!        pi = 4.0d0 * atan(1.0_rkind)
-!        deg_to_rad = pi / 180.0_rkind
+        pi = 4.0 * atan(1.0_rkind)
+        deg_to_rad = pi / 180.0_rkind
 
 ! if this is the first call to this subroutine, then read in the angles
 ! that the winds will need to be rotated by
 ! (convert degrees to radians)
-!        if (first_call) then
-!          
-!! allocate array for needed size
-!          allocate (rotate_angle(num_nodes_out),buf4(np_global),stat=alloc_stat)
-!          call check_allocation('rotate_angle', 'rotate_winds', &
-!     &                          alloc_stat)
-!
-!          if(myrank==0) then
-!            open(10, file=in_dir(1:len_in_dir)//rot_file, status='old')
-!            read(10,*) ! header
-!            read(10,*) !ne_global,np_global
-!
-!            do i_node =1, np_global !num_nodes_out
-!              read(10,*) i_node_tmp, x_tmp, y_tmp,buf4(i_node) !tmp
-!!              if(ipgl(i_node)%rank==myrank) rotate_angle(ipgl(i_node)%id)=tmp*deg_to_rad
-!            enddo
-!            close(10)
-!          endif !myrank
-!          call mpi_bcast(buf4,np_global,rtype,0,comm,alloc_stat)
-! 
-!          do i_node =1, np_global
-!            if(ipgl(i_node)%rank==myrank) rotate_angle(ipgl(i_node)%id)=buf4(i_node)*deg_to_rad
-!          enddo
-!          deallocate(buf4)
-!        endif !first_call
+        if (first_call) then
+
+! allocate array for needed size
+          allocate (rotate_angle(num_nodes_out), stat=alloc_stat)
+          call check_allocation('rotate_angle', 'rotate_winds', &
+     &                          alloc_stat)
+
+          open(10, file=rot_file, status='old')
+          read(10,*) ! header
+          read(10,*)ne_global,np_global
+
+          do i_node =1, np_global !num_nodes_out
+            read(10,*) i_node_tmp, x_tmp, y_tmp, tmp
+            if(ipgl(i_node)%rank==myrank) rotate_angle(ipgl(i_node)%id)=tmp*deg_to_rad
+          enddo
+
+          close(10)
+
+        endif !first_call
 
 ! rotate winds
-        do i_node =1, num_nodes_out !=npa
+        do i_node =1, num_nodes_out
 
 ! calculate speed and direction (geographic)
           dir = atan2(-u(i_node),-v(i_node))
           speed = sqrt(u(i_node)*u(i_node) + v(i_node)*v(i_node))
 
 ! add rotation angle
-          !dir = dir + rotate_angle(i_node)
-          dir = dir + wind_rotate_angle(i_node)
+          dir = dir + rotate_angle(i_node)
 
 ! calculate new u and v components
           u(i_node) = -speed * sin(dir)
           v(i_node) = -speed * cos(dir)
 
-        enddo !i_node
+        enddo
 
 ! set first_call to false, so subsequent calls will know that they're
 ! not the first call
@@ -1129,16 +1097,14 @@
 
         use schism_glbl, only : rkind,start_year,start_month,start_day,start_hour,utc_start
         implicit none
-       
-        !max. total # of nc files. Need to update char_num() etc if this
-        !is to be increased 
-        integer, parameter :: max_files = 9999
+        
+        integer, parameter :: max_files = 1000 !max. # of nc files
         integer, parameter :: max_times = 100000 !max. # of time records from all files
 
         type dataset_info
           character name*50
           logical :: exist = .false.
-          integer :: num_files = 0 !total # of stacks
+          integer :: num_files = 0
           integer :: nx = 0
           integer :: ny = 0
           integer :: num_nodes = 0
@@ -1157,8 +1123,8 @@
           integer,     pointer, dimension(:) :: in_elem_for_out_node
 #endif  /* NO_TR_15581 block */
           integer :: num_times = 0
-          real(rkind), dimension(max_times) :: times !Julian days for time records from all stacks
-          integer, dimension(max_times) :: file_num_for_time !stack # for each record
+          real(rkind), dimension(max_times) :: times
+          integer, dimension(max_times) :: file_num_for_time
           integer, dimension(max_times) :: time_num_for_time
           integer, dimension(max_files) :: jdate_for_file
           real(rkind) :: max_window_hours
@@ -1172,13 +1138,13 @@
 !        real(rkind) :: start_hour  = -9999.0
 !        real(rkind) :: utc_start   = -9999.0
         integer             :: start_jdate
-        real(rkind) :: start_frac_jdate = -9999.0d0
+        real(rkind) :: start_frac_jdate = -9999.0
 
         !relative weights for air; can be >1 (will be weight-averaged)
-        real(rkind) :: air_1_relative_weight = 1.0d0
-        real(rkind) :: air_2_relative_weight = 99.0d0
-        real(rkind) :: air_1_max_window_hours = 120.0d0
-        real(rkind) :: air_2_max_window_hours = 120.0d0
+        real(rkind) :: air_1_relative_weight = 1.0
+        real(rkind) :: air_2_relative_weight = 99.0
+        real(rkind) :: air_1_max_window_hours = 168.0
+        real(rkind) :: air_2_max_window_hours = 120.0
         logical             :: air_1_fail_if_missing = .true.
         logical             :: air_2_fail_if_missing = .false.
         character (len=50)  :: air_1_file = 'sflux_air_1'
@@ -1189,10 +1155,10 @@
         character (len=50)  :: stmp_name  = 'stmp'
         character (len=50)  :: spfh_name  = 'spfh'
 
-        real(rkind) :: rad_1_relative_weight = 1.0d0
-        real(rkind) :: rad_2_relative_weight = 99.0d0
-        real(rkind) :: rad_1_max_window_hours = 120.0d0
-        real(rkind) :: rad_2_max_window_hours = 24.0d0
+        real(rkind) :: rad_1_relative_weight = 1.0
+        real(rkind) :: rad_2_relative_weight = 99.0
+        real(rkind) :: rad_1_max_window_hours = 168.0
+        real(rkind) :: rad_2_max_window_hours = 24.0
         logical             :: rad_1_fail_if_missing = .true.
         logical             :: rad_2_fail_if_missing = .false.
         character (len=50)  :: rad_1_file = 'sflux_rad_1'
@@ -1200,16 +1166,15 @@
         character (len=50)  :: dlwrf_name = 'dlwrf'
         character (len=50)  :: dswrf_name = 'dswrf'
        
-        real(rkind) :: prc_1_relative_weight = 1.0d0
-        real(rkind) :: prc_2_relative_weight = 99.0d0
-        real(rkind) :: prc_1_max_window_hours = 120.0d0
-        real(rkind) :: prc_2_max_window_hours = 24.0d0
+        real(rkind) :: prc_1_relative_weight = 1.0
+        real(rkind) :: prc_2_relative_weight = 99.0
+        real(rkind) :: prc_1_max_window_hours = 168.0
+        real(rkind) :: prc_2_max_window_hours = 24.0
         logical             :: prc_1_fail_if_missing = .true.
         logical             :: prc_2_fail_if_missing = .false.
         character (len=50)  :: prc_1_file = 'sflux_prc_1'
         character (len=50)  :: prc_2_file = 'sflux_prc_2'
         character (len=50)  :: prate_name = 'prate'
-        character (len=50)  :: srate_name = 'srate'
 
         namelist /sflux_inputs/ &
 !     &    start_year, start_month, start_day, start_hour, utc_start, &
@@ -1227,7 +1192,7 @@
      &    prc_1_max_window_hours, prc_2_max_window_hours,            &
      &    prc_1_fail_if_missing, prc_2_fail_if_missing,              &
      &    prc_1_file, prc_2_file,                                    &
-     &    prate_name,srate_name
+     &    prate_name
 
       end module netcdf_io
 !-----------------------------------------------------------------------
@@ -1248,8 +1213,8 @@
         logical, save :: first_call = .true.
         type(dataset_info), save :: dataset_1, dataset_2
         real(rkind) time_now
-        real(rkind), parameter :: secs_per_day = 86400.0d0
-        real(rkind), parameter :: t_freeze = 273.15d0
+        real(rkind), parameter :: secs_per_day = 86400.0
+        real(rkind), parameter :: t_freeze = 273.15
         character data_name*50
 
 ! define the local variables num_nodes_out
@@ -1257,6 +1222,11 @@
 
 ! for the first call only, initialize starting date, datasets, etc 
         if (first_call) then
+!          fdb='sflux2_0000'
+!          lfdb=len_trim(fdb)
+!          write(fdb(lfdb-3:lfdb),'(i4.4)') myrank
+!          open(39,file='outputs/'//fdb,status='replace')
+        
           call get_sflux_inputs ()
           
 ! setup datasets
@@ -1398,7 +1368,7 @@
         type(dataset_info), save :: dataset_1, dataset_2
         real(rkind) time_now
 !        real(rkind), dimension(npa) :: albedo
-        real(rkind), parameter :: secs_per_day = 86400.0d0
+        real(rkind), parameter :: secs_per_day = 86400.0
         character data_name*50
 
 ! define the local variables num_nodes_out
@@ -1407,7 +1377,7 @@
 !        fdb='sflux3_0000'
 !        lfdb=len_trim(fdb)
 !        write(fdb(lfdb-3:lfdb),'(i4.4)') myrank
-!        open(40,file=out_dir(1:len_out_dir)//fdb,status='unknown')
+!        open(40,file='outputs/'//fdb,status='unknown')
 !        rewind(40)
 
 ! output info to debug file
@@ -1504,7 +1474,7 @@
 #endif
 !new21
         do i_node = 1, num_nodes_out
-          shortwave_d(i_node)=max((1.0d0-albedo(i_node))*shortwave_d(i_node),0.0_rkind)
+          shortwave_d(i_node)=max((1.0-albedo(i_node))*shortwave_d(i_node),0.0_rkind)
         enddo
 
 ! set first_call to false, so subsequent calls will know that they're
@@ -1529,7 +1499,7 @@
         logical, save :: first_call = .true.
         type(dataset_info), save :: dataset_1, dataset_2
         real(rkind) time_now
-        real(rkind), parameter :: secs_per_day = 86400.0d0
+        real(rkind), parameter :: secs_per_day = 86400.0
         character data_name*50
 
 ! define the local variables num_nodes_out
@@ -1538,7 +1508,7 @@
 !        fdb='sflux4_0000'
 !        lfdb=len_trim(fdb)
 !        write(fdb(lfdb-3:lfdb),'(i4.4)') myrank
-!        open(41,file=out_dir(1:len_out_dir)//fdb,status='unknown')
+!        open(41,file='outputs/'//fdb,status='unknown')
 !        rewind(41)
 
 ! output info to debug file
@@ -1621,114 +1591,6 @@
 
       return !get_precip_flux
       end
-
-      !-----------------------------------------------------------------------
-      subroutine get_precsnow_flux (time, prec_snow)
-        use schism_glbl, only : rkind, npa,fdb,lfdb
-        use schism_msgp, only : myrank,parallel_abort
-        use netcdf_io
-        implicit none
-        
-        real(rkind), intent(in) :: time
-        real(rkind), dimension(npa), intent(out) :: prec_snow
-        
-! local variables
-        integer num_nodes_out, i_node
-        logical, save :: first_call = .true.
-        type(dataset_info), save :: dataset_1, dataset_2
-        real(rkind) time_now
-        real(rkind), parameter :: secs_per_day = 86400.0d0
-        character data_name*50
-
-! define the local variables num_nodes_out
-        num_nodes_out = npa
-
-!        fdb='sflux4_0000'
-!        lfdb=len_trim(fdb)
-!        write(fdb(lfdb-3:lfdb),'(i4.4)') myrank
-!        open(41,file=out_dir(1:len_out_dir)//fdb,status='unknown')
-!        rewind(41)
-
-! output info to debug file
-#ifdef DEBUG
-        write(38,*)
-        write(38,*) 'get_precsnow_flux:  time = ', time
-        write(38,*) 'first_call             = ', first_call
-        write(38,*) 'num_nodes_out          = ', num_nodes_out
-#endif
-
-! for the first call only, initialize starting date, datasets, etc 
-        if (first_call) then
-        
-          call get_sflux_inputs ()
-          
-! setup datasets
-          dataset_1%name             = prc_1_file
-          dataset_1%max_window_hours = prc_1_max_window_hours
-          dataset_1%fail_if_missing  = prc_1_fail_if_missing
-          dataset_1%relative_weight  = prc_1_relative_weight
-
-          dataset_2%name             = prc_2_file
-          dataset_2%max_window_hours = prc_2_max_window_hours
-          dataset_2%fail_if_missing  = prc_2_fail_if_missing
-          dataset_2%relative_weight  = prc_2_relative_weight
-
-! output some details
-          if(myrank==0) then
-            write(16,*)
-            write(16,*) 'get_precsnow_flux:  sflux_inputs'
-            write(16,*) '  start_year             = ', start_year
-            write(16,*) '  start_month            = ', start_month
-            write(16,*) '  start_day              = ', start_day
-            write(16,*) '  start_hour             = ', start_hour
-            write(16,*) '  utc_start              = ', utc_start
-            write(16,*) '  start_frac_jdate       = ', start_frac_jdate
-            write(16,*) '  prc_1_file             = ', &
-     &                   trim(prc_1_file)
-            write(16,*) '  prc_1_max_window_hours = ', &
-     &                   prc_1_max_window_hours
-            write(16,*) '  prc_1_fail_if_missing  = ', &
-     &                   prc_1_fail_if_missing
-            write(16,*) '  prc_1_relative_weight  = ', &
-     &                   prc_1_relative_weight
-            write(16,*) '  prc_2_file             = ', &
-     &                   trim(prc_2_file)
-            write(16,*) '  prc_2_max_window_hours = ', &
-     &                   prc_2_max_window_hours
-            write(16,*) '  prc_2_fail_if_missing  = ', &
-     &                   prc_2_fail_if_missing
-            write(16,*) '  prc_2_relative_weight  = ', &
-     &                   prc_2_relative_weight
-            write(16,*) '  srate_name             = ', &
-     &                   trim(srate_name)
-          endif
-
-! get basic info for dataset
-          call get_dataset_info (dataset_1)
-          call get_dataset_info (dataset_2)
-        endif
-
-! get the current time
-        time_now = start_frac_jdate + time/secs_per_day
-#ifdef DEBUG
-        write(38,*) 'current jdate        = ', time_now
-#endif
-
-! get the data at this time
-        data_name = trim(srate_name)
-        call combine_sflux_data &
-     &    (time_now, dataset_1, dataset_2, &
-     &     dataset_1%exist, dataset_2%exist, &
-     &     data_name, prec_snow, &
-     &     num_nodes_out)
-        
-! set first_call to false, so subsequent calls will know that they're
-! not the first call
-        first_call = .false.
-
-      return 
-      end !get_precsnow_flux
-      
 !-----------------------------------------------------------------------
       subroutine get_dataset_info (info)
 
@@ -1759,7 +1621,7 @@
 
 ! run should fail if dataset doesn't exist and fail_if_missing is set
         if ( (.not. info%exist) .and. (info%fail_if_missing) ) then
-          call halt_error ('missing dataset: ' // file_name)
+          call halt_error ('missing dataset: ' // info%name)
         endif
 
 ! if this dataset exists, then get additional info
@@ -1792,7 +1654,7 @@
           call read_coord (file_name, data_name, info%lat, &
      &                     info%nx, info%ny)
 
-! convert lon/lat to radians, and optionally convert to -180->180 for lon
+! confine lon to -180->180 range, convert lon/lat to radians
           call fix_coords (info%lon, info%lat, info%nx, info%ny)
 
 ! get the number of nodes and elements for the sflux grid
@@ -1838,29 +1700,24 @@
       return
       end !get_dataset_info
 !-----------------------------------------------------------------------
-      character*4 function char_num (num)
+      character*3 function char_num (num)
         implicit none
         integer, intent(in) :: num
-        character(len=4) :: char
+        character char*3
         
-!10      format ('00', i1)
-!20      format ('0', i2)
-!30      format (i3)
-!
-!        if (num .le. 9) then
-!          write(char,10) num
-!        else if (num .le. 99) then
-!          write(char,20) num
-!        else if (num .le. 999) then
-!          write(char,30) num
-!        else
-!          call halt_error ('get_char_num: num too large!')
-!        endif
+10      format ('00', i1)
+20      format ('0', i2)
+30      format (i3)
 
-        if(num>9999) call halt_error ('get_char_num: num too large!')
-
-        char='0000'
-        write(char,'(i4.4)')num
+        if (num .le. 9) then
+          write(char,10) num
+        else if (num .le. 99) then
+          write(char,20) num
+        else if (num .le. 999) then
+          write(char,30) num
+        else
+          call halt_error ('get_char_num: num too large!')
+        endif
         
         char_num = char
 
@@ -1872,7 +1729,7 @@
         integer, intent(in) :: num
         character, intent(in) ::  dataset_name*50
 
-        character char_num*4
+        character char_num*3
         character, parameter :: prefix*6 = 'sflux/'
         character, parameter :: suffix*3 = '.nc'
         
@@ -1919,7 +1776,7 @@
         character, intent(in) ::  dataset_name*50
         integer, intent(in) :: max_times, max_files
         integer, intent(out) :: num_times, num_files, nx, ny
-        real(rkind), intent(out), dimension(max_times) :: times !Julian days for increasing time records (after concatenation from all stacks)
+        real(rkind), intent(out), dimension(max_times) :: times
         integer, intent(out), dimension(max_times) :: &
      &    file_num_for_time, time_num_for_time
         integer, intent(out), dimension(max_files) :: jdate_for_file
@@ -1965,7 +1822,7 @@
 
 ! get the times in this file
           call get_file_times (file_name, file_times, &
-     &                         jdate_for_file(file_num), & !Julian day for base_date
+     &                         jdate_for_file(file_num), &
      &                         max_file_times, num_file_times)
 
 ! check that num_file_times does not exceed max_times
@@ -2042,8 +1899,7 @@
      &                           file_julian_date, max_file_times, &
      &                           num_file_times)
 
-        use schism_glbl, only : rkind,in_dir,out_dir,len_in_dir,len_out_dir
-        use schism_msgp, only : myrank,itype,rtype,comm
+        use schism_glbl, only : rkind
         implicit none
         include 'netcdf.inc'
 
@@ -2056,74 +1912,70 @@
 ! file_times_tmp must be default real (netcdf)
         real, dimension(max_file_times) :: file_times_tmp
         
-        integer ncid, iret, time_dim, time_id, i_time, istat
+        integer ncid, iret, time_dim, time_id, i_time
         character data_name*50, attr_name*50
         integer, allocatable, dimension(:) :: base_date
         integer day, month, year, jd, n_base_date, allocate_stat
 
-        if(myrank==0) then
-!   open file_name and enter read-only mode
-          iret = nf_open(in_dir(1:len_in_dir)//file_name, NF_NOWRITE, ncid)
-          call check_err(iret)
+! open file_name and enter read-only mode
+        iret = nf_open(file_name, NF_NOWRITE, ncid)
+        call check_err(iret)
 
-!   get the variable id for the time variable
-          data_name = 'time'
-          iret = nf_inq_varid(ncid, data_name, time_id)
-          call check_err(iret)
+! get the variable id for the time variable
+        data_name = 'time'
+        iret = nf_inq_varid(ncid, data_name, time_id)
+        call check_err(iret)
 
-!   get the time dimension id
-          iret = nf_inq_vardimid (ncid, time_id, time_dim)
-          call check_err(iret)
-          
-!   determine number of times stored in the time dimension
-          iret = nf_inq_dimlen(ncid, time_dim, num_file_times)
-          if (num_file_times .gt. max_file_times) then
-            call halt_error ('sflux:num_file_times .gt. max_file_times!')
-          endif
-          call check_err(iret)
+! get the time dimension id
+        iret = nf_inq_vardimid (ncid, time_id, time_dim)
+        call check_err(iret)
+        
+! determine number of times stored in the time dimension
+        iret = nf_inq_dimlen(ncid, time_dim, num_file_times)
+        if (num_file_times .gt. max_file_times) then
+          call halt_error ('sflux:num_file_times .gt. max_file_times!')
+        endif
+        call check_err(iret)
 
-!   read the time vector for this file
-          iret = nf_get_var_real(ncid, time_id, file_times_tmp)
-          call check_err(iret)
+! read the time vector for this file
+        iret = nf_get_var_real(ncid, time_id, file_times_tmp)
+        call check_err(iret)
 
-!   convert from file real type to data real type
-          do i_time = 1, num_file_times
-            file_times(i_time) = real(file_times_tmp(i_time),rkind)
-          enddo
+! convert from file real type to data real type
+        do i_time = 1, num_file_times
+          file_times(i_time) = real(file_times_tmp(i_time),rkind)
+        enddo
 
-!   get the base_date - the time and date which corresponds with time zero
-!                       Note that only year,month,day of base_date are used (not 'hour').
-          attr_name = 'base_date'
+! get the base_date - the time and date which corresponds with time zero
+!                     Note that only year,month,day of base_date are used (not 'hour').
+        attr_name = 'base_date'
 
-!   get size of base_date (make sure it is at least 3)
-          iret = nf_inq_attlen (ncid, time_id, attr_name, n_base_date)
-          if (n_base_date .lt. 3) then
-            call halt_error ('insufficient fields in base_date!')
-          endif
+! get size of base_date (make sure it is at least 3)
+        iret = nf_inq_attlen (ncid, time_id, attr_name, n_base_date)
+        if (n_base_date .lt. 3) then
+          call halt_error ('insufficient fields in base_date!')
+        endif
 
-!   allocate space for base_date
-          allocate(base_date(n_base_date), stat=allocate_stat)
-          call check_allocation('base_date', 'get_file_times', &
-       &                        allocate_stat)
+! allocate space for base_date
+        allocate(base_date(n_base_date), stat=allocate_stat)
+        call check_allocation('base_date', 'get_file_times', &
+     &                        allocate_stat)
 
-!   read base_date
-          iret = nf_get_att_int(ncid, time_id, attr_name, base_date)
+! read base_date
+        iret = nf_get_att_int(ncid, time_id, attr_name, base_date)
 
-!   convert base_date to integer Julian date
-          year = base_date(1)
-          month = base_date(2)
-          day = base_date(3)
-          file_julian_date = jd(year,month,day)
+! convert base_date to integer Julian date
+        year = base_date(1)
+        month = base_date(2)
+        day = base_date(3)
+        file_julian_date = jd(year,month,day)
 
-!   deallocate base_date
-          deallocate(base_date)
-!   close the netCDF file
-          iret = nf_close(ncid)
-          call check_err(iret)
-        endif !myrank
-        call mpi_bcast(num_file_times,1,itype,0,comm,istat)
-        call mpi_bcast(file_times,max_file_times,rtype,0,comm,istat)
-        call mpi_bcast(file_julian_date,1,itype,0,comm,istat)
+! deallocate base_date
+        deallocate(base_date)
+
+! close the netCDF file
+        iret = nf_close(ncid)
+        call check_err(iret)
 
       return
       end !get_file_times
@@ -2140,7 +1992,7 @@
         logical, intent(out) :: repeat, at_end
         integer, intent(out) :: repeat_num
 
-        real(rkind), parameter :: time_eps = 0.001d0
+        real(rkind), parameter :: time_eps = 0.001
         integer i_time
         
         repeat = .false.
@@ -2151,50 +2003,44 @@
           endif
         enddo
         
-        at_end = ((test_time - (times(num_times) + time_eps)) .gt. 0.0d0)
+        at_end = ((test_time - (times(num_times) + time_eps)) .gt. 0.0)
         
       return
       end
 !-----------------------------------------------------------------------
       subroutine get_dims (file_name, nx, ny)
-        use schism_glbl, only : in_dir,out_dir,len_in_dir,len_out_dir
-        use schism_msgp, only : myrank,itype,rtype,comm
         implicit none
         include 'netcdf.inc'
         character, intent(in) ::  file_name*50
         integer, intent(out) :: nx, ny
         
-        integer ncid, iret, nx_dim, ny_dim, dim_ids(3),test_var_id,istat
+        integer ncid, iret, nx_dim, ny_dim, dim_ids(3), test_var_id
         character, parameter :: test_variable*50 = 'lat'
 
-        if(myrank==0) then
-!   open file_name and enter read-only mode
-          iret = nf_open(in_dir(1:len_in_dir)//file_name, NF_NOWRITE, ncid)
-          call check_err(iret)
+! open file_name and enter read-only mode
+        iret = nf_open(file_name, NF_NOWRITE, ncid)
+        call check_err(iret)
 
-!   get the variable ID for the test variable
-          iret = nf_inq_varid(ncid, test_variable, test_var_id)
-          call check_err(iret)
+! get the variable ID for the test variable
+        iret = nf_inq_varid(ncid, test_variable, test_var_id)
+        call check_err(iret)
 
-!   get the dimension IDs for the test variable
-          iret = nf_inq_vardimid (ncid, test_var_id, dim_ids)
-          call check_err(iret)
-          
-!   determine number of points in the nx and ny dimensions
-          nx_dim = dim_ids(1)
-          iret = nf_inq_dimlen(ncid, nx_dim, nx)
-          call check_err(iret)
+! get the dimension IDs for the test variable
+        iret = nf_inq_vardimid (ncid, test_var_id, dim_ids)
+        call check_err(iret)
+        
+! determine number of points in the nx and ny dimensions
+        nx_dim = dim_ids(1)
+        iret = nf_inq_dimlen(ncid, nx_dim, nx)
+        call check_err(iret)
 
-          ny_dim = dim_ids(2)
-          iret = nf_inq_dimlen(ncid, ny_dim, ny)
-          call check_err(iret)
+        ny_dim = dim_ids(2)
+        iret = nf_inq_dimlen(ncid, ny_dim, ny)
+        call check_err(iret)
 
-!   close the netCDF file
-          iret = nf_close(ncid)
-          call check_err(iret)
-        endif !myrank
-        call mpi_bcast(nx,1,itype,0,comm,istat)
-        call mpi_bcast(ny,1,itype,0,comm,istat)
+! close the netCDF file
+        iret = nf_close(ncid)
+        call check_err(iret)
         
       return
       end !get_dims
@@ -2212,7 +2058,7 @@
       subroutine read_coord (file_name, data_name, coord, &
      &                       nx, ny)
 
-        use schism_glbl, only : rkind,in_dir,out_dir,len_in_dir,len_out_dir
+        use schism_glbl, only : rkind
         use schism_msgp, only : myrank,comm
 !        use mpi
         implicit none
@@ -2229,7 +2075,7 @@
 
         if(myrank == 0)then
 ! open file_name and enter read-only mode
-          iret = nf_open(in_dir(1:len_in_dir)//file_name, NF_NOWRITE, ncid)
+          iret = nf_open(file_name, NF_NOWRITE, ncid)
           call check_err(iret)
 
 ! get the variable id for this variable
@@ -2259,7 +2105,7 @@
       subroutine read_data (file_name, data_name, data, &
      &                      nx, ny, time_num)
 
-        use schism_glbl, only : rkind,len_in_dir,len_out_dir,in_dir,out_dir
+        use schism_glbl, only : rkind
         use schism_msgp, only : myrank,comm
 !        use mpi
         implicit none
@@ -2286,7 +2132,7 @@
 
         if(myrank == 0)then
 ! open file_name and enter read-only mode
-          iret = nf_open(in_dir(1:len_in_dir)//file_name, NF_NOWRITE, ncid)
+          iret = nf_open(file_name, NF_NOWRITE, ncid)
           call check_err(iret)
 
 ! get the variable id for this variable
@@ -2374,7 +2220,7 @@
      &                       num_nodes_out, in_elem_for_out_node, &
      &                       weight)
 
-        use schism_glbl, only : rkind,errmsg,bounds_lon,pi
+        use schism_glbl, only : rkind,errmsg
         use schism_msgp, only : myrank,parallel_abort
         implicit none
 
@@ -2390,22 +2236,19 @@
         integer, intent(out), dimension(num_nodes_out) :: &
      &    in_elem_for_out_node
 
-        real(rkind) :: area_in(num_elems)
-        integer :: i_elem, i_node
-        integer :: i1, j1, i2, j2, i3, j3,isign_area
-        integer :: last_elem, top, floor
-        real(rkind) :: x1, y1, x2, y2, x3, y3, x4, y4
-        real(rkind) :: a1, a2, a3, aa, ae
-        real(rkind) :: ae_min
-        real(rkind), parameter :: epsilon = 1.0d-10
-        real(rkind), parameter :: bad_point_flag = -9.9d20
-        logical :: zero_ae, completed_check
+        real(rkind) area_in(num_elems)
+        integer i_elem, i_node
+        integer i1, j1, i2, j2, i3, j3
+        integer last_elem, top, floor
+        real(rkind) x1, y1, x2, y2, x3, y3, x4, y4
+        real(rkind) a1, a2, a3, aa, ae
+        real(rkind) ae_min
+        real(rkind), parameter :: epsilon = 1.0e-10
+        real(rkind), parameter :: bad_point_flag = -9.9e20
+        logical zero_ae, completed_check
 
 ! calculate and store the areas of the input grid elements
-        isign_area=1 !init as counter-clockwise
-        a1=huge(1.d0) !min lon in deg
-        a2=-a1 !max lon in deg
-        do i_elem = 1, num_elems !sflux grid; already split into pair of triangles like .gr3 format
+        do i_elem = 1, num_elems !sflux grid
           i1 = node_i(elem_nodes(i_elem,1))
           j1 = node_j(elem_nodes(i_elem,1))
           x1 = x_in(i1,j1)
@@ -2420,29 +2263,8 @@
           j3 = node_j(elem_nodes(i_elem,3))
           x3 = x_in(i3,j3)
           y3 = y_in(i3,j3)
-          area_in(i_elem)=0.5d0*((x1-x3)*(y2-y3)+(x3-x2)*(y1-y3)) !tri
-          if(area_in(i_elem)==0.d0) then
-            write(errmsg,*) 'get_weight, 0 area:',area_in(i_elem),i_elem
-            call parallel_abort(errmsg)
-          endif
- 
-          !Make sure all orintations are consistent (clockwise or counter-clockwise)
-          if(i_elem==1.and.area_in(i_elem)<0.d0) isign_area=-1 !clockwise
-          if(isign_area*area_in(i_elem)<0.d0) then
-            write(errmsg,*) 'get_weight, orientation not consistent:',isign_area,area_in(i_elem),i_elem
-            call parallel_abort(errmsg)
-          endif
-
-          !Min/max
-          a1=min(a1,x1,x2,x3)
-          a2=max(a2,x1,x2,x3)
-        enddo !i_elem
-
-!       Output lon range for diagnostics
-        if(myrank==0) then
-          write(16,*)'Longitude range in hgrid.ll=',bounds_lon(1:2)
-          write(16,*)'Longitude range in sflux =',a1/pi*180.d0,a2/pi*180.d0
-        endif
+          area_in(i_elem)=0.5*((x1-x3)*(y2-y3)+(x3-x2)*(y1-y3))
+        enddo
 
 ! now loop over the nodes of the output grid, searching for the
 ! surrounding elements on the input grid
@@ -2455,7 +2277,7 @@
 !cannot use OMP due to dependency   
         do i_node = 1, num_nodes_out !npa
 
-          ae_min = 1.0d25
+          ae_min = 1.0e25
           in_elem_for_out_node(i_node) = 0
 
 ! initialize flag which indicates that we've found correct element
@@ -2463,9 +2285,7 @@
           zero_ae = .false.
 
 ! search for element, starting with location of previous node
-!100       continue
-
-          do
+100       continue
 
 ! this block implements logic which tells which is the next element
 ! to consider
@@ -2529,16 +2349,17 @@
             x4 = x_out(i_node)
             y4 = y_out(i_node)
 
-! calculate area coord
-            a1 = (x4-x3)*(y2-y3) + (x2-x3)*(y3-y4) !2x area coord
+! calculate some type of areas
+            a1 = (x4-x3)*(y2-y3) + (x2-x3)*(y3-y4)
             a2 = (x4-x1)*(y3-y1) - (y4-y1)*(x3-x1)
             a3 = (y4-y1)*(x2-x1) - (x4-x1)*(y2-y1)
             aa = abs(a1) + abs(a2) + abs(a3)
-!            if (area_in(i_elem) .gt. 0.0d0) then
-            ae=abs(aa-2.0d0*abs(area_in(i_elem)))/abs(2.0d0*area_in(i_elem))
-!            else
-!              ae = 1.0d25
-!            endif
+            if (area_in(i_elem) .gt. 0.0) then
+              ae = abs(aa - 2.0*area_in(i_elem)) &
+     &           / (2.0*area_in(i_elem))
+            else
+              ae = 1.0e25
+            endif
 
 ! if ae equals zero (within epsilon) then we've found correct element
             zero_ae = (ae .lt. epsilon)
@@ -2557,9 +2378,7 @@
             last_elem = i_elem
 
 ! loop again if need to
-!          if ( (.not. completed_check) .and. (.not. zero_ae) ) goto 100
-            if(completed_check.or.zero_ae) exit
-          enddo !infinite do
+          if ( (.not. completed_check) .and. (.not. zero_ae) ) goto 100
 
 ! if we didnt find a good ae_min, then there are problems
 ! Currently, use nearest elem for interpolation even if no parent is found, b/cos
@@ -2577,7 +2396,7 @@
 ! (but make sure that there are no bad points from get_xy)
 
 ! get the locations of the nodes for this element on the input grid
-          i_elem = in_elem_for_out_node(i_node) !may be nearest elem (not parent)
+          i_elem = in_elem_for_out_node(i_node)
           i1 = node_i(elem_nodes(i_elem,1))
           j1 = node_j(elem_nodes(i_elem,1))
           x1 = x_in(i1,j1)
@@ -2609,14 +2428,13 @@
           x4 = x_out(i_node)
           y4 = y_out(i_node)
 
-! now calculate the weighting functions, which may be outside [0,1]
-! Signs are consistent btw area_in and each signed area
-          weight(i_node,1) = ((x4-x3)*(y2-y3) + (x2-x3)*(y3-y4)) &
-     &                     / ( 2.0d0*area_in(i_elem) )
-          weight(i_node,2) = ((x4-x1)*(y3-y1) - (y4-y1)*(x3-x1)) &
-     &                     / ( 2.0d0*area_in(i_elem) )
-          weight(i_node,3) = (-(x4-x1)*(y2-y1) + (y4-y1)*(x2-x1)) &
-     &                     / ( 2.0d0*area_in(i_elem) )
+! now calculate the weighting functions, which may be <0!
+          weight(i_node,1) = ( (x4-x3)*(y2-y3) + (x2-x3)*(y3-y4) ) &
+     &                     / ( 2.0*area_in(i_elem) )
+          weight(i_node,2) = ( (x4-x1)*(y3-y1) - (y4-y1)*(x3-x1) ) &
+     &                     / ( 2.0*area_in(i_elem) )
+          weight(i_node,3) = ( -(x4-x1)*(y2-y1) + (y4-y1)*(x2-x1) ) &
+     &                     / ( 2.0*area_in(i_elem) )
 
 ! this node is done, reset top and floor so next iteration is informed
           top = 0
@@ -2652,18 +2470,15 @@
         real(rkind) pi, deg_to_rad
         integer i, j
 
-        pi = 4.0d0 * atan(1.0_rkind)
-        deg_to_rad = pi / 180.0d0
+        pi = 4.0 * atan(1.0_rkind)
+        deg_to_rad = pi / 180.0
 
-! confine lon to -180->180 range. No need for this as long as longitude
-! ranges are consistent with hgrid.ll
-!        if(lon_jump_loc==2) then
-!          do j = 1, ny
-!            do i = 1, nx
-!              if (lon(i,j) .gt. 180.0d0) lon(i,j) = lon(i,j) - 360.0d0
-!            enddo
-!          enddo
-!        endif !lon_jump_loc
+! confine lon to -180->180 range
+        do j = 1, ny
+          do i = 1, nx
+            if (lon(i,j) .gt. 180.0) lon(i,j) = lon(i,j) - 360.0
+          enddo
+        enddo
 
 ! convert degrees to radians
         do j = 1, ny
@@ -2678,13 +2493,13 @@
 !-----------------------------------------------------------------------
       subroutine get_sflux_inputs ()
 
-        use schism_glbl, only : rkind,in_dir,out_dir,len_in_dir,len_out_dir
+        use schism_glbl, only : rkind
         use netcdf_io
         implicit none
         
         character, parameter :: &
      &    sflux_inputs_file*50 = 'sflux/sflux_inputs.txt'
-        real(rkind), parameter :: hours_per_day = 24.0d0
+        real(rkind), parameter :: hours_per_day = 24.0
         integer jd
         logical, save :: first_call = .true.
         logical exst
@@ -2699,7 +2514,7 @@
      &      call halt_error ('you must have sflux_inputs_file!')
 
 ! open input deck, and read in namelist
-          open(31, file=in_dir(1:len_in_dir)//sflux_inputs_file, status='old')
+          open(31, file=sflux_inputs_file, status='old')
           read(31, nml=sflux_inputs)
           close(31)
 !         write(*,nml=sflux_inputs)
@@ -2711,9 +2526,9 @@
      &      ('sflux_inputs_file: you must supply a value for start_month')
           if (start_day .lt. -9000) call halt_error &
      &      ('sflux_inputs_file: you must supply a value for start_day')
-          if (start_hour .lt. -9000.0d0) call halt_error &
+          if (start_hour .lt. -9000.0) call halt_error &
      &      ('sflux_inputs_file: you must supply a value for start_hour')
-          if (utc_start .lt. -9000.0d0) call halt_error &
+          if (utc_start .lt. -9000.0) call halt_error &
      &      ('sflux_inputs_file: you must supply a value for utc_start')
 
 !'
@@ -2770,7 +2585,7 @@
      &    data_out
         logical, intent(out) :: got_suitable_bracket
         
-        real(rkind), parameter :: hours_per_day = 24.0d0
+        real(rkind), parameter :: hours_per_day = 24.0
         real(rkind), dimension(info%nx,info%ny) :: data_tmp
         real(rkind) window_hours
         integer time_num_1, time_num_2
@@ -2989,16 +2804,17 @@
             do i_node = 1, num_nodes_out !npa
 ! determine if this node is within grid for data_2
               bad_node_2 = ( &
-     &            info_2%weight(i_node,1) .lt. 0.0d0 .or. &
-     &            info_2%weight(i_node,1) .gt. 1.0d0 .or. &
-     &            info_2%weight(i_node,2) .lt. 0.0d0 .or. &
-     &            info_2%weight(i_node,2) .gt. 1.0d0 .or. &
-     &            info_2%weight(i_node,3) .lt. 0.0d0 .or. &
-     &            info_2%weight(i_node,3) .gt. 1.0d0)
+     &            info_2%weight(i_node,1) .lt. 0.0 .or. &
+     &            info_2%weight(i_node,1) .gt. 1.0 .or. &
+     &            info_2%weight(i_node,2) .lt. 0.0 .or. &
+     &            info_2%weight(i_node,2) .gt. 1.0 .or. &
+     &            info_2%weight(i_node,3) .lt. 0.0 .or. &
+     &            info_2%weight(i_node,3) .gt. 1.0 &
+     &                 )
 
 ! if this is a bad node for data_2, then don't weight data_2
               if (bad_node_2) then
-                local_weight_2 = 0.0d0
+                local_weight_2 = 0.0
               else
                 local_weight_2 = info_2%relative_weight
               endif
@@ -3024,622 +2840,3 @@
 !-----------------------------------------------------------------------
 !#endif             /* USE_NETCDF end of block */
 !-----------------------------------------------------------------------
-
-
-#ifdef USE_BULK_FAIRALL
-
-!==============================================================================|
-
-      SUBROUTINE FAIRALL(num_nodes, &
-     &                        u_air, v_air, p_air, t_air, q_air, &
-     &                        sen_flux, lat_flux, &
-#ifdef PREC_EVAP
-     &                        evap_flux, &
-#endif
-     &                        tau_xz, tau_yz)
-
-!      USE CONTROL, ONLY : GRAV
-
-        use schism_glbl, only : rkind, uu2, vv2,tr_nd, & !tnd, snd, &
-     &                     idry, nvrt, ivcor,errmsg
-        use schism_glbl, only : grav
-!       use schism_glbl, only : rho0
-        use schism_msgp, only : myrank,parallel_abort
-
-!================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2007 The ROMS/TOMS Group                         !
-!    Licensed under a MIT/X style license                              !
-!    See License_ROMS.txt                                              !
-!=======================================================================
-!  This routine computes the bulk parameterization of surface wind     !
-!  stress and surface net heat fluxes.                                 !
-!                                                                      !
-!  References:                                                         !
-!                                                                      !
-!    Fairall, C.W., E.F. Bradley, D.P. Rogers, J.B. Edson and G.S.     !
-!      Young, 1996:  Bulk parameterization of air-sea fluxes for       !
-!      tropical ocean-global atmosphere Coupled-Ocean Atmosphere       !
-!      Response Experiment, JGR, 101, 3747-3764.                       !
-!                                                                      !
-!    Fairall, C.W., E.F. Bradley, J.S. Godfrey, G.A. Wick, J.B.        !
-!      Edson, and G.S. Young, 1996:  Cool-skin and warm-layer          !
-!      effects on sea surface temperature, JGR, 101, 1295-1308.        !
-!                                                                      !
-!    Liu, W.T., K.B. Katsaros, and J.A. Businger, 1979:  Bulk          !
-!        parameterization of the air-sea exchange of heat and          !
-!        water vapor including the molecular constraints at            !
-!        the interface, J. Atmos. Sci, 36, 1722-1735.                  !
-!                                                                      !
-!  Adapted from COARE code written originally by David Rutgers and     !
-!  Frank Bradley.                                                      !
-!                                                                      !
-!  EMINUSP option for equivalent salt fluxes added by Paul Goodman     !
-!  (10/2004).                                                          !
-!                                                                      !
-!  Modified by Kate Hedstrom for COARE version 3.0 (03/2005).          !
-!  Modified by Jim Edson to correct specific hunidities.               !
-!                                                                      !
-!  Reference:                                                          !
-!                                                                      !
-!     Fairall et al., 2003: J. Climate, 16, 571-591.                   !
-!                                                                      !
-!     Taylor, P. K., and M. A. Yelland, 2001: The dependence of sea    !
-!     surface roughness on the height and steepness of the waves.      !
-!     J. Phys. Oceanogr., 31, 572-590.                                 !
-!                                                                      !
-!     Oost, W. A., G. J. Komen, C. M. J. Jacobs, and C. van Oort, 2002:!
-!     New evidence for a relation between wind stress and wave age     !
-!     from measurements during ASGAMAGE. Bound.-Layer Meteor., 103,    !
-!     409-438.                                                         !
-!                                                                      !
-!=======================================================================
-      IMPLICIT NONE
-
-! input/output variables
-      integer, intent(in) :: num_nodes
-      real(rkind), dimension(num_nodes), intent(in) :: &
-     &    u_air, v_air, p_air, t_air, q_air
-      real(rkind), dimension(num_nodes), intent(out) :: &
-     &    sen_flux, lat_flux, tau_xz, tau_yz
-
-!      REAL(rkind),INTENT(IN) :: wspd0,patm,TairC,TseaC,RH0,radlw,radsw
-!      REAL(rkind),INTENT(OUT) :: stflx
-!      REAL(rkind),INTENT(OUT) :: hfsen,hflat ! For diag
-! Local Variables              
-      INTEGER :: IterMax,Iter      
-      REAL(rkind) :: hflw
-      REAL(rkind) :: wspd, RH
-      REAL(rkind) :: a,cff
-      REAL(rkind) :: rho0i,cpi,patmb
-      REAL(rkind) :: rhoSea,Qsea,TseaK,TseaC
-      REAL(rkind) :: TairC,TairK,rhoAir,Qair
-      REAL(rkind) :: Q,VisAir,Hlv
-      REAL(rkind) :: delW,delT,delQ
-      REAL(rkind) :: u10,Zo10,Cd10,Ch10,Ct10,Cd
-      REAL(rkind) :: Ct,CC,Ri,Ribcu,Zetu,L10
-      REAL(rkind) :: Wstar,Tstar,Qstar
-      REAL(rkind) :: ZoW,ZoT,ZoT10,ZoQ,ZoL,L,Rr,Bf
-      REAL(rkind) :: Wpsi,Tpsi,Qpsi
-      REAL(rkind) :: Wgus,charn
-      REAL(rkind) :: upvel,evap,wspd0
-      logical :: dry
-      integer :: i_node, sfc_lev      
-      ! notes Jerome: all local variables from IterMax to sfc_lev
-      ! are declared as OMP Private vars
-
-      REAL(rkind), parameter :: blk_Rgas=287.1d0
-      REAL(rkind), parameter :: blk_ZW=10.0d0
-      REAL(rkind), parameter :: blk_ZT=10.0d0
-      REAL(rkind), parameter :: blk_ZQ=10.0d0
-      REAL(rkind), parameter :: blk_Zabl=600.0d0
-      REAL(rkind), parameter :: blk_beta=1.2d0
-      REAL(rkind), parameter :: blk_Cpa=1004.67d0
-      ! Boussinesque Approximation Mean density [kg/m^3]
-      REAL(rkind), parameter :: rho0=1025.d0 ! ... from schism_glbl ?
-      REAL(rkind), parameter :: t_freeze = 273.15d0
-
-      REAL(rkind), parameter :: emiss_lw=0.985d0
-      REAL(rkind), parameter :: SigmaSB=5.6697d-8
-
-      REAL(rkind), parameter :: rhow=1000.0d0
-      REAL(rkind), parameter :: eps=1.d-20
-      REAL(rkind), parameter :: r3=1.0d0/3.0d0
-      REAL(rkind), parameter :: vonKar  = 0.41d0   !non-dimensional
-!      REAL(rkind), parameter :: GRAV = 9.81d0 ... grav from schism_glbl
-      integer, parameter :: printit = 1000
-!
-! Specific heat [Joules/kg/degC] for seawater, it is approximately
-! 4000, and varies only slightly (see Gill, 1982, Appendix 3).
-      REAL(rkind),parameter :: Cp=3985.0d0
-! Functions:
-      REAL(rkind) :: bulk_psit,bulk_psiu
-
-
-#ifdef DEBUG
-     WRITE(38,*)'! Start BULK_FAIRALL'
-#endif
-
-!  define inverse seawater density, use mean value for seawater density.
-      rho0i=1.0d0/rho0
-
-!  set inverse of specific heat for seawater (kg-degC/Joule).
-!  cp is defined in scalars.h
-      cpi=1.0d0/cp
-!
-!  Input bulk parameterization fields
-!
-! patm   : PMSL, Pa
-! wspd0  : Surface wind speed, m.s-1
-! TairC  : Temp Air, C
-! TseaC  : Temp Water, C
-! rhoSea : Sea Wa. Density
-! Rh     : Rel. Hum, %
-! radlw  : downwelling longwave radiation only
-
-! now loop over all points
-!$OMP parallel do default(shared) private(IterMax,Iter,hflw,wspd,RH,a,cff, &
-!$OMP rho0i,cpi,patmb,rhoSea,Qsea,TseaK,TseaC,TairC,TairK,rhoAir,Qair,Q, &      
-!$OMP VisAir,Hlv,delW,delT,delQ,u10,Zo10,Cd10,Ch10,Ct10,Cd,Ct,CC,Ri,Ribcu, &      
-!$OMP Zetu,L10,Wstar,Tstar,Qstar,ZoW,ZoT,ZoT10,ZoQ,ZoL,L,Rr,Bf,Wpsi,Tpsi, &
-!$OMP Qpsi,Wgus,charn,upvel,evap,wspd0,dry,i_node, sfc_lev)
-        do i_node = 1, num_nodes !=npa
-!=================================================================
-#ifdef DEBUG
-          if (mod(i_node-1,printit) .eq. 0) then
-            write(38,*)
-            write(38,*) 'i_node = ', i_node
-          endif
-#endif
-
-! define whether this node is dry or not (depends on coordinate system)
-          dry = idry(i_node) .eq. 1
-!     &        ( (ivcor .eq. -1) .and. (kfp(i_node)  .eq. -1) ) & ! z
-!     &      .or. &
-!     &        ( (ivcor .ne. -1) .and. (idry(i_node) .eq. 1) )   !sigma
-
-! if this point isn't dry, then calculate fluxes (if dry, then skip)
-        if (.not. dry) then
-
-! specify the surface level at this node (depends on coordinate system)
-!          if (ivcor .eq. -1) then         ! z
-!            sfc_lev = kfp(i_node)
-!          else                            ! sigma
-          sfc_lev = nvrt
-!          endif
-
-! Do some unit conversion, air/Sea Temperature
-          TseaC = tr_nd(1,sfc_lev,i_node)
-          TseaK = TseaC+t_freeze
-          TairC = t_air(i_node)
-          TairK = TairC+t_freeze
-
-! Surface pressure (pa -> mb)
-          patmb = p_air(i_node)*1.0d-2
-!  Treat input longwave data as downwelling radiation only and add
-!  outgoing IR from model sea surface temperature.
-!      hflw=-radlw+emiss_lw*(rho0i*cpi*SigmaSB*TseaK*TseaK*TseaK*TseaK)
-!         hflw = radlw-emiss_lw*(SigmaSB*TseaK*TseaK*TseaK*TseaK)
-
-!  Compute specific humidities (kg/kg).
-!
-!    note that Qair is the saturation specific humidity at Tair
-!                 Q is the actual specific humidity
-!              Qsea is the saturation specific humidity at Tsea
-
-!          Saturation vapor pressure in mb is first computed and then
-!          converted to specific humidity in kg/kg
-!
-!          The saturation vapor pressure is computed from Teten formula
-!          using the approach of Buck (1981):
-!
-!          Esat(mb) = (1.0007+3.46E-6*patm)*6.1121*
-!                  EXP(17.502*TairC(C)/(240.97+TairC(C)))
-!
-!          The ambient vapor is found from the definition of the
-!          Relative humidity:
-!
-!          RH = W/Ws*100 ~ E/Esat*100   E = RH/100*Esat if RH is in %
-!                                       E = RH*Esat     if RH fractional
-!
-!          The specific humidity is then found using the relationship:
-!
-!          Q = 0.622 E/(P + (0.622-1)e)
-!
-!          Q(kg/kg) = 0.62197*(E(mb)/(patm(mb)-0.378*E(mb)))
-!
-!-----------------------------------------------------------------------
-
-!  Get Q, the specific humidities (kg/kg)
-          Q = q_air(i_node)
-!
-!  Compute air saturation vapor pressure (mb), using Teten formula.
-!
-          cff=(1.0007d0+3.46d-6*patmb)*6.1121d0*&
-     &         exp(17.502d0*TairC/(240.97d0+TairC))
-!
-!  Compute specific humidity at Saturation, Qair (kg/kg).
-!
-          Qair=0.62197d0*(cff/(patmb-0.378d0*cff))
-!
-!  Compute specific humidity, Q (kg/kg).
-!
-!          RH = 0.01_SP*RH0  ! Transform RH (%) to fraction
-
-!         if (RH.lt.2.0) then                          !RH fraction
-!            cff=cff*RH                                 !Vapor pres (mb)
-!            Q=0.62197*(cff/(patmb-0.378*cff))           !Spec hum (kg/kg)
-!          else          !RH input was actually specific humidity in g/kg
-!            Q=RH/1000.0                                !Spec Hum (kg/kg)
-!            Call Fatal_error("BULK_FAIRALL: check RH unit twice")
-!          endif
-!
-!  Compute water saturation vapor pressure (mb), using Teten formula.
-!
-          cff=(1.0007d0+3.46d-6*patmb)*6.1121d0*&
-     &         exp(17.502d0*TseaC/(240.97d0+TseaC))
-!
-!  Vapor Pressure reduced for salinity (Kraus & Businger, 1994, pp 42).
-!
-          cff=cff*0.98d0
-!
-!  Compute Qsea (kg/kg) from vapor pressure.
-!
-          Qsea=0.62197d0*(cff/(patmb-0.378d0*cff))
-!
-!-----------------------------------------------------------------------
-!  Compute Monin-Obukhov similarity parameters for wind (Wstar),
-!  heat (Tstar), and moisture (Qstar), Liu et al. (1979).
-!-----------------------------------------------------------------------
-!
-!  Moist air density (kg/m3).
-!
-          rhoAir=patmb*100.0d0/(blk_Rgas*TairK*&
-     &                             (1.0d0+0.61d0*Q))
-!
-!  Kinematic viscosity of dry air (m2/s), Andreas (1989).
-!
-          VisAir=1.326d-5*(1.0d0+TairC*(6.542d-3+TairC*&
-                    (8.301d-6-4.84d-9*TairC)))
-!
-!  Compute latent heat of vaporization (J/kg) at sea surface, Hlv.
-!
-          Hlv=(2.501d0-0.00237d0*TseaC)*1.0d6
-!
-!  Assume that wind is measured relative to sea surface and include
-!  gustiness.
-          wspd0 = sqrt( u_air(i_node)*u_air(i_node) + &
-     &                  v_air(i_node)*v_air(i_node) )
-!
-          Wgus=0.5d0
-          delW=SQRT(wspd0*wspd0+Wgus*Wgus)
-          delQ=Qsea-Q
-          delT=TseaC-TairC
-
-#ifdef DEBUG
-          if (mod(i_node-1,printit) .eq. 0) then
-            write(38,*) 'Qsea, Qair, VisAir = ', &
-     &                   Qsea, Qair, VisAir
-            write(38,*) 'delta_q, delta_theta = ', &
-     &                   delQ, delT
-            write(38,*) 'rho_air = ', rhoAir
-          endif
-#endif
-!  Neutral coefficients.
-!
-          ZoW=1.0d-4
-          u10=delW*LOG(10.0d0/ZoW)/LOG(blk_ZW/ZoW)
-          Wstar=0.035d0*u10
-          Zo10=0.011d0*Wstar*Wstar/GRAV+0.11d0*VisAir/Wstar
-          Cd10=(vonKar/LOG(10.0d0/Zo10))**2.d0
-          Ch10=0.00115d0
-          Ct10=Ch10/sqrt(Cd10)
-          ZoT10=10.0d0/exp(vonKar/Ct10)
-          Cd=(vonKar/LOG(blk_ZW/Zo10))**2.d0
-!
-!  Compute Richardson number.
-!
-          Ct=vonKar/LOG(blk_ZT/ZoT10)  ! T transfer coefficient
-          CC=vonKar*Ct/Cd
-          Ribcu=-blk_ZW/(blk_Zabl*0.004d0*blk_beta**3.d0)
-          Ri=-GRAV*blk_ZW*(delT+0.61d0*TairK*delQ)/&
-               (TairK*delW*delW)
-          if (Ri.lt.0.0d0) then
-            Zetu=CC*Ri/(1.0d0+Ri/Ribcu)         ! Unstable
-          else
-            Zetu=CC*Ri/(1.0d0+3.0d0*Ri/CC)      ! Stable
-          endif
-          L10=blk_ZW/Zetu
-          if (Zetu.gt.50.0d0) then
-            IterMax=1
-          else
-            IterMax=3
-          endif
-!
-!  First guesses for Monon-Obukhov similarity scales.
-!
-          Wstar= delW*vonKar/(LOG(blk_ZW/Zo10)-&
-     &                        bulk_psiu(blk_ZW/L10))
-          Tstar=-delT*vonKar/(LOG(blk_ZT/ZoT10)-&
-     &                        bulk_psit(blk_ZT/L10))
-          Qstar=-delQ*vonKar/(LOG(blk_ZQ/ZoT10)-&
-     &                        bulk_psit(blk_ZQ/L10))
-!
-!  Modify Charnock for high wind speeds. The 0.125 factor below is for
-!  1.0/(18.0-10.0).
-!
-          if (delW.gt.18.0d0) then
-            charn=0.018d0
-          elseif ((10.0d0.lt.delW).and.(delW.le.18.0d0)) then
-            charn=0.011d0+0.125d0*(0.018d0-0.011d0)*(delW-10.d0)
-          else
-            charn=0.011d0
-          endif
-
-!  Iterate until convergence. It usually converges within four
-!  iterations.
-!
-        do Iter=1,IterMax
-          ZoW=charn*Wstar*Wstar/GRAV+0.11d0*VisAir/(Wstar+eps)
-          Rr=ZoW*Wstar/VisAir
-!
-!  Compute Monin-Obukhov stability parameter, Z/L.
-!
-          ZoQ=MIN(1.15d-4,5.5d-5/Rr**0.6d0)
-          ZoT=ZoQ
-          ZoL=vonKar*GRAV*blk_ZW*&
-     &        (Tstar*(1.0d0+0.61d0*Q)+0.61d0*TairK*Qstar)/&
-     &        (TairK*Wstar*Wstar*(1.0d0+0.61d0*Q)+eps)
-          L=blk_ZW/(ZoL+eps)
-!
-!  Evaluate stability functions at Z/L.
-!
-          Wpsi=bulk_psiu(ZoL)
-          Tpsi=bulk_psit(blk_ZT/L)
-          Qpsi=bulk_psit(blk_ZQ/L)
-!
-!  Compute wind scaling parameters, Wstar.
-!
-          Wstar=MAX(eps,delW*vonKar/(LOG(blk_ZW/ZoW)-Wpsi))
-          Tstar=-delT*vonKar/(LOG(blk_ZT/ZoT)-Tpsi)
-          Qstar=-delQ*vonKar/(LOG(blk_ZQ/ZoQ)-Qpsi)
-!
-!  Compute gustiness in wind speed.
-!
-          Bf=-GRAV/TairK*Wstar*(Tstar+0.61d0*TairK*Qstar)
-          if (Bf.gt.0.0d0) then
-            Wgus=blk_beta*(Bf*blk_Zabl)**r3
-          else
-            Wgus=0.2d0
-          endif
-          delW=SQRT(wspd0*wspd0+Wgus*Wgus)
-        enddo
-!
-!-----------------------------------------------------------------------
-!  Compute Atmosphere/Ocean fluxes.
-!-----------------------------------------------------------------------
-!
-!
-!  Compute transfer coefficients for momentum (Cd).
-!
-          wspd=SQRT(wspd0*wspd0+Wgus*Wgus)
-          Cd=Wstar*Wstar/(wspd*wspd+eps)
-!
-!  Compute turbulent sensible heat flux (W/m2), Hs.
-!
-          sen_flux(i_node) = -blk_Cpa*rhoAir*Wstar*Tstar
-!
-!  Compute turbulent latent heat flux (W/m2), Hl.
-!
-          lat_flux(i_node) = -Hlv*rhoAir*Wstar*Qstar
-!
-!  Compute Webb correction (Webb effect) to latent heat flux, Hlw.
-!
-          upvel=-1.61d0*Wstar*Qstar-(1.0d0+1.61d0*Q)*Wstar*Tstar/TairK
-          lat_flux(i_node)=lat_flux(i_node)+rhoAir*Hlv*upvel*Q
-
-#ifdef PREC_EVAP
-          evap_flux(i_node) = - rhoAir*Wstar* Qstar
-
-         ! evap_flux(i_node) = evap_flux(i_node) *5.
-         ! if(myrank==0.and.i_node==1) then
-         !   write(16,*) 'evap_flux x5'
-         ! endif
-#endif
-
-!
-!=======================================================================
-!  Compute surface net heat flux and surface wind stress.
-!=======================================================================
-!
-!  Compute kinematic, surface, net heat flux (degC m/s).  Notice that
-!  the signs of latent and sensible fluxes are reversed because fluxes
-!  calculated from the bulk formulations above are positive out of the
-!  ocean.
-!
-!  For EMINUSP option,  EVAP = LHeat (W/m2) / Hlv (J/kg) = kg/m2/s
-!                       PREC = rain = kg/m2/s
-!
-!  To convert these rates to m/s divide by freshwater density, rhow.
-!
-!  Note that when the air is undersaturated in water vapor (Q < Qsea)
-!  the model will evaporate and LHeat > 0:
-!
-!                   LHeat positive out of the ocean
-!                    evap positive out of the ocean
-!
-!  Note that if evaporating, the salt flux is positive
-!        and if     raining, the salt flux is negative
-!
-!  Note that fresh water flux is positive out of the ocean and the
-!  salt flux (stflx(isalt)) is positive into the ocean. It is converted
-!  to (psu m/s) for stflx(isalt) in "set_vbc.F".
-!
-!          hflat=-hflat*rho0i*cpi    ! JEROME ROMS want Flux
-!          hfsen=-hfsen*rho0i*cpi    ! JEROME ROMS want Flux
-
-! Jerome : feb 2017 same convention in coare26z
-!           hflat = -hflat
-!           hfsen = -hfsen
-
-! Compute total surface heat flux ! JErome
-
-!           stflx = radsw + hflw + hflat + hfsen  ! = HEAT_NET(I)
-
-           !WRITE(IPT,*)'! TseaC=',TseaC,'hflw=',hflw,'stflx=',stflx
-
-! Compute Wind stresses
-           tau_xz(i_node) = rhoAir*wspd0*rho0i*Cd*u_air(i_node)
-           tau_yz(i_node) = rhoAir*wspd0*rho0i*Cd*v_air(i_node)
-
-! end of wet/dry block
-        endif
-
-!=================================================================
-! end of loop over points
-        enddo !i_node
-!$OMP end parallel do
-
-#ifdef DEBUG
-      WRITE(38,*)'! End BULK_FAIRALL'
-#endif
-
-      return
-      END SUBROUTINE FAIRALL
-!=======================================================================
-
-      REAL FUNCTION bulk_psiu(ZoL)
-
-      use schism_glbl, only : rkind
-
-      IMPLICIT NONE
-!
-!=======================================================================
-!                                                                      !
-!  This function evaluates the stability function for  wind speed      !
-!  by matching Kansas  and free convection forms.  The convective      !
-!  form follows Fairall et al. (1996) with profile constants from      !
-!  Grachev et al. (2000) BLM.  The  stable  form is from Beljaars      !
-!  and Holtslag (1991).                                                !
-!                                                                      !
-!=======================================================================
-!
-!
-!  Function result
-!
-!   REAL(rkind) :: BLK_PSIU
-!
-!  Imported variable declarations.
-!
-      real(rkind) :: ZoL
-!
-!  Local variable declarations.
-!
-      real(rkind), parameter :: r3=1.0d0/3.0d0
-      real(rkind) :: Fw, cff, psic, psik, x, y
-      real(rkind) :: PI
-
-      PI = 4.0d0 * atan(1.0_rkind)
-!
-!-----------------------------------------------------------------------
-!  Compute stability function, PSI.
-!-----------------------------------------------------------------------
-!
-!  Unstable conditions.
-!
-      if (ZoL.lt.0.0d0) then
-        x=(1.0d0-15.0d0*ZoL)**0.25d0
-        psik=2.0d0*LOG(0.5d0*(1.0d0+x))+ &
-     &       LOG(0.5d0*(1.0d0+x*x))-2.0d0*ATAN(x)+0.5d0*PI
-!
-!  For very unstable conditions, use free-convection (Fairall).
-!
-        cff=SQRT(3.0d0)
-        y=(1.0d0-10.15d0*ZoL)**r3
-        psic=1.5d0*LOG(r3*(1.0d0+y+y*y))- &
-     &       cff*ATAN((1.0d0+2.0d0*y)/cff)+PI/cff
-!
-!  Match Kansas and free-convection forms with weighting Fw.
-!
-        cff=ZoL*ZoL
-        Fw=cff/(1.0d0+cff)
-        bulk_psiu=(1.0d0-Fw)*psik+Fw*psic
-!
-!  Stable conditions.
-!
-      else
-        cff=MIN(50.0d0,0.35d0*ZoL)
-        bulk_psiu=-((1.0d0+ZoL)+ &
-     &              0.6667d0*(ZoL-14.28d0)/EXP(cff)+8.525d0)
-      endif
-      return
-      END FUNCTION bulk_psiu
-!=================================================================
-
-      REAL(rkind) FUNCTION bulk_psit(ZoL)
-
-      use schism_glbl, only : rkind
-      IMPLICIT NONE
-!=======================================================================
-!                                                                      !
-!  This function evaluates the  stability function  for moisture and   !
-!  heat by matching Kansas and free convection forms. The convective   !
-!  form follows Fairall et al. (1996) with  profile  constants  from   !
-!  Grachev et al. (2000) BLM.  The stable form is from  Beljaars and   !
-!  and Holtslag (1991).                                                !
-!
-!=======================================================================
-!
-!  Function result
-!
-!  Imported variable declarations.
-!
-      real(rkind) :: ZoL
-!
-!  Local variable declarations.
-!
-      real(rkind),parameter :: r3=1.0d0/3.0d0
-      real(rkind) :: Fw, cff, psic, psik, x, y
-      real(rkind) :: PI
-
-      PI = 4.0d0 * atan(1.0_rkind)
-
-!
-!-----------------------------------------------------------------------
-!  Compute stability function, PSI.
-!-----------------------------------------------------------------------
-!
-!  Unstable conditions.
-!
-      if (ZoL.lt.0.0d0) then
-        x=(1.0d0-15.0d0*ZoL)**0.5d0
-        psik=2.0d0*LOG(0.5d0*(1.0d0+x))
-!
-!  For very unstable conditions, use free-convection (Fairall).
-!
-        cff=SQRT(3.0d0)
-        y=(1.0-34.15*ZoL)**r3
-        psic=1.5d0*LOG(r3*(1.0d0+y+y*y))- &
-     &       cff*ATAN((1.0d0+2.0d0*y)/cff)+PI/cff
-!
-!  Match Kansas and free-convection forms with weighting Fw.
-!
-        cff=ZoL*ZoL
-        Fw=cff/(1.0d0+cff)
-        bulk_psit=(1.0d0-Fw)*psik+Fw*psic
-!
-!  Stable conditions.
-!
-      else
-        cff=MIN(50.0d0,0.35d0*ZoL)
-        bulk_psit=-((1.0d0+2.0d0*ZoL)**1.5d0+ & 
-     &              0.6667d0*(ZoL-14.28d0)/EXP(cff)+8.525d0)
-      endif
-      return
-      END FUNCTION bulk_psit
-
-!==============================================================================|
-!      END BULK_FAIRALL SECTION
-!==============================================================================|
-
-#endif /*USE_BULK_FAIRALL*/
-        

@@ -14,17 +14,13 @@
 
 !										
 !	SCHISM Particle tracking code for nc outputs. Works for mixed
-!	tri/quads, but may not work if the bottom is moving (as the fill values in
-!	nc outputs are based on initial bottom). Euler tracking only.
+!	tri/quads.
 !	Routines adpated from SCHISM:						
 !	cpp, quicksearch, intersect2, signa, area_coord, levels			
 !       Warning: indices in 2D arrays are not swapped (i.e., (np,nv)).	
 !                 Also interpolation is along S-coord in tracking; no
 !                 bilinear interp for quads.
 !                 Assume the quads are not split in the nc outputs.
-!
-!       Behavior when particles hit horizontal bnd or dry interface:
-!       reflect off like LTRAN
 !										
 !	Inputs: 
 !          a) hgrid.ll (if ics=2 in particle.bp) or hgrid.gr3 (if ics=1 in
@@ -51,15 +47,13 @@
 !                         contained in a file, in the case there is only 1 file.
 !             Also: rnday may be smaller than the original run.
 !	  (8) nparticle: # of particles;					
-!	  (9) idp(i),st_p(i),xpar(i),ypar(i),zpar0(i): particle id, start time (sec),
+!	  (9) idp(i),st_p(i),xpar(i),ypar(i),zpar0(i): particle id, start time (s),
 !		starting x,y, and z relative to the instant f.s. (<=0).		
 !         (10) additional parameters for oil spill
 !										
 !	Output: particle.pth, particle.pth.more (more info), fort.11 (fatal errors).		
 !										
-! ifort -mcmodel=medium -assume byterecl -O2 -o ptrack3.exe ../UtilLib/compute_zcor.f90 ../UtilLib/schism_geometry.f90 ptrack3.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
-! pgf90 -mcmodel=medium -O2 -o ptrack3.exe ../UtilLib/compute_zcor.f90 ../UtilLib/schism_geometry.f90 ptrack3.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
-! gfortran -O2 -ffree-line-length-none  -o ptrack3.exe ../UtilLib/compute_zcor.f90 ../UtilLib/schism_geometry.f90 ptrack3.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
+! ifort -mcmodel=medium -CB -assume byterecl -O2 -o ptrack3.WW ptrack3.f90 ../UtilLib/compute_zcor.f90 ../UtilLib/schism_geometry.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
 
 !...  Data type consts
       module kind_par
@@ -72,6 +66,11 @@
 
 !...  definition of variables
 !...
+!
+!************************************************************************
+!     			mnp < mne < mns					*
+!************************************************************************
+!
       module global
         implicit none
         public
@@ -88,7 +87,7 @@
 !...  	Important variables
         integer, save :: np,ne,ns,nvrt,mnei,mod_part,ibf,istiff,ivcor,kz,nsig
       	real(kind=dbl_kind), save :: h0,rho0,dt
-        real(kind=dbl_kind), save :: h_c,theta_b,theta_f,h_s !s_con1
+        real,save :: h_c,theta_b,theta_f,h_s !s_con1
 
 !...    Output handles
         character(len=48), save :: start_time,version
@@ -104,7 +103,7 @@
 
         real(kind=dbl_kind),save, allocatable :: zpar0(:)
         !For interface with util routines
-        real(kind=dbl_kind),save, allocatable :: ztot(:),sigma(:),xcj(:),ycj(:),sigma_lcl(:,:)
+        real,save, allocatable :: ztot(:),sigma(:),xcj(:),ycj(:),sigma_lcl(:,:)
 
         integer,save, allocatable :: i34(:),elnode(:,:),ic3(:,:),elside(:,:),isdel(:,:),isidenode(:,:)
         integer,save, allocatable :: icum1(:,:),icum2(:,:,:)
@@ -120,8 +119,6 @@
       program ptrack
       use global
       use netcdf
-      use compute_zcor
-      use schism_geometry_mod
 
       implicit real(kind=dbl_kind)(a-h,o-z),integer(i-n)
 
@@ -134,14 +131,9 @@
       character(len=25), allocatable :: idp(:)
       real*8 :: vxl(4,2),vyl(4,2),vzl(4,2),vxn(4),vyn(4),vzn(4),arco(3), &
      &dx(10),dy(10),dz(10),val(4,2),vbl(4,2),vcl(4,2),vdl(4,2),van(4),vcn(4),vdn(4),vwx(4),vwy(4)
-      real, allocatable :: real_ar(:,:)
+      real, allocatable :: zlcl(:),real_ar(:,:)
       integer :: nodel2(3)
       integer :: varid1,varid2,dimids(3),istat,nvtx,iret
-
-      print*, 'Do you output *.pth.more for more infor?'
-      read(*,*)ismore
-      if(ismore/=0.and.ismore/=1) stop 'Unknown ismore'
-
 
       !Random seed used only for oil spill model
       iseed=5
@@ -288,7 +280,7 @@
 
 !...  Read in header (if quads r split in binary, the hgrid read in here
 !     has different conn table from hgrid.gr3)
-      ntime=nint(rnday*86400/dt) !total # of records
+      ntime=rnday*86400/dt !total # of records
       ifile=1 !for st_m=0; starting stack #
       do i=1,ntime/nrec+1
         if(st_m/dt>(i-1)*nrec.and.st_m/dt<=i*nrec) then
@@ -308,7 +300,6 @@
       ifile_char=adjustl(ifile_char); len_char=len_trim(ifile_char)
       file63='schout_'//ifile_char(1:len_char)//'.nc'
       iret=nf90_open(trim(adjustl(file63)),OR(NF90_NETCDF4,NF90_NOWRITE),ncid)
-      if(iret/=nf90_NoErr) stop '1st stack not opened'
       iret=nf90_inq_varid(ncid,'elev',ielev_id)
       if(iret/=nf90_NoErr) stop 'elev not found'
       iret=nf90_inq_varid(ncid,'hvel',luv)
@@ -319,7 +310,7 @@
         iret=nf90_inq_varid(ncid,'wind_speed',lwind)
         if(iret/=nf90_NoErr) stop 'wind not found'
         iret=nf90_inq_varid(ncid,'diffusivity',ltdff)
-        if(iret/=nf90_NoErr) stop 'tdiff not found'
+        if(iret/=nf90_NoErr) stop 'elev not found'
       endif !mod_part
 
 !      open(60,file=trim(ifile_char)//'_elev.61',access='direct',recl=nbyte)
@@ -331,28 +322,17 @@
 !      endif !mod_part
 
       iret=nf90_inq_dimid(ncid,'nSCHISM_vgrid_layers',i)
-      if(iret/=nf90_NoErr) stop 'nSCHISM_vgrid_layers not found'
       iret=nf90_Inquire_Dimension(ncid,i,len=nvrt)
-      if(iret/=nf90_NoErr) stop 'read error(1)'
       iret=nf90_inq_varid(ncid,'SCHISM_hgrid_face_nodes',varid1)
-      if(iret/=nf90_NoErr) stop 'read error(2)'
       iret=nf90_Inquire_Variable(ncid,varid1,dimids=dimids(1:2))
-      if(iret/=nf90_NoErr) stop 'read error(3)'
       iret=nf90_Inquire_Dimension(ncid,dimids(1),len=nvtx)
-      if(iret/=nf90_NoErr) stop 'read error(4)'
       iret=nf90_Inquire_Dimension(ncid,dimids(2),len=ne)
-      if(iret/=nf90_NoErr) stop 'read error(5)'
       if(nvtx/=4) stop 'vtx/=4'
       iret=nf90_inq_varid(ncid,'SCHISM_hgrid_node_x',varid2)
-      if(iret/=nf90_NoErr) stop 'read error(6)'
       iret=nf90_Inquire_Variable(ncid,varid2,dimids=dimids)
-      if(iret/=nf90_NoErr) stop 'read error(7)'
       iret=nf90_Inquire_Dimension(ncid,dimids(1),len=np)
-      if(iret/=nf90_NoErr) stop 'read error(8)'
       iret=nf90_inq_varid(ncid,'time',itime_id)
-      if(iret/=nf90_NoErr) stop 'read error(9)'
       iret=nf90_Inquire_Variable(ncid,itime_id,dimids=dimids)
-      if(iret/=nf90_NoErr) stop 'read error(10)'
       iret=nf90_Inquire_Dimension(ncid,dimids(1),len=nrec)
       if(iret.ne.NF90_NOERR) then
         print*, nf90_strerror(iret) 
@@ -366,21 +346,13 @@
       if(istat/=0) stop 'failed to allocate (3)'
 
       iret=nf90_get_var(ncid,varid1,elnode)
-      if(iret/=nf90_NoErr) stop 'read error(11)'
       iret=nf90_get_var(ncid,varid2,x)
-      if(iret/=nf90_NoErr) stop 'read error(12)'
       iret=nf90_inq_varid(ncid,'SCHISM_hgrid_node_y',varid1)
-      if(iret/=nf90_NoErr) stop 'read error(13)'
       iret=nf90_get_var(ncid,varid1,y)
-      if(iret/=nf90_NoErr) stop 'read error(14)'
       iret=nf90_inq_varid(ncid,'depth',varid1)
-      if(iret/=nf90_NoErr) stop 'read error(15)'
       iret=nf90_get_var(ncid,varid1,dp)
-      if(iret/=nf90_NoErr) stop 'read error(16)'
       iret=nf90_inq_varid(ncid,'node_bottom_index',varid1)
-      if(iret/=nf90_NoErr) stop 'read error(17)'
       iret=nf90_get_var(ncid,varid1,kbp00)
-      if(iret/=nf90_NoErr) stop 'kbp00 not found'
 
       !Leave it open as this is the 1st stack to read from
 !      iret=nf90_close(ncid)
@@ -516,10 +488,10 @@
       rewind(19)
       allocate(sigma_lcl(nvrt,np),z(np,nvrt),icum1(np,nvrt),icum2(np,nvrt,2), &
      &uu1(np,nvrt),vv1(np,nvrt),ww1(np,nvrt),uu2(np,nvrt),vv2(np,nvrt),ww2(np,nvrt), &
-     &ztmp(nvrt),ztmp2(nvrt),sigma(nvrt),ztot(nvrt),hf1(np,nvrt), &
+     &ztmp(nvrt),ztmp2(nvrt),zlcl(nvrt),sigma(nvrt),ztot(nvrt),hf1(np,nvrt), &
      &hf2(np,nvrt),vf1(np,nvrt),vf2(np,nvrt),hvis_e(ne,nvrt),stat=istat)
       if(istat/=0) stop 'Failed to alloc (3)'
-      call get_vgrid_double('vgrid.in',np,nvrt,ivcor,kz,h_s,h_c,theta_b,theta_f,ztot,sigma,sigma_lcl,kbp)
+      call get_vgrid('vgrid.in',np,nvrt,ivcor,kz,h_s,h_c,theta_b,theta_f,ztot,sigma,sigma_lcl,kbp)
       !kbp has been assigned for ivcor=1
 
 !     Init some arrays (for below bottom etc)
@@ -566,7 +538,7 @@
       if(istat/=0) stop 'Failed to alloc (4)'
 !     Then compute the rest of side related arrays with additional
 !     inputs (xnd,ynd) (x,y coordinates of each node)
-      call schism_geometry_double(np,ne,ns,x,y,i34,elnode,ic3,elside,isdel,isidenode,xcj,ycj)
+      call schism_geometry(np,ne,ns,real(x),real(y),i34,elnode,ic3,elside,isdel,isidenode,xcj,ycj)
 
       !Remaining side arrays
       do i=1,ns
@@ -646,9 +618,7 @@
       end do lp1 !i=1,nparticle
 
       open(95,file='particle.pth',status='replace')
-      if(ismore==1)then
-        open(97,file='particle.pth.more',status='replace')
-      endif
+      open(97,file='particle.pth.more',status='replace')
       write(95,*)'Drogues'
       if(ibf==1) then
         write(95,*) ntime-iths+1
@@ -690,12 +660,9 @@
         ifile_char=adjustl(ifile_char); len_char=len_trim(ifile_char)
         file63='schout_'//ifile_char(1:len_char)//'.nc'
         iret=nf90_open(trim(adjustl(file63)),OR(NF90_NETCDF4,NF90_NOWRITE),ncid)
-        if(iret/=nf90_NoErr) stop 'schout not opened (2)'
         !time is double
         iret=nf90_inq_varid(ncid,'time',itime_id)
-        if(iret/=nf90_NoErr) stop 'itime_id'
         iret=nf90_get_var(ncid,itime_id,timeout,(/1/),(/nrec/))
-        if(iret/=nf90_NoErr) stop 'time not read'
 
         !Reset record #
         if(ibf==1) then
@@ -726,31 +693,92 @@
       if(irec1<1.or.irec1>nrec) stop 'record out of bound'
 
       iret=nf90_get_var(ncid,ielev_id,real_ar(1,1:np),(/1,irec1/),(/np,1/))
-      if(iret/=nf90_NoErr) stop 'elev not read'
       eta2=real_ar(1,1:np)
       iret=nf90_get_var(ncid,luv,real_ar(1:nvrt,1:np),(/1,1,1,irec1/),(/1,nvrt,np,1/))
-      if(iret/=nf90_NoErr) stop 'uu2 not read'
       uu2(:,:)=transpose(real_ar(1:nvrt,1:np))
       iret=nf90_get_var(ncid,luv,real_ar(1:nvrt,1:np),(/2,1,1,irec1/),(/1,nvrt,np,1/))
-      if(iret/=nf90_NoErr) stop 'vv2 not read'
       vv2(:,:)=transpose(real_ar(1:nvrt,1:np))
       iret=nf90_get_var(ncid,lw,real_ar(1:nvrt,1:np),(/1,1,irec1/),(/nvrt,np,1/))
-      if(iret/=nf90_NoErr) stop 'ww2 not read'
       ww2(:,:)=transpose(real_ar(1:nvrt,1:np))
       if(mod_part==1) then
         iret=nf90_get_var(ncid,lwind,real_ar(1:2,1:np),(/1,1,irec1/),(/2,np,1/))
-        if(iret/=nf90_NoErr) stop 'wind not read'
         wnx2(:)=real_ar(1,1:np)
         wny2(:)=real_ar(2,1:np)
         iret=nf90_get_var(ncid,ltdff,real_ar(1:nvrt,1:np),(/1,1,irec1/),(/nvrt,np,1/))
-        if(iret/=nf90_NoErr) stop 'tdiff not read'
         vf2(:,:)=transpose(real_ar(1:nvrt,1:np))
       endif !mod_part
 
       irec1=irec1+ibf
 
+!      if(ibf==1) then
+!        irec1=irec1+np+2
+!        irec2=irec2+np+2
+!        irec3=irec3+np+2
+!        irec4=irec4+np+2 
+!        irec5=irec5+np+2
+!
+!        do i=1,np
+!          read(60,rec=irec1+1) floatout
+!          irec1=irec1+1
+!          eta2(i)=floatout
+!
+!          if(mod_part==1) then
+!            read(63,rec=irec4+1) floatout
+!            read(63,rec=irec4+2) floatout2
+!            irec4=irec4+2
+!            wnx2(i)=floatout
+!            wny2(i)=floatout2
+!          endif !mod_part
+!
+!          do k=max0(1,kbp00(i)),nvrt
+!            read(61,rec=irec2+1) floatout
+!            read(61,rec=irec2+2) floatout2
+!            irec2=irec2+2
+!            uu2(i,k)=floatout
+!            vv2(i,k)=floatout2
+!            read(62,rec=irec3+1) floatout
+!            irec3=irec3+1
+!            ww2(i,k)=floatout
+!
+!            if(mod_part==1) then
+!              read(64,rec=irec5+1) floatout
+!              irec5=irec5+1
+!              vf2(i,k)=floatout
+!            endif !mod_part
+!          enddo !k
+!        enddo !i=1,np
+!      else !ibf=-1
+!        do i=np,1,-1
+!          read(60,rec=irec1-1) floatout
+!          irec1=irec1-1
+!          eta2(i)=floatout
+!
+!          do k=nvrt,max0(1,kbp00(i)),-1
+!            read(61,rec=irec2-2) floatout
+!            read(61,rec=irec2-1) floatout2
+!            irec2=irec2-2
+!            uu2(i,k)=floatout
+!            vv2(i,k)=floatout2
+!            read(62,rec=irec3-1) floatout
+!            irec3=irec3-1
+!            ww2(i,k)=floatout
+!          enddo !k
+!        enddo !i 
+!
+!        if(irec1-np-2<=0.or.irec2-np-2<=0.or.irec3-np-2<=0) then
+!          write(*,*)'Negative record #:',irec1-np-2,irec2-np-2,irec3-np-2
+!          stop
+!        endif
+!        irec1=irec1-np-2
+!        irec2=irec2-np-2
+!        irec3=irec3-np-2
+!      endif !ibf
+
 !...  Store info for first step
-      if(it==iths) eta1=eta2
+      if(it==iths) then
+        uu1=uu2; vv1=vv2; ww1=ww2; eta1=eta2
+        vf1=vf2; wnx1=wnx2; wny1=wny2
+      endif 
 
 !...  Compute elevation eta3
       do i=1,np
@@ -763,28 +791,6 @@
 
 !...  Compute z-cor
       call levels
-
-!...  Deal with junks
-      do i=1,np
-        if(idry(i)==1) then
-          uu2(i,:)=0; vv2(i,:)=0; ww2(i,:)=0; vf2(i,:)=0
-        else !note that the fill values in nc are based on init bottom, which may be different from kbp
-          do k=1,nvrt
-            if(k<=kbp(i)-1.or.abs(uu2(i,k))>1.e8) then
-              uu2(i,k)=0
-              vv2(i,k)=0
-              ww2(i,k)=0
-              vf2(i,k)=0
-            endif
-          enddo !k
-        endif 
-      enddo !i
-      
-!...  Store info for first step
-      if(it==iths) then
-        uu1=uu2; vv1=vv2; ww1=ww2
-        vf1=vf2; wnx1=wnx2; wny1=wny2
-      endif 
 
 !...  compute hvis_e & hvis_e based on Smagorinsky Algorithm
       if(mod_part==1) then
@@ -834,9 +840,7 @@
 
 !...  Particle tracking
       write(95,*) time,nparticle
-      if(ismore==1)then
-        write(97,*) time,nparticle
-      endif
+      write(97,*) time,nparticle
       do i=1,nparticle
         eta_p=0; dp_p=0 !for output before moving
         if((ibf==1.and.time<=st_p(i)).or.(ibf==-1.and.time>st_p(i)-dt)) go to 449 !output directly
@@ -932,15 +936,16 @@
 
           if(mod_part==1) then !oil spill
 ! ...       wind rotation & apply to surface current
+!Error:     the following seems to be a bug in original version
+            !dir = atan2(wndx(i),wndy(i))
             dir = atan2(wndy(i),wndx(i))
             speed = sqrt(wndx(i)**2+wndy(i)**2)
             dir = dir+rotate_angle
             if(iwind==0) then
               cur_x=0; cur_y=0
             else
-!Error: original code used wrong sin/cos
-              cur_x = speed*cos(dir)*drag_c !approx surface current
-              cur_y = speed*sin(dir)*drag_c
+              cur_x = speed*sin(dir)*drag_c !approx surface current
+              cur_y = speed*cos(dir)*drag_c
             endif  
             if(z0<-0.1) then  ! sub_surface particles are not influenced by wind
               cur_x=0; cur_y=0
@@ -1103,15 +1108,14 @@
         !drogue format for xmvis6s; no extra lines after this
         write(95,'(i12,2(1x,e22.14),1x,f12.3)')i,xout,yout,zpar(i)-eta_p
 !       write(95,*) i,ist(i),amas(i),xout,yout,real(zpar(i)-eta_p)
-        if(ismore==1)then
-          write(97,*)i,real(xout),real(yout),real(zpar(i)),ielpar(i),levpar(i), &
-       &real(eta_p),real(dp_p),iabnorm(i),real(upar(i)),real(vpar(i)),real(wpar(i))
-          if(levpar(i)>0) then
-            ie4=ielpar(i)
-            write(97,*)'wet:',i34(ie4),real(arco(1:3)),real(uu2(elnode(1:i34(ie4),ie4),levpar(i))), &
-       &real(vv2(elnode(1:i34(ie4),ie4),levpar(i))),real(eta3(elnode(1:i34(ie4),ie4)))
-          endif !levpar
-        endif
+        write(97,*)i,real(xout),real(yout),real(zpar(i)),ielpar(i),levpar(i), &
+     &real(eta_p),real(dp_p),iabnorm(i),real(upar(i)),real(vpar(i)),real(wpar(i))
+        if(levpar(i)>0) then
+          ie4=ielpar(i)
+          write(97,*)'wet:',i34(ie4),real(arco(1:3)),real(uu2(elnode(1:i34(ie4),ie4),levpar(i))), &
+     &real(vv2(elnode(1:i34(ie4),ie4),levpar(i))),real(eta3(elnode(1:i34(ie4),ie4)))
+        endif !levpar
+
 !!        write(95,'(2e14.4)')time,ztmp2(nvrt)
 !!        write(*,'(2e14.4)')time,zpar(i)-eta3(ielpar(i))
       enddo !i=1,nparticle
@@ -1377,11 +1381,10 @@
 !
       subroutine levels
       use global
-      use compute_zcor
       implicit real(kind=dbl_kind)(a-h,o-z),integer(i-n)
 
       dimension idry_new(np) !,out2(12+mnv)
-      real(dbl_kind) :: zlcl(nvrt)
+      real :: zlcl(nvrt)
 
 !...  z-coor. for nodes
 !...  
@@ -1397,7 +1400,7 @@
           idry_new(i)=0
 
           if(ivcor==2) then
-            call zcor_SZ_double(dp(i),eta3(i),h0,h_s,h_c,theta_b, &
+            call zcor_SZ(real(dp(i)),real(eta3(i)),real(h0),h_s,h_c,theta_b, &
      &theta_f,kz,nvrt,ztot,sigma,zlcl,idry_tmp,kbpl)
             if(idry_tmp==1) then
               write(11,*)'Impossible dry (7):',i,idry_tmp,dp(i),eta1(i),eta2(i),eta3(i),kbpl
@@ -1459,7 +1462,6 @@
      &nodel2,arco,zrat,nfl,etal,dp_p,ztmp,kbpl,ist2,inbr2,rnds,pbeach)
 
       use global
-      use compute_zcor
       implicit real(kind=dbl_kind)(a-h,o-z),integer(i-n)
 
       integer, intent(in) :: iloc,idt,ipar,nnel0,jlev0
@@ -1469,7 +1471,7 @@
       real(kind=dbl_kind), intent(out) :: arco(3),zrat,etal,dp_p,ztmp(nvrt)
 
       !Local
-      real(dbl_kind) :: zlcl(nvrt)
+      real :: zlcl(nvrt)
       logical ::  ltmp1,ltmp2
 
       if(iloc>1) then
@@ -1581,7 +1583,8 @@
       endif
 
       lit=0 !flag
-!     For horizontal exit and dry elements
+!     For horizontal exit and dry elements, compute tangential vel.,
+!     update target (xt,yt,zt) and continue.
       if(ic3(nel_j,nel)==0.or.idry_e(max(1,ic3(nel_j,nel)))==1) then
         lit=1
         isd=elside(nel_j,nel)
@@ -1623,42 +1626,33 @@
           endif !ic3
         endif !mod_part
 
-!       Reflect off
-!        eps=1.e-2
-!        xin=(1-eps)*xin+eps*xctr(nel)
-!        yin=(1-eps)*yin+eps*yctr(nel)
+!       Nudge intersect (xin,yin), and update starting pt
+        eps=1.e-2
+        xin=(1-eps)*xin+eps*xctr(nel)
+        yin=(1-eps)*yin+eps*yctr(nel)
         xcg=xin
         ycg=yin
 
-        !Original vel
-        uvel0=(xt-xin)/trm
-        vvel0=(yt-yin)/trm
-        vnorm=uvel0*snx(isd)+vvel0*sny(isd)
-        vtan=-uvel0*sny(isd)+vvel0*snx(isd)
-        !vtan=-(uu2(md1,jlev0)+uu2(md2,jlev0))/2*sny(isd)+(vv2(md1,jlev0)+vv2(md2,jlev0))/2*snx(isd)
-        !Reverse normal vel
-        vnorm=-vnorm
-
-        !tmp=max(abs(vtan),1.d-2) !to prevent getting stuck
-        !vtan=tmp*sign(1.d0,tmp)
-        xvel=vnorm*snx(isd)-vtan*sny(isd)
-        yvel=vnorm*sny(isd)+vtan*snx(isd)
+        vtan=-(uu2(md1,jlev0)+uu2(md2,jlev0))/2*sny(isd)+(vv2(md1,jlev0)+vv2(md2,jlev0))/2*snx(isd)
+        tmp=max(abs(vtan),1.d-2) !to prevent getting stuck
+        vtan=tmp*sign(1.d0,tmp)
+        xvel=-vtan*sny(isd)
+        yvel=vtan*snx(isd)
         zvel=(ww2(md1,jlev0)+ww2(md2,jlev0))/2
-        xt=xin+xvel*trm
-        yt=yin+yvel*trm
-        zt=zin+zvel*trm
-!        hvel=dsqrt(xvel**2+yvel**2)
-!        if(hvel<1.e-4) then
-!          write(11,*)'Impossible (5):',hvel
+        xt=xin-xvel*trm
+        yt=yin-yvel*trm
+        zt=zin-zvel*trm
+        hvel=dsqrt(xvel**2+yvel**2)
+        if(hvel<1.e-4) then
+          write(11,*)'Impossible (5):',hvel
 !          nfl=1
 !          xt=xin
 !          yt=yin
 !          zt=zin
 !          nnel1=nel
 !          exit loop4
-!        endif
-        !pathl unchanged since hvel is unchanged
-!        pathl=hvel*trm
+        endif
+        pathl=hvel*trm
       endif !abnormal cases
 
 !     Search for nel's neighbor with edge nel_j, or in abnormal cases, the same element
@@ -1722,7 +1716,7 @@
 
 !     Compute z-levels
       if(ivcor==2) then
-        call zcor_SZ_double(dep,etal,h0,h_s,h_c,theta_b, &
+        call zcor_SZ(real(dep),real(etal),real(h0),h_s,h_c,theta_b, &
      &theta_f,kz,nvrt,ztot,sigma,zlcl,idry_tmp,kbpl)
         ztmp(kbpl:nvrt)=zlcl(kbpl:nvrt)
       else if(ivcor==1) then
@@ -1870,7 +1864,7 @@
 
         ae=abs(aa-ar(m))/ar(m)
         if(ae<=ae_min) then
-          ae_min=ae
+          ae=ae_min
           nodel(1:3)=list(1:3)
           arco(1:3)=swild(m,1:3)/ar(m)
           arco(1)=max(0.d0,min(1.d0,arco(1)))

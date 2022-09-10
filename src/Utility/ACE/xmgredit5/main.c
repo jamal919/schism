@@ -47,7 +47,6 @@ extern int draw_circum;
  */
 int readimage = 0;
 char image_filename[1024];
-char bcfile[2048];
 double imagex;
 double imagey;
 
@@ -55,7 +54,7 @@ main(int argc, char **argv)
 {
     extern int revflag;
     int i = 0, c, readback = 0, did_bath = 0, wflag = 0, lflag = 0,
-     tflag = 0, cflag = 0, cbc = 0;
+     tflag = 0, cflag = 0;
     int dofork = 1, doedge = 0, dopom = 0;
     double x1, y1, x2, y2;
     char *s, *getenv(const char *);
@@ -97,17 +96,6 @@ main(int argc, char **argv)
 			mindist = atof(argv[i]);
 			printf("Using minimum distance for triangulating of %lf\n", mindist);
 		    }
-                } else if (argmatch(argv[i], "-bc", 3)) {
-/* Compute boundary and read bc file */
-                    if (i == argc) {
-                        fprintf(stderr, "Missing argument for BC file\n");
-                        usage(argv[0]);
-                        exit(1);
-                    } else {
-                        i++;
-                        cbc = 1;
-                        strcpy(bcfile, argv[i]);
-                    }
 		} else if (argmatch(argv[i], "-swap", 5)) {
 /* For binary files create on systems with different byte order */
 		    swapBytes = 1;
@@ -325,7 +313,6 @@ main(int argc, char **argv)
 		    usage(argv[0]);
 		    exit(0);
 		}
-
 	    } else {
 		/* a data file (we hope) */
 		if (!(i >= argc)) {
@@ -381,19 +368,7 @@ main(int argc, char **argv)
 /*
    getassoc_elements(0);
  */
-    if (cbc) {
-        FILE *fp;
-        compute_boundary(0);
-        file_bc(bcfile);
-        fp = fopen("bcs.bnd", "w");
-        if (fp != NULL) {
-            write_adcirc_openb(0, fp);
-            fclose(fp);
-        }
-    }
-
     hselectfont(4);
-
     if (dofork && (fork() != 0)) {
         exit(0);
     }

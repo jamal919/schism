@@ -12,10 +12,10 @@
 ! Output: combined nc file
 !
 
-!  ifort -cpp -O2 -assume byterecl -o combine_output11.exe ../UtilLib/argparse.f90 ../UtilLib/schism_geometry.f90 combine_output11.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
+!  ifort -cpp -O2 -assume byterecl -o combine_output11.WW ../UtilLib/argparse.F90 combine_output11.f90 ../UtilLib/schism_geometry.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
 
 !  History: 
-!          2018-1      Richard Hofmeister changed the combine method (all vars read in at a
+!          2018-1      Richard changed the combine method (all vars read in at a
 !                      time) in order to speed up combine on many cores. This
 !                      version requires more memory.
 !          2017-9      revamped whole thing (all-in-1 pre- and post-combine
@@ -32,10 +32,9 @@
 !           coordinates not dependable).
 
 !           From combine_output9: netcdf
-subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
+subroutine combine_output11(ibgn,iend,iwetdry)
 !-------------------------------------------------------------------------------
   use netcdf
-  use schism_geometry_mod
   implicit real(4)(a-h,o-z),integer(i-n)
   
 !  integer                              :: nfile  !< number of file base names
@@ -52,23 +51,16 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
   integer :: start_year,start_month,start_day
   real*8 :: start_hour,utc_start
   integer :: lfgb,lfdb       ! Length of processor specific global output file name
-  character(len=6) :: a_4
+  character(len=4) :: a_4
   integer,allocatable :: elnode(:,:)
   integer,allocatable :: elside(:,:)
   integer,allocatable :: isdel(:,:),vlen(:),ne(:),np(:),ns(:),ihot_len(:), &
  &i34(:),nm2(:,:),kbp00(:),iplg(:,:),ielg(:,:),islg(:,:),kbs(:),kbe(:), &
  &ic3(:,:),isidenode(:,:),i23d(:),ivs(:),ndims(:),iu_id(:),idry(:),idry_e(:),idry_s(:)
-  !Coordinates in double
-  real*8,allocatable :: x(:),y(:)
   real,allocatable :: ztot(:),sigma(:),cs(:),eta2(:),outeb(:,:,:), &
- &outsb(:,:,:),worka(:,:,:),xctr(:),yctr(:),dpe(:),dp(:),xcj(:),ycj(:), &
+ &outsb(:,:,:),worka(:,:,:),xctr(:),yctr(:),dpe(:),x(:),y(:),dp(:),xcj(:),ycj(:), &
  &dps(:),eta2s(:),eta2e(:)
   character(len=48),allocatable :: variable_nm(:)
-  character(len=1024)           :: to_be_combined
-  character(len=1024)           :: default_variables='time,wetdry_elem,wetdry_node,wetdry_side,depth'
-  character(len=1024)           :: output_prefix
-  logical                       :: check_vars=.false.
-  logical,allocatable           :: skip_var(:)
 
   type :: type_outd
     real,pointer :: data(:,:,:)=>null()
@@ -106,8 +98,8 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
 
   invalid_index = -99999
 
-! Read local_to_global_000000 for global info
-  open(10,file='local_to_global_000000',status='old')
+! Read local_to_global_0000 for global info
+  open(10,file='local_to_global_0000',status='old')
   read(10,*)ns_global,ne_global,np_global,nvrt,nproc !,ntracers
   close(10)
   allocate(x(np_global),y(np_global),dp(np_global),kbp00(np_global),kbe(ne_global),i34(ne_global), &
@@ -122,12 +114,12 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
   ! Read rank-specific local_to_global*
   !-------------------------------------------------------------------------------
   ! Read in local-global mappings from all ranks
-  fdb='local_to_global_000000'
+  fdb='local_to_global_0000'
   lfdb=len_trim(fdb)
 
   !Find max. for dimensioning
   do irank=0,nproc-1
-    write(fdb(lfdb-5:lfdb),'(i6.6)') irank
+    write(fdb(lfdb-3:lfdb),'(i4.4)') irank
     open(10,file=fdb,status='old')
     read(10,*) !global info
     read(10,*) !info
@@ -152,7 +144,7 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
   !Re-read
   !ns_global=0
   do irank=0,nproc-1
-    write(fdb(lfdb-5:lfdb),'(i6.6)') irank
+    write(fdb(lfdb-3:lfdb),'(i4.4)') irank
     open(10,file=fdb,status='old')
     read(10,*) !global info
     read(10,*) !info
@@ -219,7 +211,7 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
   allocate(ic3(4,ne_global),elside(4,ne_global),isdel(2,ns2),isidenode(2,ns2),xcj(ns2),ycj(ns2), &
   &worka(2,nvrt,ns2),stat=istat)
   if(istat/=0) stop 'Allocation error: side(0)'
-  call schism_geometry_single(np_global,ne_global,ns2,real(x),real(y),i34,elnode(1:4,1:ne_global),ic3(1:4,1:ne_global), &
+  call schism_geometry(np_global,ne_global,ns2,x,y,i34,elnode(1:4,1:ne_global),ic3(1:4,1:ne_global), &
   &elside(1:4,1:ne_global),isdel,isidenode,xcj,ycj)
 
   if(ns2/=ns_global) then
@@ -254,7 +246,7 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
     write(it_char,'(i12)')iinput
     it_char=adjustl(it_char)  !place blanks at end
     it_len=len_trim(it_char)  !length without trailing blanks
-    fname=trim(output_prefix)//'_'//it_char(1:it_len)//'.nc'
+    fname='schout_'//it_char(1:it_len)//'.nc'
     !fname=it_char(1:it_len)//'_hvel.nc'
     fname=adjustl(fname)
 
@@ -275,8 +267,8 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
 !    coords_type =1 ! default project coords
       
     if(ics==1) then
-      lat_coord_standard_name = "projection_y_coordinate"
-      lon_coord_standard_name = "projection_x_coordinate"
+      lat_coord_standard_name = "projection_x_coordinate"
+      lon_coord_standard_name = "projection_y_coordinate"
       x_units = "m"
       y_units = "m"
       lat_str_len = 23
@@ -284,8 +276,8 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
     else
       lat_coord_standard_name = "latitude"
       lon_coord_standard_name = "longitude"
-      y_units = "degrees_north"
-      x_units = "degrees_east"
+      x_units = "degrees_north"
+      y_units = "degrees_east"
       lat_str_len = 8
       lon_str_len = 9
     endif
@@ -354,15 +346,15 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
     iret=nf90_put_att(ncid,iedge_id,'start_index',1) !int_buffer)
       
     x_dims(1)=node_dim
-    iret=nf90_def_var(ncid,'SCHISM_hgrid_node_x',NF90_DOUBLE,x_dims,ix_id)
+    iret=nf90_def_var(ncid,'SCHISM_hgrid_node_x',NF90_FLOAT,x_dims,ix_id)
     iret=nf90_put_att(ncid,ix_id,'long_name','node x-coordinate')
-    iret=nf90_put_att(ncid,ix_id,'standard_name',lon_coord_standard_name)
+    iret=nf90_put_att(ncid,ix_id,'standard_name',lat_coord_standard_name)
     iret=nf90_put_att(ncid,ix_id,'units',x_units)
     iret=nf90_put_att(ncid,ix_id,'mesh','SCHISM_hgrid')
       
-    iret=nf90_def_var(ncid,'SCHISM_hgrid_node_y',NF90_DOUBLE,x_dims,iy_id)
+    iret=nf90_def_var(ncid,'SCHISM_hgrid_node_y',NF90_FLOAT,x_dims,iy_id)
     iret=nf90_put_att(ncid,iy_id,'long_name','node y-coordinate')
-    iret=nf90_put_att(ncid,iy_id,'standard_name',lat_coord_standard_name)
+    iret=nf90_put_att(ncid,iy_id,'standard_name',lon_coord_standard_name)
     iret=nf90_put_att(ncid,iy_id,'units',y_units)
     iret=nf90_put_att(ncid,iy_id,'mesh','SCHISM_hgrid')
       
@@ -377,14 +369,14 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
     x_dims(1)=nele_dim
     iret=nf90_def_var(ncid,'SCHISM_hgrid_face_x',NF90_FLOAT,x_dims,ix_face_id)
     iret=nf90_put_att(ncid,ix_face_id,'long_name','x_coordinate of 2D mesh face')
-    iret=nf90_put_att(ncid,ix_face_id,'standard_name',lon_coord_standard_name)
-    iret=nf90_put_att(ncid,ix_face_id,'units',x_units)
+    iret=nf90_put_att(ncid,ix_face_id,'standard_name',lat_coord_standard_name)
+    iret=nf90_put_att(ncid,ix_face_id,'units','m')
     iret=nf90_put_att(ncid,ix_face_id,'mesh','SCHISM_hgrid')
 
     iret=nf90_def_var(ncid,'SCHISM_hgrid_face_y',NF90_FLOAT,x_dims,iy_face_id)
     iret=nf90_put_att(ncid,iy_face_id,'long_name','y_coordinate of 2D mesh face')
-    iret=nf90_put_att(ncid,iy_face_id,'standard_name',lat_coord_standard_name)
-    iret=nf90_put_att(ncid,iy_face_id,'units',y_units)
+    iret=nf90_put_att(ncid,iy_face_id,'standard_name',lon_coord_standard_name)
+    iret=nf90_put_att(ncid,iy_face_id,'units','m')
     iret=nf90_put_att(ncid,iy_face_id,'mesh','SCHISM_hgrid')
       
     iret=nf90_def_var(ncid,'ele_bottom_index',NF90_INT,x_dims,iele_bottom_id)
@@ -398,14 +390,14 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
     x_dims(1)=nedge_dim
     iret=nf90_def_var(ncid,'SCHISM_hgrid_edge_x',NF90_FLOAT,x_dims,ix_edge_id)
     iret=nf90_put_att(ncid,ix_edge_id,'long_name','x_coordinate of 2D mesh edge')
-    iret=nf90_put_att(ncid,ix_edge_id,'standard_name',lon_coord_standard_name)
-    iret=nf90_put_att(ncid,ix_edge_id,'units',x_units)
+    iret=nf90_put_att(ncid,ix_edge_id,'standard_name',lat_coord_standard_name)
+    iret=nf90_put_att(ncid,ix_edge_id,'units','m')
     iret=nf90_put_att(ncid,ix_edge_id,'mesh','SCHISM_hgrid')
 
     iret=nf90_def_var(ncid,'SCHISM_hgrid_edge_y',NF90_FLOAT,x_dims,iy_edge_id)
     iret=nf90_put_att(ncid,iy_edge_id,'long_name','y_coordinate of 2D mesh edge')
-    iret=nf90_put_att(ncid,iy_edge_id,'standard_name',lat_coord_standard_name)
-    iret=nf90_put_att(ncid,iy_edge_id,'units',y_units)
+    iret=nf90_put_att(ncid,iy_edge_id,'standard_name',lon_coord_standard_name)
+    iret=nf90_put_att(ncid,iy_edge_id,'units','m')
     iret=nf90_put_att(ncid,iy_edge_id,'mesh','SCHISM_hgrid')
     
     iret=nf90_def_var(ncid,'edge_bottom_index',NF90_INT,x_dims,iedge_bottom_id)
@@ -427,8 +419,8 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
     sigma_dims(1)=nsigma_dim
     ! See http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.7-draft1/apd.html 
     ! section "Ocean s-coordinate"  for the CF calculation
-    ! See trunk/src/Utility/Post-Processing-Fortran/compute_zcor.f90 for the SCHISM calc.
-    ! CF:SCHISM corresponence: depth_c:h_c s:sigma C(k):cs(k) a:theta_f b:theta_b 
+    ! See trunk/src/Utility/Post-Processing-Fortran/compute_zcor.f90 for the SELFE calc.
+    ! CF:SELFE corresponence: depth_c:h_c s:sigma C(k):cs(k) a:theta_f b:theta_b 
     hs_array(1)=h_s
     hc_array(1)=h_c
     thetab_array(1)=theta_b
@@ -505,10 +497,9 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
 !          endif
 
     !Find and define variables
-    file63='schout_000000_'//it_char(1:it_len)//'.nc'
+    file63='schout_0000_'//it_char(1:it_len)//'.nc'
     file63=adjustl(file63)
     iret=nf90_open(trim(file63),OR(NF90_NETCDF4,NF90_NOWRITE),ncid2)
-    if(iret/=NF90_NOERR) stop 'Failed to open(1)'
     !iret=nf_inq_nvars(ncid2,nvars)
     iret=nf90_inquire(ncid2,nVariables=nvars)
 !    write(99,*)'nvars=',nvars,file63
@@ -517,9 +508,6 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
       allocate(i23d(nvars),ivs(nvars),variable_nm(nvars),vlen(nvars),ndims(nvars), &
     &iu_id(nvars))
       allocate(outd(nvars),stat=istat)
-      allocate(skip_var(nvars),stat=istat)
-      skip_var(:)=.false. ! by default do not skip variables
-      check_vars = len_trim(to_be_combined)>0
     endif
 
     !Debug
@@ -527,23 +515,9 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
     !iret=nf_def_var(ncid,'elev',NF_FLOAT,2,var2d_dims,iu_id(2))
     !write(98,*)'Before:',ncid,var2d_dims,iu_id(2),nvars,iinput,ibgn
 
-    !Define all time-varying vars (all vars from uncombined)
     do m=1,nvars
       iret=nf90_inquire_variable(ncid2,m,name=variable_nm(m)) !,itype,ndims(m),int_buffer,natts)
       variable_nm(m)=trim(adjustl(variable_nm(m))); vlen(m)=len_trim(variable_nm(m))
-      if (check_vars) then
-        if ((index(to_be_combined,trim(variable_nm(m)))>0).or. &
-           (index(default_variables,trim(variable_nm(m)))>0)) then
-          skip_var(m)=.false.
-        else
-          skip_var(m)=.true.
-          cycle ! continue with next variable in loop
-        end if
-        if (m==nvars) check_vars=.false. ! continue with skip_var array
-      else
-        if (skip_var(m)) cycle
-      end if
-
       iret=nf90_get_att(ncid2,m,'i23d',i23d(m))
 
 !      write(99,*)'i23d:',m,variable_nm(m),i23d(m)
@@ -733,18 +707,13 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
       !Gather all ranks
       do irank=0,nproc-1
         !Open input file
-        write(a_4,'(i6.6)') irank
+        write(a_4,'(i4.4)') irank
         file63='schout_'//a_4//'_'//it_char(1:it_len)//'.nc'
         file63=adjustl(file63)
         iret=nf90_open(trim(file63),OR(NF90_NETCDF4,NF90_NOWRITE),ncid2)
-        if(iret/=NF90_NOERR) then
-          print*, 'Failed to open(2):',irank
-          stop
-        endif
         !write(99,*)'nvars=',nvars,file63
 
         do m=1,nvars
-          if (skip_var(m)) cycle 
           ! get variable id (maybe not necessary)
           iret = nf90_inq_varid(ncid2,variable_nm(m),varid)
           !if (iret/=NF90_NOERR) then
@@ -818,15 +787,8 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
       enddo !irank
 
       do m=1,nvars
-        if (skip_var(m)) then
-          if(m<=4) stop 'u cannot skip wet/dry outputs'
-          cycle
-        endif
-
-        !Compute wet/dry flags: idry, idry_s are only used to filter 3D outputs
-        !below. There are outputs for these 2 flags independently in comb'ed
-        !output
-        if(m==3) then !idry_e
+        !Compute wet/dry flags
+        if(m==2) then !idry_e
           idry_e=nint(outd(m)%data(1,1,1:ne_global))
           idry=1 !init as dry
           idry_s=1
@@ -840,7 +802,7 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
               endif
             enddo !j
           enddo !i
-       endif !m=3
+        endif !m=2
 
 !        !Compute bottom indices based on zcor
 !        if(m==3) then !zcor
@@ -956,7 +918,6 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
 
   ! deallocate output arrays
   do m=1,size(outd)
-    if (skip_var(m)) cycle 
     if (associated(outd(m)%data)) deallocate(outd(m)%data)
     nullify(outd(m)%data)
   end do
@@ -964,21 +925,18 @@ subroutine combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
   
 end subroutine combine_output11
 
-subroutine combine_output11_input(ibgn,iend,iwetdry,to_be_combined,output_prefix)
+subroutine combine_output11_input(ibgn,iend,iwetdry)
 use argparse
 implicit none
 integer, parameter                   :: nfilemax = 20
 !integer                              :: nfile   !< number of file base names
 !character(len=30),dimension(nfilemax) :: files   !< base names (e.g. elev.61) of files to combine
-integer,intent(out)                              :: ibgn    !< first output file index to process
-integer,intent(out)                              :: iend    !< last output file index to process
-integer,intent(out)                              :: iwetdry !dry value option
+integer                              :: ibgn    !< first output file index to process
+integer                              :: iend    !< last output file index to process
+integer                              :: iwetdry !dry value option
 !integer                              :: inetcdf !< netcdf flag
 character(len=80) :: infile
 character(len=30) :: cfile = ""
-character(len=1024) :: varlist = ""
-character(len=1024) :: output_prefix
-character(len=1024) :: to_be_combined ! list of variables to be combined
 
 ! local
 integer :: comcount
@@ -989,7 +947,7 @@ cfile = ""
 !files=""
 
 cmd_name = "combine_output11"
-call cla_init(cmd_name,"Combine time blocked per-processor binary outputs (e.g. 'schout_000000_1.nc') into time blocked global outputs ('schout_1.nc')")
+call cla_init(cmd_name,"Combine time blocked per-processor binary outputs (e.g. 'schout_0000_1.nc') into time blocked global outputs ('schout_1.nc')")
 
 !call cla_register('-i','--in', 'input file (e.g. combine_input.in) containing options (overridden by command line specs)', cla_char,'')
 call cla_register('-b','--begin', 'start day', cla_int,'-1')
@@ -997,8 +955,6 @@ call cla_register('-e','--end','end day', cla_int  ,'-1')
 call cla_register('-w','--wetdry','dry option (0: last wet value; 1: junk value)', cla_int  ,'0')
 !call cla_register('-n','--nc','combine to NetCDF format (1) or ordinary binary (0)', cla_int  ,'0')
 !call cla_register('-f','--file','base file name like elev.61',  cla_char,'') 
-call cla_register('-v','--vars','comma separated list of variables enclosed in double quotes',  cla_char,'') 
-call cla_register('-o','--output','output file prefix',  cla_char,'schout') 
 call cla_validate
     
 comcount = command_argument_count()
@@ -1031,8 +987,6 @@ end if
   call cla_get("--begin",ibgn)
   call cla_get("--end",iend)
   call cla_get("--wetdry",iwetdry)
-  call cla_get("--vars", varlist)
-  call cla_get("--output", output_prefix)
 !  call cla_get("--nc",inetcdf)
 !  call cla_get("--file", cfile)
 !end if
@@ -1044,19 +998,11 @@ end if
 !  print*, "No base files specified."
 !end if
 
-to_be_combined=varlist
-
 ! validate and prioritize
 if (ibgn > iend) then
-  stop ("Beginning index after end. Check input file or -b and -e options")
+  stop("Beginning index after end. Check input file or -b and -e options")
 end if
 print '("Begin: ",i4,", End: ",i4,", dry flag: ", i4)',ibgn,iend,iwetdry 
-
-if (len_trim(to_be_combined)==0) then
-  print *,'combine all variables'
-else
-  print *,'combine variables: ',trim(to_be_combined)
-end if
 !print*,"File:"
 !do ifile = 1,nfile
 !  print*, files(ifile)
@@ -1075,10 +1021,8 @@ integer                              :: ibgn   !< first output file index to pro
 integer                              :: iend   !< last output file index to process
 integer                              :: iwetdry !dry option
 integer                              :: inetcdf !< netcdf flag
-character(len=1024)                  :: to_be_combined ! list of variables to be combined
-character(len=1024)                  :: output_prefix ! output file
-call combine_output11_input(ibgn,iend,iwetdry,to_be_combined,output_prefix)
-call combine_output11(ibgn,iend,iwetdry,to_be_combined,output_prefix)
+call combine_output11_input(ibgn,iend,iwetdry)
+call combine_output11(ibgn,iend,iwetdry)
 end program
 
 

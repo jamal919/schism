@@ -7,7 +7,7 @@
 !     Allocate side-related arrays
 !     allocate(ic3(4,ne),elside(4,ne),isdel(2,ns),isidenode(2,ns),xcj(ns),ycj(ns))
 !     Then compute the rest of side related arrays with additional inputs (xnd,ynd) (x,y coordinates of each node)
-!     call schism_geometry_[single,double](np,ne,ns,xnd,ynd,i34,elnode,ic3,elside,isdel,isidenode,xcj,ycj)
+!     call schism_geometry(np,ne,ns,xnd,ynd,i34,elnode,ic3,elside,isdel,isidenode,xcj,ycj)
 !     The outputs:
 !                ns: # of sides
 !                ic3(4,ne): neighboring elements of an element
@@ -16,28 +16,20 @@
 !                isidenode(2,ns): 2 end nodes of a side
 !                xcj(ns),ycj(ns): x,y of each side center
 
-    module schism_geometry_mod
-!#ifdef USE_DOUBLE
-!      integer,parameter,private :: RKIND=8
-!#else
-!      integer,parameter,private :: RKIND=4
-!#endif
-
-      integer,save,private :: nx(4,4,3)
-      integer,save,allocatable,private :: nne(:),indel(:,:),ic3(:,:)
+!     Common data used in 2 routines
+      module schism_geometry_mod
+      implicit none
       public
-
-      contains
+      integer,save :: nx(4,4,3)
+      integer,save,allocatable :: nne(:),indel(:,:),ic3(:,:)
+      end module schism_geometry_mod
 
       subroutine compute_nside(np,ne,i34,elnode,ns)
-      !This routine deals only with int; no real
-      implicit real(8)(a-h,o-z),integer(i-n)
+      use schism_geometry_mod
+      implicit real(4)(a-h,o-z),integer(i-n)
       integer, intent(in) :: np,ne,i34(ne),elnode(4,ne)
       integer, intent(out) :: ns !,ic3(3,ne)
-
-      if(allocated(nne)) deallocate(nne)
-      if(allocated(ic3)) deallocate(ic3)
-      if(allocated(indel)) deallocate(indel)
+!      integer, allocatable :: indel(:,:)
 
       allocate(nne(np),ic3(4,ne),stat=istat)
       if(istat/=0) stop 'Failed to alloc. nne'
@@ -106,30 +98,55 @@
 
       end subroutine compute_nside
 
-      !Double precision version
-      subroutine schism_geometry_double(np,ne,ns0,xnd,ynd,i34,elnode,ic3_out,&
+      subroutine schism_geometry(np,ne,ns0,xnd,ynd,i34,elnode,ic3_out,&
      &elside,isdel,isidenode,xcj,ycj)
-      implicit real(8)(a-h,o-z),integer(i-n)
-      integer, intent(in) :: np,ne,ns0,i34(ne),elnode(4,ne)
-      real(8), intent(in) :: xnd(np),ynd(np)
-      integer, intent(out) :: ic3_out(4,ne),elside(4,ne),isdel(2,ns0),isidenode(2,ns0)
-      real(8), intent(out) :: xcj(ns0),ycj(ns0)
-      
-      include 'schism_geometry.txt'
-
-      end subroutine schism_geometry_double
-
-      !Single precision version
-      subroutine schism_geometry_single(np,ne,ns0,xnd,ynd,i34,elnode,ic3_out,&
-     &elside,isdel,isidenode,xcj,ycj)
+      use schism_geometry_mod
       implicit real(4)(a-h,o-z),integer(i-n)
       integer, intent(in) :: np,ne,ns0,i34(ne),elnode(4,ne)
-      real(4), intent(in) :: xnd(np),ynd(np)
+      real, intent(in) :: xnd(np),ynd(np)
       integer, intent(out) :: ic3_out(4,ne),elside(4,ne),isdel(2,ns0),isidenode(2,ns0)
-      real(4), intent(out) :: xcj(ns0),ycj(ns0)
+      real, intent(out) :: xcj(ns0),ycj(ns0)
       
-      include 'schism_geometry.txt'
+      ic3_out=ic3
 
-      end subroutine schism_geometry_single
+      ns=0 !# of sides
+      do i=1,ne
+        do j=1,i34(i)
+          nd1=elnode(nx(i34(i),j,1),i)
+          nd2=elnode(nx(i34(i),j,2),i)
+          if(ic3(j,i)==0.or.i<ic3(j,i)) then !new sides
+            ns=ns+1
+            if(ns>ns0) then
+              write(*,*)'Too many sides'
+              stop
+            endif
+            elside(j,i)=ns
+            isdel(1,ns)=i
+            isidenode(1,ns)=nd1
+            isidenode(2,ns)=nd2
+            xcj(ns)=(xnd(nd1)+xnd(nd2))/2
+            ycj(ns)=(ynd(nd1)+ynd(nd2))/2
 
-    end module schism_geometry_mod
+            isdel(2,ns)=ic3(j,i) !bnd element => bnd side
+!           Corresponding side in element ic3(j,i)
+            if(ic3(j,i)/=0) then !old internal side
+              iel=ic3(j,i)
+              index=0
+              do k=1,i34(iel)
+                if(ic3(k,iel)==i) then
+                  index=k
+                  exit
+                endif
+              enddo !k
+              if(index==0) then
+                write(*,*)'Wrong ball info',i,j
+                stop
+              endif
+              elside(index,iel)=ns
+            endif !ic3(j,i).ne.0
+          endif !ic3(j,i)==0.or.i<ic3(j,i)
+        enddo !j
+      enddo !i=1,ne
+      if(ns/=ns0) stop 'Side count mismatch'
+
+      end subroutine schism_geometry

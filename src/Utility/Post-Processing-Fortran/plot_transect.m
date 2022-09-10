@@ -1,9 +1,9 @@
-%Plot (scalar) transect output from read_output*_transect.f90
-%Inputs: transect.out, transect_grd.r0, transect_grd.z0. The transect grid must be fixed
+%Plot (scalar) transect output from read_output7b_transect.f90
+%Inputs: transect_T.out, transect_grd.r0, transect_grd.z0. The transect grid must be fixed
 %        In time.
 clear all; close all;
 run='RUN22a';
-var=load(['../' run '/transect.out']); %time(sec),out3(1:nxy*ntranz,it) [vertical direction first]
+var=load(['../' run '/transect_T_Darss_2_Gotland.out']); %time(sec),out3(1:nxy*ntranz,it) [vertical direction first]
 r0=load(['../' run '/transect_grd.r0']); %along transect distance
 z0=load(['../' run '/transect_grd.z0']); % z (m)
 start_year=2011;

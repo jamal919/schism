@@ -1,7 +1,7 @@
 %Read in dataset "1" (larger grid) and interpolate onto grid "2" (smaller)
 %This is useful when the dataset "2" is missing some days
-%No interpolation in time (as SCHISM can handle variable # of timesteps in each file)
-%Assume dataset "1" and setnm2 are already in SCHISM format
+%No interpolation in time (as SELFE can handle variable # of timesteps in each file)
+%Assume dataset "1" and setnm2 are already in SELFE format
 %Run inside sflux/; outputs: sflux_air_2*.nc
 
 %Dimension for arrays reversed from ncdump (FORTRAN convention)
@@ -30,7 +30,7 @@ lat2=reshape(double(lat),nxout*nyout,1);
 fill_in=1.e9; %junk value from nc files
 avi_out = avifile('out.avi');
 for i=1:nfiles 
-  char=sprintf('%4.4d',i);
+  char=sprintf('%3.3d',i);
   filen=strcat(setnm1,char,'.nc');
   ncid0 = netcdf.open(filen,'NC_NOWRITE');
   vid=netcdf.inqVarID(ncid0,'time'); %input var./array name

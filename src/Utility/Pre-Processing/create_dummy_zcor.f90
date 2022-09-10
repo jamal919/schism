@@ -55,7 +55,6 @@
       end subroutine
 
       subroutine create_zcor(hgrid,vgrid,eta)
-      use compute_zcor
       character(len=*),intent(in) :: hgrid
       character(len=*),intent(in) :: vgrid
       real,intent(in)  :: eta
@@ -139,7 +138,7 @@
       tehta_b = 0
       kbp=1
       if(nvrt>2) then
-        call get_vgrid_single(trim(vgrid),np,nvrt,ivcor,kz,h_s,h_c,theta_b,theta_f,ztot,sigma,sigma_lcl,kbp)
+        call get_vgrid(trim(vgrid),np,nvrt,ivcor,kz,h_s,h_c,theta_b,theta_f,ztot,sigma,sigma_lcl,kbp)
       else 
         sigma(1)=-1.0
         sigma(2)=0.0

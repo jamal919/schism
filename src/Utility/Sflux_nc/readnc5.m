@@ -1,4 +1,4 @@
-%Generate SCHISM compliant nc files using inverse weight interpolaton
+%Generate SELFE compliant nc files using inverse weight interpolaton
 %from obs points
 clear all; close all;
 delete('*.nc');
@@ -74,19 +74,13 @@ disp('Min of pres, uwind, vwind:');
 
 fill_in=-999; %junk value
 for day=1:366 %2003
-  %Write nc file of SCHISM format (Warning: use single precision!)
+  %Write nc file of SELFE format (Warning: use single precision!)
   %Write out new nc file (1 day per file)
   hours=(day-1)*24:(day-1)*24+23; %hourly from Jan. 1
   ntimes=length(hours);
 %  disp(strcat('Outputting Day: ',num2str(day)));
-  day_str=sprintf('%4.4d',day);
+  day_str=sprintf('%3.3d',day);
   filenm=strcat('sflux_air_2.',day_str,'.nc');
-
-%IMPORTANT: use nc4 to avoid file size limit!!
-%cmode = netcdf.getConstant('NETCDF4');
-%cmode = bitor(cmode,netcdf.getConstant('CLASSIC_MODEL'));
-%ncid2 = netcdf.create(filenm,cmode);
-
   ncid2 = netcdf.create(filenm,'CLOBBER');
   dims(1)=netcdf.defDim(ncid2,'n1',n1);
   dims(2)=netcdf.defDim(ncid2,'n2',n2);
@@ -120,8 +114,8 @@ for day=1:366 %2003
   netcdf.putVar(ncid2,uid,uwind(:,:,hours+1));
   netcdf.putVar(ncid2,vid,vwind(:,:,hours+1));
   netcdf.putVar(ncid2,pid,pres(:,:,hours+1));
-  airt=300*ones(n1,n2,ntimes); %no air T info so we use a constant 300K
-  spfh=0.0175873*ones(n1,n2,ntimes); %use a const specific humidty
+  airt=300*ones(n1,n2,ntimes);
+  spfh=0.0175873*ones(n1,n2,ntimes);
   netcdf.putVar(ncid2,tid,airt);
   netcdf.putVar(ncid2,hid,spfh);
   netcdf.close(ncid2);

@@ -7,7 +7,6 @@
 !     ifort -CB -Bstatic -o viz_source_sink viz_source_sink.f90
 !     pgf90 -O2 -mcmodel=medium -Mbounds -Bstatic -o viz_source_sink viz_source_sink.f90
 
-      implicit real*8(a-h,o-z)
       allocatable :: xctr(:),yctr(:),dpe(:),xnd(:),ynd(:)
       integer,allocatable :: elnode(:,:)
 
@@ -51,7 +50,7 @@
       write(12,*)
       write(12,*)nbp
       do i=1,ne
-        if(abs(dpe(i))>0.1) write(12,'(i12,2(1x,e22.14),1x,f12.3)')i,xctr(i),yctr(i),dpe(i)
+        if(abs(dpe(i))>0.1) write(12,*)i,xctr(i),yctr(i),dpe(i)
       enddo !i
 
 

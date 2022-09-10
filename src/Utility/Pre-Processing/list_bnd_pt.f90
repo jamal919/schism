@@ -1,8 +1,8 @@
-!     Output open&land&island bnd points from hgrid.gr3 (for mlab); has
+!     Output open&land bnd points from hgrid.gr3 (for mlab); has
 !     duplicate pts btw bnd's
 !     Input: 
 !           (1) hgrid.gr3
-!     Output: bnd.xy (list of x,y's)
+!     Output: bnd.xy
 
 !     ifort -Bstatic -assume byterecl -O3 -o list_bnd_pt list_bnd_pt.f90
 

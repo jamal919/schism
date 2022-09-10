@@ -12,11 +12,9 @@
       real(rkind) eCF_COEFF(4)
       LOGICAL EXTRAPO_OUT
       integer nbExtrapolation
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'Begin COMPUTE_BND_INTERPOLATION_ARRAY'
-        WRITE(STAT%FHNDL,*) 'EXTRAPOLATION_ALLOWED_BOUC=', EXTRAPOLATION_ALLOWED_BOUC
-        FLUSH(STAT%FHNDL)
-      END IF
+      WRITE(STAT%FHNDL,*) 'Begin COMPUTE_BND_INTERPOLATION_ARRAY'
+      WRITE(STAT%FHNDL,*) 'EXTRAPOLATION_ALLOWED_BOUC=', EXTRAPOLATION_ALLOWED_BOUC
+      FLUSH(STAT%FHNDL)
       allocate(CF_IX_BOUC(IWBMNP), CF_IY_BOUC(IWBMNP), CF_COEFF_BOUC(4,IWBMNP), stat=istat)
       IF (istat/=0) CALL WWM_ABORT('CF_*_BOUC allocation error')
       
@@ -33,11 +31,10 @@
           nbExtrapolation=nbExtrapolation + 1
         END IF
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL, *) 'Computing extrapolation array for boundary'
-        WRITE(STAT%FHNDL, *) 'nbExtrapolation=', nbExtrapolation
-        FLUSH(STAT%FHNDL)
-      END IF      
+      IF (EXTRAPOLATION_ALLOWED_BOUC) THEN
+        WRITE(STAT % FHNDL, *) 'Computing extrapolation array for boundary'
+        WRITE(STAT % FHNDL, *) 'nbExtrapolation=', nbExtrapolation
+      END IF
       END SUBROUTINE COMPUTE_BND_INTERPOLATION_ARRAY
 !**********************************************************************
 !*                                                                    *
@@ -48,9 +45,7 @@
       USE GRIB_API
       IMPLICIT NONE
       INTEGER ifile, IFILE_IN
-      REAL(rkind) :: eTimeMjd
       LOGICAL STEPRANGE_IN
-      LOGICAL :: USE_DATATIME = .TRUE.
       type(FD_FORCING_GRID) :: TheInfo
       character(len=20) shortName
       integer GRIB_TYPE
@@ -73,7 +68,7 @@
       integer M
       CALL TEST_FILE_EXIST_DIE("Missing list of WAM files: ", TRIM(WAV%FNAME))
       OPEN(WAV%FHNDL,FILE=WAV%FNAME,STATUS='OLD')
-      IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,*) WAV%FHNDL, WAV%FNAME, BND%FHNDL, BND%FNAME
+      WRITE(STAT%FHNDL,*) WAV%FHNDL, WAV%FNAME, BND%FHNDL, BND%FNAME
       STEPRANGE_IN = .TRUE.
 # ifdef MPI_PARALL_GRID
       IF (MULTIPLE_IN_BOUND .or. (myrank .eq. 0)) THEN
@@ -88,7 +83,11 @@
           NUM_WAM_SPEC_FILES = NUM_WAM_SPEC_FILES + 1
         END DO
         REWIND(WAV%FHNDL)
-        IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,*) 'NUM_WAM_SPEC_FILES=', NUM_WAM_SPEC_FILES
+!        WRITE(STAT%FHNDL,*) 'NUM_WAM_SPEC_FILES=', NUM_WAM_SPEC_FILES
+!        FLUSH(STAT%FHNDL)
+        IF (NUM_WAM_SPEC_FILES .eq. 0) THEN
+          CALL WWM_ABORT('We need at least one file in order for this to work')
+        END IF
         !
         ! Reading the file names
         !
@@ -112,8 +111,14 @@
           allocate(igrib(n))
           DO i=1,n
             call grib_new_from_file(ifile, igrib(i))
+!            WRITE(STAT%FHNDL,*) 'i=', i, ' n=', n
+!            WRITE(STAT%FHNDL,*) 'Iter symbol, step 1'
+!            FLUSH(STAT%FHNDL)
             call grib_get(igrib(i), 'numberOfDirections', nbdir_wam_read)
             call grib_get(igrib(i), 'numberOfFrequencies', nbfreq_wam_read)
+!            WRITE(STAT%FHNDL,*) 'Iter symbol, step 2'
+!            WRITE(STAT%FHNDL,*) 'IsFirst=', IsFirst
+!            FLUSH(STAT%FHNDL)
             IF (IsFirst .eqv. .TRUE.) THEN
               nbdir_wam = nbdir_wam_read
               nbfreq_wam = nbfreq_wam_read
@@ -132,29 +137,27 @@
                   eDir = eDir - 360
                 END IF
                 ListDir_wam(idir) = eDir
-                IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,*) 'idir=', idir, ' eDir=', eDir
+!                WRITE(STAT%FHNDL,*) 'idir=', idir, ' eDir=', eDir
               END DO
               DO ifreq=1,nbfreq_wam
                 eFreq = MyREAL(ListFreq_i(ifreq)) / MyREAL(freqScal)
                 ListFreq_wam(ifreq) = eFreq
-                IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,*) 'ifreq=', ifreq, ' eFreq=', eFreq
+!                WRITE(STAT%FHNDL,*) 'ifreq=', ifreq, ' eFreq=', eFreq
               END DO
               FRATIO = ListFreq_wam(2) / ListFreq_wam(1)
-              IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,*) 'FRATIO=', FRATIO
+!              WRITE(STAT%FHNDL,*) 'FRATIO=', FRATIO
               DELTH_WAM = PI2 / MyREAL(nbdir_wam)
-              IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,*) 'DELTH_WAM=', DELTH_WAM
+!              WRITE(STAT%FHNDL,*) 'DELTH_WAM=', DELTH_WAM
               CO1 = 0.5*(FRATIO-1.)*DELTH_WAM
-              IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,*) 'CO1=', CO1
-              DFIM_wam(1) = CO1 * ListFreq_wam(1)
+!              WRITE(STAT%FHNDL,*) 'CO1=', CO1
+              DFIM_WAM(1) = CO1 * ListFreq_wam(1)
               DO M=2,nbFreq_wam-1
-                 DFIM_wam(M) = CO1 * (ListFreq_wam(M) + ListFreq_wam(M-1))
+                 DFIM_WAM(M) = CO1 * (ListFreq_wam(M) + ListFreq_wam(M-1))
               ENDDO
-              DFIM_wam(nbFreq_wam) = CO1 * ListFreq_wam(nbFreq_wam-1)
-              IF (WRITESTATFLAG == 1) THEN
-                DO M=1,nbFreq_wam
-                  WRITE(STAT%FHNDL,*) 'M=', M, ' DFIM=', DFIM_wam(M)
-                END DO
-              END IF
+              DFIM_WAM(nbFreq_wam) = CO1 * ListFreq_wam(nbFreq_wam-1)
+!              DO M=1,nbFreq_wam
+!                WRITE(STAT%FHNDL,*) 'M=', M, ' DFIM=', DFIM_WAM(M)
+!              END DO
               WETAIL_WAM = 0.25
               DELT25_WAM = WETAIL_WAM*ListFreq_wam(nbFreq_wam)*DELTH_WAM
               deallocate(ListDir_i, ListFreq_i)
@@ -166,63 +169,93 @@
               END IF
             END IF
             IsFirst=.FALSE.
+            call grib_release(igrib(i))
           END DO
           deallocate(igrib)
           CALL GRIB_CLOSE_FILE(ifile)
           nbTotalNumberEntry = nbTotalNumberEntry + n / (nbdir_wam * nbfreq_wam)
         END DO
+!        WRITE(STAT%FHNDL,*) 'First loop done nbTotalNumberEntry=', nbTotalNumberEntry
+!        FLUSH(STAT%FHNDL)
         ALLOCATE(eVAR_BOUC_WAM % ListTime(nbTotalNumberEntry), ListIFileWAM(nbTotalNumberEntry), stat=istat)
         eVAR_BOUC_WAM % nbTime = nbTotalNumberEntry
         IF (istat/=0) CALL WWM_ABORT('wwm_bdcons_wam, allocate error 9')
         idx=0
         DO IFILE_IN = 1, NUM_WAM_SPEC_FILES
           eFile=WAM_SPEC_FILE_NAMES_BND(IFILE_IN)
-!          Print *, 'iFile=', iFile, ' eFile=', TRIM(eFile)
+!          WRITE(STAT%FHNDL,*) 'iFile=', iFile
+!          WRITE(STAT%FHNDL,*) 'eFile=', TRIM(eFile)
+!          FLUSH(STAT%FHNDL)
           CALL TEST_FILE_EXIST_DIE("Missing grib file: ", TRIM(eFile))
+!          WRITE(STAT%FHNDL,*) 'Debug GRID, step 1'
+!          FLUSH(STAT%FHNDL)
           CALL GRIB_OPEN_FILE(ifile, TRIM(eFile), 'r')
+!          WRITE(STAT%FHNDL,*) 'Debug GRID, step 2'
+!          FLUSH(STAT%FHNDL)
           call grib_count_in_file(ifile,n)
+!          WRITE(STAT%FHNDL,*) 'Debug GRID, step 3'
+!          FLUSH(STAT%FHNDL)
           allocate(igrib(n))
           DO i=1,n
+!            WRITE(STAT%FHNDL,*) 'i=', i
+!            FLUSH(STAT%FHNDL)
             call grib_new_from_file(ifile, igrib(i))
+!            WRITE(STAT%FHNDL,*) '  Debug loop GRID, step 1'
+!            FLUSH(STAT%FHNDL)
             call grib_get(igrib(i), 'directionNumber', idir)
+!            WRITE(STAT%FHNDL,*) '  Debug loop GRID, step 2'
+!            FLUSH(STAT%FHNDL)
             call grib_get(igrib(i), 'frequencyNumber', ifreq)
+!            WRITE(STAT%FHNDL,*) '  Debug loop GRID, step 3'
+!            FLUSH(STAT%FHNDL)
             IF ((idir .eq. 1).and.(ifreq .eq. 1)) THEN
-!              Print *, 'i=', i, ' idir=', idir, ' ifreq=', ifreq
-              CALL RAW_READ_TIME_OF_GRIB_FILE(ifile, igrib(i), STEPRANGE_IN, eTimeOut)
+              CALL RAW_READ_TIME_OF_GRIB_FILE(igrib(i), STEPRANGE_IN, eTimeOut)
               !
               idx=idx+1
               eVAR_BOUC_WAM % ListTime(idx) = eTimeOut
               ListIFileWAM(idx) = IFILE_IN
             END IF
+            call grib_release(igrib(i))
+!            WRITE(STAT%FHNDL,*) '  Debug loop GRID, step 4'
+!            FLUSH(STAT%FHNDL)
           END DO
           deallocate(igrib)
           CALL GRIB_CLOSE_FILE(ifile)
         END DO
+!        WRITE(STAT%FHNDL,*) 'Second loop done'
+!        FLUSH(STAT%FHNDL)
         !
         ! reading the grid
         !
         shortName='2dfd'
         GRIB_TYPE=1 ! 1 for ECMWF
         IFILE_IN = 1
-!        Print *, 'Before READ_GRID_INFO_FROM_GRIB'
+!        WRITE(STAT%FHNDL,*) 'Before READ_GRID_INFO_FROM_GRIB'
+!        WRITE(STAT%FHNDL,*) 'IFILE_IN=', IFILE_IN
+!        WRITE(STAT%FHNDL,*) 'WAM_SPEC_FILE_NAMES=', WAM_SPEC_FILE_NAMES_BND(IFILE_IN)
+!        FLUSH(STAT%FHNDL)
         CALL READ_GRID_INFO_FROM_GRIB(TheInfo, WAM_SPEC_FILE_NAMES_BND(IFILE_IN), shortName, GRIB_TYPE)
-!        Print *, 'After READ_GRID_INFO_FROM_GRIB'
+!        WRITE(STAT%FHNDL,*) 'After READ_GRID_INFO_FROM_GRIB'
+!        FLUSH(STAT%FHNDL)
 # ifdef MPI_PARALL_GRID
       END IF
 # endif
+!      WRITE(STAT%FHNDL,*) 'Before COMPUTE_BND_INTERPOLATION_ARRAY'
+!      FLUSH(STAT%FHNDL)
       CALL COMPUTE_BND_INTERPOLATION_ARRAY(TheInfo)
+!      WRITE(STAT%FHNDL,*) 'After COMPUTE_BND_INTERPOLATION_ARRAY'
+!      FLUSH(STAT%FHNDL)
       deallocate(TheInfo % LON, TheInfo % LAT)
       nx_wam = TheInfo % nx_dim
       ny_wam = TheInfo % ny_dim
-!      Print *, 'After COMPUTE_BND_INTERPOLATION_ARRAY'
       !
       ! Now the spectral interpolation arrays
       !
-      allocate(WAM_ID1(MDC), WAM_ID2(MDC), WAM_WD1(MDC), WAM_WD2(MDC), stat=istat)
+      allocate(WAM_ID1(NUMDIR), WAM_ID2(NUMDIR), WAM_WD1(NUMDIR), WAM_WD2(NUMDIR), stat=istat)
       IF (istat/=0) CALL WWM_ABORT('CF_*_BOUC allocation error')
       WAM_ID1=0
       WAM_ID2=0
-      DO ID=1,MDC
+      DO ID=1,NUMDIR
         eDIR=SPDIR(ID) * RADDEG
         IsAssigned=.false.
         DO ID1=1,nbdir_wam
@@ -270,19 +303,18 @@
         IF (IsAssigned .eqv. .FALSE.) THEN
           CALL WWM_ABORT('Error in the interpolation direction')
         END IF
-        IF (WRITESTATFLAG == 1) THEN
-          WRITE(STAT%FHNDL,*) 'ID=', ID, 'eDir=', eDIR
-          WRITE(STAT%FHNDL,*) 'WAM_ID12=', WAM_ID1(ID), WAM_ID2(ID)
-          WRITE(STAT%FHNDL,*) 'WAM_WD12=', WAM_WD1(ID), WAM_WD2(ID)
-          WRITE(STAT%FHNDL,*) 'WAM_eD12=', ListDir_wam(WAM_ID1(ID)), ListDir_wam(WAM_ID2(ID))
-          FLUSH(STAT%FHNDL)
-        END IF        
+!        WRITE(STAT%FHNDL,*) 'ID=', ID, 'eDir=', eDIR
+!        WRITE(STAT%FHNDL,*) 'WAM_ID12=', WAM_ID1(ID), WAM_ID2(ID)
+!        WRITE(STAT%FHNDL,*) 'WAM_WD12=', WAM_WD1(ID), WAM_WD2(ID)
+!        WRITE(STAT%FHNDL,*) 'WAM_eD12=', ListDir_wam(WAM_ID1(ID)), ListDir_wam(WAM_ID2(ID))
       END DO
-      allocate(WAM_IS1(MSC), WAM_IS2(MSC), WAM_WS1(MSC), WAM_WS2(MSC), stat=istat)
+!      WRITE(STAT%FHNDL,*) 'Interpolation array for direction done'
+!      FLUSH(STAT%FHNDL)
+      allocate(WAM_IS1(NUMSIG), WAM_IS2(NUMSIG), WAM_WS1(NUMSIG), WAM_WS2(NUMSIG), stat=istat)
       IF (istat/=0) CALL WWM_ABORT('CF_*_BOUC allocation error')
       WAM_IS1=0
       WAM_IS2=0
-      DO IS=1,MSC
+      DO IS=1,NUMSIG
         IsAssigned=.FALSE.
         eFR=FR(IS)
         DO iFreq=1,nbfreq_wam-1
@@ -303,6 +335,8 @@
 !        WRITE(STAT%FHNDL,*) 'WAM_IS12=', WAM_IS1(IS), WAM_IS2(IS)
 !        WRITE(STAT%FHNDL,*) 'WAM_WS12=', WAM_WS1(IS), WAM_WS2(IS)
       END DO
+!      WRITE(STAT%FHNDL,*) 'Interpolation array for frequency done'
+!      FLUSH(STAT%FHNDL)
 !      Print *, 'Leaving INIT_GRIB_WAM_BOUNDARY'
       END SUBROUTINE
 !**********************************************************************
@@ -328,6 +362,7 @@
       real(rkind) eTimeOut
       character(len=140) eShortName
       integer iX, iY, ifile
+      real(rkind) eVal
 !      Print *, 'Begin READ_GRIB_WAM_BOUNDARY_WBAC_KERNEL_NAKED'
       DirFreqStatus=0
       eFile=WAM_SPEC_FILE_NAMES_BND(IFILE_IN)
@@ -335,9 +370,10 @@
       CALL GRIB_OPEN_FILE(ifile, TRIM(eFile), 'r')
       call grib_count_in_file(ifile,n)
       allocate(igrib(n))
+      WBAC_WAM=0
       DO i=1,n
         call grib_new_from_file(ifile, igrib(i))
-        CALL RAW_READ_TIME_OF_GRIB_FILE(ifile, igrib(i), STEPRANGE_IN, eTimeOut)
+        CALL RAW_READ_TIME_OF_GRIB_FILE(igrib(i), STEPRANGE_IN, eTimeOut)
         DeltaDiff = abs(eTimeOut - eTimeSearch)
         IF (DeltaDiff .le. 1.0E-8) THEN
           call grib_get(igrib(i), 'shortName', eShortName)
@@ -345,16 +381,23 @@
             call grib_get(igrib(i), 'directionNumber', idir)
             call grib_get(igrib(i), 'frequencyNumber', ifreq)
             CALL grib_get(igrib(i), 'values', values)
+!            WRITE(STAT%FHNDL,*) 'idir=', idir, ' ifreq=', ifreq
+!            WRITE(STAT%FHNDL,*) 'max(values)=', maxval(values)
+!            WRITE(STAT%FHNDL,*) 'min(values)=', minval(values)
             DirFreqStatus(idir, ifreq) = 1
             idx=0
             DO iY=1,ny_wam
               DO iX=1,nx_wam
                 idx=idx+1
-                WBAC_WAM(idir, ifreq, iX,iY) = values(idx)
+                IF (values(idx) .lt. MyREAL(9990)) THEN
+                  eVal=EXP(values(idx)*LOG(10.))
+                  WBAC_WAM(idir, ifreq, iX,iY) = eVal
+                ENDIF
               END DO
-            END DO  
+            END DO
           END IF
         END IF
+        CALL grib_release(igrib(i))
       END DO
       deallocate(igrib)
       CALL GRIB_CLOSE_FILE(ifile)
@@ -362,7 +405,9 @@
       if (eDiff .ne. 0) THEN
         CALL WWM_ABORT('Error reading WAM file. Some direction/frequencies not assigned')
       END IF
-      WRITE(STAT%FHNDL,*) 'sum(WBAC_WAM)=', sum(WBAC_WAM)
+!      WRITE(STAT%FHNDL,*) 'sum(WBAC_WAM)=', sum(WBAC_WAM)
+!      WRITE(STAT%FHNDL,*) 'max(WBAC_WAM)=', maxval(WBAC_WAM)
+!      WRITE(STAT%FHNDL,*) 'min(WBAC_WAM)=', minval(WBAC_WAM)
 !      Print *, 'End READ_GRIB_WAM_BOUNDARY_WBAC_KERNEL_NAKED'
       END SUBROUTINE
 !**********************************************************************
@@ -371,7 +416,7 @@
       SUBROUTINE READ_GRIB_WAM_BOUNDARY_WBAC_KERNEL(WBACOUT, IFILE, eTimeSearch)
       USE DATAPOOL
       IMPLICIT NONE
-      REAL(rkind), INTENT(OUT)   :: WBACOUT(MSC,MDC,IWBMNP)
+      REAL(rkind), INTENT(OUT)   :: WBACOUT(NUMSIG,NUMDIR,IWBMNP)
       integer, intent(in) :: IFILE
       real(rkind), intent(in) :: eTimeSearch
       !
@@ -380,34 +425,41 @@
       integer ID1, ID2, IS1, IS2
       integer ID, IS, J, IP
       real(rkind) WD1, WD2, WS1, WS2
-      real(rkind) ACLOC(MSC,MDC)
+      real(rkind) WALOC(NUMSIG,NUMDIR)
       integer IX, IY
       real(rkind) eAC_1, eAC_2, eAC
-      real(rkind) EM, HS_WAM, eSum
+      real(rkind) EM, HS_WAM, eSum, quot
       integer M, K
       LOGICAL :: DoHSchecks = .TRUE.
-      real(rkind) ETOT, tmp(msc), DS, ETAIL, HS_WWM, EMwork
-      
+      real(rkind) ETOT, tmp(NUMSIG), DS, ETAIL, HS_WWM, EMwork
+      INTEGER SHIFTXY(4,2)
+      SHIFTXY(1,1)=0
+      SHIFTXY(1,2)=0
+      SHIFTXY(2,1)=1
+      SHIFTXY(2,2)=0
+      SHIFTXY(3,1)=0
+      SHIFTXY(3,2)=1
+      SHIFTXY(4,1)=1
+      SHIFTXY(4,2)=1
       CALL READ_GRIB_WAM_BOUNDARY_WBAC_KERNEL_NAKED(WBAC_WAM, IFILE, eTimeSearch)
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'RETURN: sum(WBAC_WAM)=', sum(WBAC_WAM)
-        WRITE(STAT%FHNDL,*) 'IWBMNP=', IWBMNP
-      END IF      
+!      WRITE(STAT%FHNDL,*) 'RETURN: sum(WBAC_WAM)=', sum(WBAC_WAM)
+!      WRITE(STAT%FHNDL,*) 'IWBMNP=', IWBMNP
       DO IP=1,IWBMNP
+!        WRITE(STAT%FHNDL,*) 'IP=', IP
+!        FLUSH(STAT%FHNDL)
         IX=CF_IX_BOUC(IP)
         IY=CF_IY_BOUC(IP)
         WBAC_WAM_LOC=0
         DO J=1,4
           WBAC_WAM_LOC(:,:) = WBAC_WAM_LOC(:,:) + CF_COEFF_BOUC(J,IP)*WBAC_WAM(:,:,IX+SHIFTXY(J,1),IY+SHIFTXY(J,2))
         END DO
-        IF (WRITESTATFLAG == 1) WRITE(STAT%FHNDL,*) 'sum(WBAC_WAM_LOC)=', sum(WBAC_WAM_LOC)
+!        WRITE(STAT%FHNDL,*) '  step 1'
+!        FLUSH(STAT%FHNDL)
         !
         IF (DoHSchecks) THEN
-          IF (WRITESTATFLAG == 1) THEN
-            DO J=1,4
-              WRITE(STAT%FHNDL,*) 'J=', J, ' eCF=', CF_COEFF_BOUC(J,IP)
-            END DO
-          END IF
+!          DO J=1,4
+!            WRITE(STAT%FHNDL,*) 'J=', J, ' eCF=', CF_COEFF_BOUC(J,IP)
+!          END DO
           EM=0
           DO M=1,nbfreq_wam
             eSum=0
@@ -415,60 +467,80 @@
               eSum = eSum + WBAC_WAM_LOC(K,M)
             END DO
             EM = EM + DFIM_WAM(M)*eSum
-            Print *, 'M=', M, ' EM=', EM
+!            Print *, 'M=', M, ' EM=', EM
           END DO
-          Print *, 'DELT25=', DELT25_WAM
+!          Print *, 'DELT25=', DELT25_WAM
           EM = EM + DELT25_WAM*eSum
-          Print *, 'EM=', EM
+!          Print *, 'EM=', EM
           EMwork=MAX(ZERO, EM)
-          Print *, 'EMwork=', EMwork
+!          Print *, 'EMwork=', EMwork
           HS_WAM = 4.*SQRT(EMwork)
         END IF
-        ACLOC=0
-        DO IS=1,MSC
-          DO ID=1,MDC
+        WRITE(STAT%FHNDL,*) '  step 2'
+        FLUSH(STAT%FHNDL)
+        WALOC=0
+        DO IS=1,NUMSIG
+          DO ID=1,NUMDIR
             ID1=WAM_ID1(ID)
             ID2=WAM_ID2(ID)
             WD1=WAM_WD1(ID)
             WD2=WAM_WD2(ID)
             !
-            IS1=WAM_IS1(ID)
-            IS2=WAM_IS2(ID)
-            WS1=WAM_WS1(ID)
-            WS2=WAM_WS2(ID)
+            IS1=WAM_IS1(IS)
+            IS2=WAM_IS2(IS)
+            WS1=WAM_WS1(IS)
+            WS2=WAM_WS2(IS)
             !
-            Print *, 'ID12=', ID1, ID2, ' IS12=', IS1, IS2
+!            WRITE(STAT%FHNDL,*) 'ID12=', ID1, ID2, ' IS12=', IS1, IS2
+!            FLUSH(STAT%FHNDL)
             IF (IS1 .gt. 0) THEN
               eAC_1=WD1 * WBAC_WAM_LOC(ID1, IS1) + WD2 * WBAC_WAM_LOC(ID2, IS1)
               eAC_2=WD1 * WBAC_WAM_LOC(ID1, IS2) + WD2 * WBAC_WAM_LOC(ID2, IS2)
+!              WRITE(STAT%FHNDL,*) 'eAC_1/2=', eAC_1, eAC_2
+!              FLUSH(STAT%FHNDL)
               eAC=WS1 * eAC_1 + WS2 * eAC_2
-              ACLOC(IS,ID)=eAC
+!              WRITE(STAT%FHNDL,*) 'eAC=', eAC
+!              FLUSH(STAT%FHNDL)
+              WALOC(IS,ID)=eAC / (SPSIG(IS) * PI2)
+!              WRITE(STAT%FHNDL,*) 'after write'
+!              FLUSH(STAT%FHNDL)
             END IF
           END DO
         END DO
+!        WRITE(STAT%FHNDL,*) '  step 3'
+!        FLUSH(STAT%FHNDL)
         IF (DoHSchecks) THEN
           ETOT=0
-          DO ID=1,MDC
-            tmp(:) = acloc(:,id) * spsig
+          DO ID=1,NUMDIR
+            tmp(:) = WALOC(:,id) * spsig
             ETOT = ETOT + tmp(1) * ONEHALF * ds_incr(1)*ddir
-            do is = 2, msc
+            do is = 2, NUMSIG
               ETOT = ETOT + ONEHALF*(tmp(is)+tmp(is-1))*ds_band(is)*ddir
             end do
-            ETOT = ETOT + ONEHALF * tmp(msc) * ds_incr(msc)*ddir
+            ETOT = ETOT + ONEHALF * tmp(NUMSIG) * ds_incr(NUMSIG)*ddir
           END DO
-          DS    = SPSIG(MSC) - SPSIG(MSC-1)
-          ETAIL = SUM(ACLOC(MSC,:)) * SIGPOW(MSC,2) * DDIR * DS
-          ETOT  = ETOT + PTAIL(6) * ETAIL
+          DS    = SPSIG(NUMSIG) - SPSIG(NUMSIG-1)
+          ETAIL = SUM(WALOC(NUMSIG,:)) * SIGPOW(NUMSIG,2) * DDIR * DS
+          ETOT  = ETOT + TAIL_ARR(6) * ETAIL
           HS_WWM = 4*SQRT(MAX(0.0, ETOT))
-          IF (WRITESTATFLAG == 1) THEN
-            WRITE(STAT%FHNDL,*) 'BOUND IP=', IP, '/', IWBMNP
-            WRITE(STAT%FHNDL,*) 'ETOT(WAM/WWM)=', EM, ETOT
-            WRITE(STAT%FHNDL,*) 'HS(WAM/WWM)=', HS_WAM, HS_WWM, ETOT
-            FLUSH(STAT%FHNDL)
-          END IF          
+          IF (ETOT .gt. 0) THEN
+            quot = EM/ETOT
+          ELSE
+            quot = -1
+          END IF
+!          WRITE(STAT%FHNDL,*) 'BOUND IP=', IP, '/', IWBMNP
+!          WRITE(STAT%FHNDL,*) 'ETOT(WAM/WWM)=', EM, ETOT
+!          WRITE(STAT%FHNDL,*) 'quot=', quot
+!          WRITE(STAT%FHNDL,*) 'HS(WAM/WWM)=', HS_WAM, HS_WWM, ETOT
         END IF
-        WBACOUT(:,:,IP)=ACLOC
+!        WRITE(STAT%FHNDL,*) '  step 4'
+!        FLUSH(STAT%FHNDL)
+        WBACOUT(:,:,IP)=WALOC
+!        WRITE(STAT%FHNDL,*) '  step 5'
+!        FLUSH(STAT%FHNDL)
       END DO
+!      WRITE(STAT%FHNDL,*) 'Leaving after interpolation of WBAC'
+!      FLUSH(STAT%FHNDL)
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
@@ -476,7 +548,7 @@
       SUBROUTINE READ_GRIB_WAM_BOUNDARY_WBAC(WBACOUT)
       USE DATAPOOL
       IMPLICIT NONE
-      REAL(rkind), INTENT(OUT)   :: WBACOUT(MSC,MDC,IWBMNP)
+      REAL(rkind), INTENT(OUT)   :: WBACOUT(NUMSIG,NUMDIR,IWBMNP)
       !
       integer iTime
       real(rkind) DeltaDiff, eTimeSearch

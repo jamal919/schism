@@ -20,28 +20,23 @@
 ! The code will do all it can to extrapolate: below bottom/above surface.
 ! If a pt in hgrid.ll is outside the background nc grid, const. values will be filled. 
 !
-! ifort -mcmodel=medium -CB -O2 -o gen_nudge_from_hycom.exe ../UtilLib/pt_in_poly_test.f90 ../UtilLib/compute_zcor.f90 gen_nudge_from_hycom.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
+! ifort -mcmodel=medium -CB -O2 -o gen_nudge_from_hycom gen_nudge_from_hycom.f90 ../UtilLib/compute_zcor.f90 -I$NETCDF/include -I$NETCDF_FORTRAN/include -L$NETCDF_FORTRAN/lib -L$NETCDF/lib -lnetcdf -lnetcdff
 
 !   Input: 
 !     (1) hgrid.gr3;
 !     (2) hgrid.ll;
 !     (3) vgrid.in (SCHISM R3000 and up);
-!     (4) TEM_nudge.gr3: used to mark elem's that need nudging (assuming identical to SAL_nudge.gr3!)
+!     (4) include.gr3: if depth=0, skip the interpolation to speed up;
 !     (5) gen_nudge_from_nc.in: 
 !                     1st line: T,S values for pts outside bg grid in nc (make sure nudging zone is inside bg grid in nc)
 !                     2nd line: time step in .nc in sec; output stride
 !                     3rd line: # of nc files
 !     (6) HYCOM files: TS_[1,2,..nfiles].nc (includes lon/lat; beware scaling etc)
-!                      The extent the HYCOM files cover needs to be
-!                      larger than the nudging region specified in TEM_nudge.gr3,
-!                      and lon/lat coord monotonically increasing.
-!   Output: [TEM,SAL]_nu.nc (reduced to within nudging zone only); include3.gr3 (nudging zone)
+!   Output: [TEM,SAL]_nu.nc 
 !   Debug outputs: fort.11 (fatal errors); fort.*
 
       program gen_hot
       use netcdf
-      use compute_zcor
-      use pt_in_poly_test
 
 !      implicit none
 
@@ -63,10 +58,9 @@
       integer :: evid ! SSH variable IDs
       integer :: var1d_dims(1),var4d_dims(4)
       integer, dimension(nf90_max_var_dims) :: dids
-      integer :: lldim ! check lat/lon dimension
              
 !     Local variables for data
-      real (kind = 4), allocatable :: xind(:), yind(:), lind(:), xind2(:,:), yind2(:,:) 
+      real (kind = 4), allocatable :: xind(:), yind(:), lind(:) 
 !     Lat, lon, bathymetry
       real (kind = 4), allocatable :: lat(:,:), lon(:,:), hnc(:)
 !     Vertical postion, salinity, and temperature
@@ -88,25 +82,24 @@
       integer :: ier ! allocate error return.
       integer :: ixlen, iylen, ilen ! sampled lengths in each coordinate direction
       integer :: ixlen1, iylen1,ixlen2, iylen2 !reduced indices for CORIE grid to speed up interpolation
+!      integer :: elnode(4,mne)
+!      dimension xl(mnp),yl(mnp),dp(mnp),i34(mne),include2(mnp)
+!      dimension tempout(mnp,mnv), saltout(mnp,mnv)
+!      dimension ztot(0:mnv),sigma(mnv),ixy(mnp,3),arco(3,mnp)
       real, allocatable :: xl(:),yl(:),dp(:),tempout(:,:),saltout(:,:),ztot(:),sigma(:),arco(:,:)
-      integer, allocatable :: i34(:),elnode(:,:),include2(:),ixy(:,:),imap(:)
+      integer, allocatable :: i34(:),elnode(:,:),include2(:),ixy(:,:)
       dimension wild(100),wild2(100,2)
       dimension nx(4,4,3),month_day(12)
       dimension ndays_mon(12)
       allocatable :: z(:,:),sigma_lcl(:,:),kbp2(:),iparen_of_dry(:,:)
-      real*8 :: aa1(1),dtmp
+      real*8 :: aa1(1)
 
 !     First statement
-!     Currently we assume rectangular grid in HYCOM
-!     (interp_mode=0). interp_mode=1 uses generic UG search (splitting
-!     quads) and is kept for more generic cases
-      interp_mode=0
-
       ndays_mon=(/31,28,31,30,31,30,31,31,30,31,30,31/)  !# of days in each month for non-leap yr
 !      hr_char=(/'03','09','15','21'/) !each day has 4 starting hours in ROMS
 
       open(10,file='gen_nudge_from_nc.in',status='old')
-      read(10,*) tem_outside,sal_outside !T,S values for pts outside bg grid in nc or TEM_nudge.gr3
+      read(10,*) tem_outside,sal_outside !T,S values for pts outside bg grid in nc or include.gr3
       read(10,*) dtout,nt_out !time step in .nc [sec], output stride
       !read(10,*) istart_year,istart_mon,istart_day 
       read(10,*) nndays !# of nc files
@@ -114,25 +107,20 @@
 
 !     Read in hgrid and vgrid
       open(16,file='hgrid.ll',status='old')
-      open(15,file='TEM_nudge.gr3',status='old')
+      open(15,file='include.gr3',status='old')
       open(14,file='hgrid.gr3',status='old') !only need depth info and connectivity
       open(19,file='vgrid.in',status='old')
       open(11,file='fort.11',status='replace')
       read(14,*)
       read(14,*)ne,np
-      allocate(xl(np),yl(np),dp(np),i34(ne),elnode(4,ne),include2(np),ixy(np,2),arco(4,np),imap(np))
+      allocate(xl(np),yl(np),dp(np),i34(ne),elnode(4,ne),include2(np),ixy(np,3),arco(3,np))
       read(16,*); read(16,*)
       read(15,*); read(15,*)
       do i=1,np
         read(14,*)j,xtmp,ytmp,dp(i)
         read(16,*)j,xl(i),yl(i) !,dp(i)
-        read(15,*)j,xtmp,ytmp,dtmp
-        !dtmp is double
-        if(abs(dtmp)>1.d-14) then
-          include2(i)=1 !nint(tmp)
-        else
-          include2(i)=0
-        endif
+        read(15,*)j,xtmp,ytmp,tmp
+        include2(i)=nint(tmp)
       enddo !i
       do i=1,ne
         read(14,*)j,i34(i),(elnode(l,i),l=1,i34(i))
@@ -150,44 +138,21 @@
 !        enddo
 !      enddo
 
-!     Expand nudging marker to neighbors (to account for elem)
-      imap=include2 !temp save
-      do i=1,ne
-        if(maxval(include2(elnode(1:i34(i),i)))>0) then
-          imap(elnode(1:i34(i),i))=1
-        endif
-      enddo !i
-      include2=imap
-
       close(14)
       close(15)
       close(16)
-
-      !Output
-      open(15,file='include3.gr3',status='replace')      
-      write(15,*); write(15,*)ne,np
-      icount=0
-      do i=1,np
-        write(15,*)i,xl(i),yl(i),include2(i)
-        if(include2(i)>0) icount=icount+1
-      enddo !i
-      print*, icount,' nodes included in _nu.nc'
-      do i=1,ne
-        write(15,*)i,i34(i),(elnode(l,i),l=1,i34(i))
-      enddo !i
-      close(15)
 
 !     V-grid
       read(19,*)ivcor
       read(19,*)nvrt
       rewind(19)
-      allocate(ztot(nvrt),sigma(nvrt),sigma_lcl(nvrt,np),z(np,nvrt),kbp2(np),tempout(nvrt,np),saltout(nvrt,np))
-      call get_vgrid_single('vgrid.in',np,nvrt,ivcor,kz,h_s,h_c,theta_b,theta_f,ztot,sigma,sigma_lcl,kbp2)
+      allocate(ztot(nvrt),sigma(nvrt),sigma_lcl(nvrt,np),z(np,nvrt),kbp2(np),tempout(np,nvrt),saltout(np,nvrt))
+      call get_vgrid('vgrid.in',np,nvrt,ivcor,kz,h_s,h_c,theta_b,theta_f,ztot,sigma,sigma_lcl,kbp2)
 
 !     Compute z-coord.
       do i=1,np
         if(ivcor==2) then
-          call zcor_SZ_single(max(0.11,dp(i)),0.,0.1,h_s,h_c,theta_b,theta_f,kz,nvrt,ztot,sigma,z(i,:),idry,kbp2(i))
+          call zcor_SZ(max(0.11,dp(i)),0.,0.1,h_s,h_c,theta_b,theta_f,kz,nvrt,ztot,sigma,z(i,:),idry,kbp2(i))
         else if(ivcor==1) then !impose min h
           z(i,kbp2(i):nvrt)=max(0.11,dp(i))*sigma_lcl(kbp2(i):nvrt,i)
         else
@@ -199,12 +164,37 @@
         z(i,1:kbp2(i)-1)=z(i,kbp2(i))
       enddo !i
 
+!     open(54,file='TEM_nu.in',form='unformatted',status='replace')
+!     open(55,file='SAL_nu.in',form='unformatted',status='replace')
+      iret=nf90_create('TEM_nu.nc',OR(NF90_CLOBBER,NF90_NETCDF4),ncid_T)
+      iret=nf90_def_dim(ncid_T,'node',np,node_dim)
+      iret=nf90_def_dim(ncid_T,'nLevels',nvrt,nv_dim)
+      iret=nf90_def_dim(ncid_T,'one',1,one_dim)
+      iret=nf90_def_dim(ncid_T,'time', NF90_UNLIMITED,itime_dim)
+
+      var1d_dims(1)=itime_dim
+      iret=nf90_def_var(ncid_T,'time',NF90_DOUBLE,var1d_dims,itime_id_T)
+      var4d_dims(1)=one_dim; var4d_dims(2)=nv_dim; 
+      var4d_dims(3)=node_dim; var4d_dims(4)=itime_dim
+      iret=nf90_def_var(ncid_T,'tracer_concentration',NF90_FLOAT,var4d_dims,ivar_T)
+      iret=nf90_enddef(ncid_T)
+
+      iret=nf90_create('SAL_nu.nc',OR(NF90_CLOBBER,NF90_NETCDF4),ncid_S)
+      iret=nf90_def_dim(ncid_S,'node',np,node_dim)
+      iret=nf90_def_dim(ncid_S,'nLevels',nvrt,nv_dim)
+      iret=nf90_def_dim(ncid_S,'one',1,one_dim)
+      iret=nf90_def_dim(ncid_S,'time', NF90_UNLIMITED,itime_dim)
+
+      iret=nf90_def_var(ncid_S,'time',NF90_DOUBLE,var1d_dims,itime_id_S)
+      iret=nf90_def_var(ncid_S,'tracer_concentration',NF90_FLOAT,var4d_dims,ivar_S)
+      iret=nf90_enddef(ncid_S)
+
 !start11
 !     Define limits for variables for sanity checks
       tempmin=-15 
       tempmax=50
       saltmin=0
-      saltmax=45.2
+      saltmax=45
 
 !     Assume S,T have same dimensions (and time step) and grids do not change over time
       timeout=-dtout !sec
@@ -227,8 +217,8 @@
 
 !     Get dimnesions from first file, assumed same for all variables
       if(ifile==1) then
-        status = nf90_inq_varid(sid, "salinity", svid)
-        status = nf90_inq_varid(sid, "temperature", tvid)
+        status = nf90_inq_varid(sid, "SALINITY", svid)
+        status = nf90_inq_varid(sid, "TEMPERATURE", tvid)
         write(20,*)'Done reading variable ID'
 
 !       WARNING: indices reversed from ncdump!
@@ -239,26 +229,9 @@
         status = nf90_Inquire_Dimension(sid, dids(4), len = ntime)
         print*, 'ixlen,iylen,ilen,ntime= ',ixlen,iylen,ilen,ntime
 
-!       Check static info (lat/lon) dimension & allocate
-        status = nf90_inq_varid(sid, "xlon", xvid)
-        status = nf90_Inquire_Variable(sid, xvid,ndims = lldim)
-        print*, 'xlon, ylat is ', lldim ,' dimension.'
-        if (lldim.eq.1) then
-           allocate(xind(ixlen),stat=ier)
-           allocate(yind(iylen),stat=ier)
-        else if (lldim.eq.2) then
-           allocate(xind2(ixlen,iylen),stat=ier)
-           allocate(yind2(ixlen,iylen),stat=ier)
-           interp_mode=1
-        else
-           print*, 'Error dimension in xlon,ylat!'
-           stop
-        end if
-
-
 !       allocate arrays
-!       allocate(xind(ixlen),stat=ier)
-!       allocate(yind(iylen),stat=ier)
+        allocate(xind(ixlen),stat=ier)
+        allocate(yind(iylen),stat=ier)
         allocate(lind(ilen),stat=ier)
         allocate(lat(ixlen,iylen))
         allocate(lon(ixlen,iylen))
@@ -271,61 +244,21 @@
 !        allocate(salt0(ixlen,iylen,ilen),stat=ier)
 !        allocate(temp0(ixlen,iylen,ilen),stat=ier)
   
-!       get static info (lat/lon grids etc)
-        if (lldim.eq.1) then
-           status = nf90_inq_varid(sid, "xlon", xvid)
-           status = nf90_get_var(sid, xvid, xind)
-           status = nf90_inq_varid(sid, "ylat", yvid)
-           status = nf90_get_var(sid, yvid, yind)
-        elseif (lldim.eq.2) then
-           status = nf90_inq_varid(sid, "xlon", xvid)
-           status = nf90_get_var(sid, xvid, xind2)
-           status = nf90_inq_varid(sid, "ylat", yvid)
-           status = nf90_get_var(sid, yvid, yind2)
-        end if
-
+!       get static info (lat/lon grids etc) 
         status = nf90_inq_varid(sid, "depth", hvid)
         status = nf90_get_var(sid, hvid, hnc)
+        status = nf90_inq_varid(sid, "lon", xvid)
+        status = nf90_get_var(sid, xvid, xind)
+        status = nf90_inq_varid(sid, "lat", yvid)
+        status = nf90_get_var(sid, yvid, yind)
 
 !       processing static info
-!       lon/lat as 2D arrays mostly for potential extension to
-!       non-rectangular grids
-        if (lldim.eq.1) then
-           do i=1,ixlen
-             lon(i,:)=xind(i)
-             if(i<ixlen) then; if(xind(i)>=xind(i+1)) then
-               write(11,*)'Lon must be increasing:',i,xind(i),xind(i+1)
-               stop
-             endif; endif;
-           enddo !i
-           do j=1,iylen
-             lat(:,j)=yind(j)
-             if(j<iylen) then; if(yind(j)>=yind(j+1)) then
-               write(11,*)'Lat must be increasing:',j,yind(j),yind(j+1)
-               stop
-             endif; endif;
-           enddo !j
-        elseif (lldim.eq.2) then
-           lon=xind2
-           lat=yind2
-           do j=1,iylen
-            do i=1,ixlen
-             if(i<ixlen) then; if(lon(i,j)>=lon(i+1,j)) then
-               write(11,*)'Lon must be increasing:',i,lon(i,j),lon(i+1,j)
-               stop
-             endif; endif;
-            enddo !i
-           enddo !j
-           do i=1,ixlen
-            do j=1,iylen
-             if(j<iylen) then; if(lat(i,j)>=lat(i,j+1)) then
-               write(11,*)'Lat must be increasing:',i,lat(i,j),lat(i,j+1)
-               stop
-             endif; endif;
-            enddo !j
-           enddo !i
-        end if
-
+        do i=1,ixlen
+          lon(i,:)=xind(i)
+        enddo !i
+        do j=1,iylen
+          lat(:,j)=yind(j)
+        enddo !j
 !        lon=lon-360 !convert to our long.
 
 !       Grid bounds for searching for parents  later
@@ -372,8 +305,7 @@
         !Scaling etc
         salt=salt*1.e-3+20
         temp=temp*1.e-3+20
-        !Define junk value for sid; the test is
-        !salt<rjunk+0.1
+        !Define junk value for sid; the test is abs(salt-rjunk)<1.e-4
         rjunk=-3.e4*1.e-3+20
 
 !       done read nc this step
@@ -388,14 +320,14 @@
           ndrypt=0 !# of dry nodes in nc
           do i=1,ixlen
             do j=1,iylen
-              if(salt(i,j,ilen)<rjunk+0.1) then
+              if(abs(salt(i,j,ilen)-rjunk)<1.e-4) then
                 kbp(i,j)=-1 !dry
                 ndrypt=ndrypt+1
               else !wet
                 !Extend near bottom
                 klev0=-1 !flag
                 do k=1,ilen
-                  if(salt(i,j,k)>rjunk) then
+                  if(abs(salt(i,j,k)-rjunk)>=1.e-4) then
                     klev0=k; exit
                   endif
                 enddo !k
@@ -507,91 +439,54 @@
             !won't work across dateline
             if(xl(i)<xlmin.or.xl(i)>xlmax.or.yl(i)<ylmin.or.yl(i)>ylmax) cycle loop4
             if(include2(i)==0) cycle loop4
-            
-            if(interp_mode==0) then !SG search
-              do ix=1,ixlen-1
-                if(xl(i)>=xind(ix).and.xl(i)<=xind(ix+1)) then
-                  !Lower left corner index
-                  ixy(i,1)=ix 
-                  xrat=(xl(i)-xind(ix))/(xind(ix+1)-xind(ix))
-                  exit
-                endif
-              enddo !ix
-              do iy=1,iylen-1
-                if(yl(i)>=yind(iy).and.yl(i)<=yind(iy+1)) then
-                  !Lower left corner index
-                  ixy(i,2)=iy 
-                  yrat=(yl(i)-yind(iy))/(yind(iy+1)-yind(iy))
-                  exit
-                endif
-              enddo !ix
 
-              if(ixy(i,1)==0.or.ixy(i,2)==0) then
-                write(11,*)'Did not find parent:',i,ixy(i,1:2)
-                stop
-              endif
-              if(xrat<0.or.xrat>1.or.yrat<0.or.yrat>1) then
-                write(11,*)'Ratio out of bound:',i,xrat,yrat
-                stop
-              endif
-
-              !Bilinear shape function
-              arco(1,i)=(1-xrat)*(1-yrat)
-              arco(2,i)=xrat*(1-yrat)
-              arco(4,i)=(1-xrat)*yrat
-              arco(3,i)=xrat*yrat
-            else !interp_mode=1; generic search with UG
-              do ix=1,ixlen-1 
-                do iy=1,iylen-1 
-                  x1=lon(ix,iy); x2=lon(ix+1,iy); x3=lon(ix+1,iy+1); x4=lon(ix,iy+1)
-                  y1=lat(ix,iy); y2=lat(ix+1,iy); y3=lat(ix+1,iy+1); y4=lat(ix,iy+1)
-                  a1=abs(signa_single(xl(i),x1,x2,yl(i),y1,y2))
-                  a2=abs(signa_single(xl(i),x2,x3,yl(i),y2,y3))
-                  a3=abs(signa_single(xl(i),x3,x4,yl(i),y3,y4))
-                  a4=abs(signa_single(xl(i),x4,x1,yl(i),y4,y1))
-                  b1=abs(signa_single(x1,x2,x3,y1,y2,y3))
-                  b2=abs(signa_single(x1,x3,x4,y1,y3,y4))
-                  rat=abs(a1+a2+a3+a4-b1-b2)/(b1+b2)
-                  if(rat<small1) then
-                    ixy(i,1)=ix; ixy(i,2)=iy
-!                   Find a triangle
-                    in=0 !flag
-                    do l=1,2 !split quad
-                      ap=abs(signa_single(xl(i),x1,x3,yl(i),y1,y3))
-                      if(l==1) then !nodes 1,2,3
-                        bb=abs(signa_single(x1,x2,x3,y1,y2,y3))
-                        wild(l)=abs(a1+a2+ap-bb)/bb
-                        if(wild(l)<small1*5) then
-                          in=1
-                          arco(1,i)=max(0.,min(1.,a2/bb))
-                          arco(2,i)=max(0.,min(1.,ap/bb))
-                          arco(3,i)=max(0.,min(1.,1-arco(1,i)-arco(2,i)))
-                          arco(4,i)=0.
-                          exit
-                        endif
-                      else !nodes 1,3,4
-                        bb=abs(signa_single(x1,x3,x4,y1,y3,y4))
-                        wild(l)=abs(a3+a4+ap-bb)/bb
-                        if(wild(l)<small1*5) then
-                          in=2
-                          arco(1,i)=max(0.,min(1.,a3/bb))
-                          arco(3,i)=max(0.,min(1.,a4/bb))
-                          arco(4,i)=max(0.,min(1.,1-arco(1,i)-arco(3,i)))
-                          arco(2,i)=0.
-                          exit
-                        endif
+            do ix=1,ixlen-1 
+              do iy=1,iylen-1 
+                x1=lon(ix,iy); x2=lon(ix+1,iy); x3=lon(ix+1,iy+1); x4=lon(ix,iy+1)
+                y1=lat(ix,iy); y2=lat(ix+1,iy); y3=lat(ix+1,iy+1); y4=lat(ix,iy+1)
+                a1=abs(signa(xl(i),x1,x2,yl(i),y1,y2))
+                a2=abs(signa(xl(i),x2,x3,yl(i),y2,y3))
+                a3=abs(signa(xl(i),x3,x4,yl(i),y3,y4))
+                a4=abs(signa(xl(i),x4,x1,yl(i),y4,y1))
+                b1=abs(signa(x1,x2,x3,y1,y2,y3))
+                b2=abs(signa(x1,x3,x4,y1,y3,y4))
+                rat=abs(a1+a2+a3+a4-b1-b2)/(b1+b2)
+                if(rat<small1) then
+                  ixy(i,1)=ix; ixy(i,2)=iy
+!                 Find a triangle
+                  in=0 !flag
+                  do l=1,2 !split quad
+                    ap=abs(signa(xl(i),x1,x3,yl(i),y1,y3))
+                    if(l==1) then !nodes 1,2,3
+                      bb=abs(signa(x1,x2,x3,y1,y2,y3))
+                      wild(l)=abs(a1+a2+ap-bb)/bb
+                      if(wild(l)<small1*5) then
+                        in=1
+                        arco(1,i)=max(0.,min(1.,a2/bb))
+                        arco(2,i)=max(0.,min(1.,ap/bb))
+                        exit
                       endif
-                    enddo !l=1,2
-                    if(in==0) then
-                      write(11,*)'Cannot find a triangle:',(wild(l),l=1,2)
-                      stop
+                    else !nodes 1,3,4
+                      bb=abs(signa(x1,x3,x4,y1,y3,y4))
+                      wild(l)=abs(a3+a4+ap-bb)/bb
+                      if(wild(l)<small1*5) then
+                        in=2
+                        arco(1,i)=max(0.,min(1.,a3/bb))
+                        arco(2,i)=max(0.,min(1.,a4/bb))
+                        exit
+                      endif
                     endif
-                    !ixy(i,3)=in
-                    cycle loop4
-                  endif !rat<small1
-                enddo !iy=iylen1,iylen2-1
-              enddo !ix=ixlen1,ixlen2-1
-            endif !interp_mode
+                  enddo !l=1,2
+                  if(in==0) then
+                    write(11,*)'Cannot find a triangle:',(wild(l),l=1,2)
+                    stop
+                  endif
+                  ixy(i,3)=in
+                  arco(3,i)=max(0.,min(1.,1-arco(1,i)-arco(2,i)))
+                  cycle loop4
+                endif !rat<small1
+              enddo !iy=iylen1,iylen2-1
+            enddo !ix=ixlen1,ixlen2-1
           end do loop4 !i=1,np
 
           call cpu_time(tt1)
@@ -605,7 +500,7 @@
                 !Extend bottom - kbp changes over time
                 klev0=-1 !flag
                 do k=1,ilen
-                  if(salt(i,j,k)>rjunk) then 
+                  if(abs(salt(i,j,k)-rjunk)>=1.e-4) then !salt(i,j,k)<rjunk) then
                     klev0=k; exit
                   endif
                 enddo !k
@@ -667,13 +562,12 @@
 !       Do interpolation
 !        print*, 'Time out (days)=',timeout/86400,it2,ilo,ntime
         tempout=tem_outside; saltout=sal_outside !init
-        npout=0 !# of _valid_ output points
         do i=1,np
           if(ixy(i,1)==0.or.ixy(i,2)==0) then
+!            tempout(i,:)=tem_outside
+!            saltout(i,:)=sal_outside
           else !found parent 
-            npout=npout+1
-            imap(npout)=i
-            ix=ixy(i,1); iy=ixy(i,2) !in=ixy(i,3)
+            ix=ixy(i,1); iy=ixy(i,2); in=ixy(i,3)
             !Find vertical level
             do k=1,nvrt
               if(kbp(ix,iy)==-1) then
@@ -698,99 +592,67 @@
               endif
           
 !              write(18,*)i,k,ix,iy,lev,vrat,kbp(ix,iy)
-              !Impose bounds for odd cases
-              lev2=lev+1
-              lev=max(1,min(ilen,lev))
-              lev2=max(1,min(ilen,lev2))
+              wild2(1,1)=temp(ix,iy,lev)*(1-vrat)+temp(ix,iy,lev+1)*vrat
+              wild2(1,2)=salt(ix,iy,lev)*(1-vrat)+salt(ix,iy,lev+1)*vrat
+              wild2(2,1)=temp(ix+1,iy,lev)*(1-vrat)+temp(ix+1,iy,lev+1)*vrat
+              wild2(2,2)=salt(ix+1,iy,lev)*(1-vrat)+salt(ix+1,iy,lev+1)*vrat
+              wild2(3,1)=temp(ix+1,iy+1,lev)*(1-vrat)+temp(ix+1,iy+1,lev+1)*vrat
+              wild2(3,2)=salt(ix+1,iy+1,lev)*(1-vrat)+salt(ix+1,iy+1,lev+1)*vrat
+              wild2(4,1)=temp(ix,iy+1,lev)*(1-vrat)+temp(ix,iy+1,lev+1)*vrat
+              wild2(4,2)=salt(ix,iy+1,lev)*(1-vrat)+salt(ix,iy+1,lev+1)*vrat
 
-              wild2(1,1)=temp(ix,iy,lev)*(1-vrat)+temp(ix,iy,lev2)*vrat
-              wild2(1,2)=salt(ix,iy,lev)*(1-vrat)+salt(ix,iy,lev2)*vrat
-              wild2(2,1)=temp(ix+1,iy,lev)*(1-vrat)+temp(ix+1,iy,lev2)*vrat
-              wild2(2,2)=salt(ix+1,iy,lev)*(1-vrat)+salt(ix+1,iy,lev2)*vrat
-              wild2(3,1)=temp(ix+1,iy+1,lev)*(1-vrat)+temp(ix+1,iy+1,lev2)*vrat
-              wild2(3,2)=salt(ix+1,iy+1,lev)*(1-vrat)+salt(ix+1,iy+1,lev2)*vrat
-              wild2(4,1)=temp(ix,iy+1,lev)*(1-vrat)+temp(ix,iy+1,lev2)*vrat
-              wild2(4,2)=salt(ix,iy+1,lev)*(1-vrat)+salt(ix,iy+1,lev2)*vrat
-
-              tempout(k,i)=dot_product(wild2(1:4,1),arco(1:4,i))
-              saltout(k,i)=dot_product(wild2(1:4,2),arco(1:4,i))
-!              if(in==1) then
-!                tempout(k,i)=wild2(1,1)*arco(1,i)+wild2(2,1)*arco(2,i)+wild2(3,1)*arco(3,i)
-!                saltout(k,i)=wild2(1,2)*arco(1,i)+wild2(2,2)*arco(2,i)+wild2(3,2)*arco(3,i)
-!              else
-!                tempout(k,i)=wild2(1,1)*arco(1,i)+wild2(3,1)*arco(2,i)+wild2(4,1)*arco(3,i)
-!                saltout(k,i)=wild2(1,2)*arco(1,i)+wild2(3,2)*arco(2,i)+wild2(4,2)*arco(3,i)
-!              endif
+!              wild2(5,1)=uvel(ix,iy,lev)*(1-vrat)+uvel(ix,iy,lev+1)*vrat
+!              wild2(5,2)=vvel(ix,iy,lev)*(1-vrat)+vvel(ix,iy,lev+1)*vrat
+!              wild2(6,1)=uvel(ix+1,iy,lev)*(1-vrat)+uvel(ix+1,iy,lev+1)*vrat
+!              wild2(6,2)=vvel(ix+1,iy,lev)*(1-vrat)+vvel(ix+1,iy,lev+1)*vrat
+!              wild2(7,1)=uvel(ix+1,iy+1,lev)*(1-vrat)+uvel(ix+1,iy+1,lev+1)*vrat
+!              wild2(7,2)=vvel(ix+1,iy+1,lev)*(1-vrat)+vvel(ix+1,iy+1,lev+1)*vrat
+!              wild2(8,1)=uvel(ix,iy+1,lev)*(1-vrat)+uvel(ix,iy+1,lev+1)*vrat
+!              wild2(8,2)=vvel(ix,iy+1,lev)*(1-vrat)+vvel(ix,iy+1,lev+1)*vrat
+              if(in==1) then
+                tempout(i,k)=wild2(1,1)*arco(1,i)+wild2(2,1)*arco(2,i)+wild2(3,1)*arco(3,i)
+                saltout(i,k)=wild2(1,2)*arco(1,i)+wild2(2,2)*arco(2,i)+wild2(3,2)*arco(3,i)
+              else
+                tempout(i,k)=wild2(1,1)*arco(1,i)+wild2(3,1)*arco(2,i)+wild2(4,1)*arco(3,i)
+                saltout(i,k)=wild2(1,2)*arco(1,i)+wild2(3,2)*arco(2,i)+wild2(4,2)*arco(3,i)
+              endif
 
               !Check
-              if(tempout(k,i)<tempmin.or.tempout(k,i)>tempmax.or. &
-               &saltout(k,i)<saltmin.or.saltout(k,i)>saltmax) then
-                write(11,*)'Interpolated values invalid:',i,k,tempout(k,i),saltout(k,i)
+              if(tempout(i,k)<tempmin.or.tempout(i,k)>tempmax.or. &
+               &saltout(i,k)<saltmin.or.saltout(i,k)>saltmax) then
+                write(11,*)'Interpolated values invalid:',i,k,tempout(i,k),saltout(i,k)
                 stop
               endif
 
 !             Enforce lower bound for temp. for eqstate
-              tempout(k,i)=max(0.,tempout(k,i))
+              tempout(i,k)=max(0.,tempout(i,k))
             enddo !k=1,nvrt
           endif !ixy(i,1)==0.or.
         enddo !i=1,np
     
 !       Output (junks outside nudging zone)
         print*, 'outputting _nu.nc at day ',timeout/86400
-!       For debug
-        if(ifile==1.and.it2==ilo) then
-          do i=1,np
-            write(101,*)i,xl(i),yl(i),tempout(nvrt,i)
-            write(102,*)i,xl(i),yl(i),tempout(1,i)
-            write(103,*)i,xl(i),yl(i),saltout(nvrt,i)
-          enddo !i
+!        write(54)timeout
+!        write(55)timeout
+        do i=1,np
+!          write(54)tempout(i,1:nvrt)
+!          write(55)saltout(i,1:nvrt)
 
-          !write(*,*)'# of output nodes=',npout 
-          write(104,*); write(104,*)npout
-          do i=1,npout
-            nd=imap(i)
-            write(104,*)i,xl(nd),yl(nd),0.
-          enddo !i
-        endif !ifile
+!         For debug
+          if(ifile==1.and.it2==ilo) then
+            write(101,*)i,xl(i),yl(i),tempout(i,nvrt)
+            write(102,*)i,xl(i),yl(i),tempout(i,1)
+            write(103,*)i,xl(i),yl(i),saltout(i,nvrt)
+          endif !ifile
+        enddo !i
         close(101); close(102); close(103)
-
-        if(ifile==1.and.it2==ilo) then
-          iret=nf90_create('TEM_nu.nc',OR(NF90_CLOBBER,NF90_NETCDF4),ncid_T)
-          iret=nf90_def_dim(ncid_T,'node',npout,node_dim)
-          iret=nf90_def_dim(ncid_T,'nLevels',nvrt,nv_dim)
-          iret=nf90_def_dim(ncid_T,'one',1,one_dim)
-          iret=nf90_def_dim(ncid_T,'time', NF90_UNLIMITED,itime_dim)
-
-          var1d_dims(1)=itime_dim
-          iret=nf90_def_var(ncid_T,'time',NF90_DOUBLE,var1d_dims,itime_id_T)
-          var1d_dims(1)=node_dim
-          iret=nf90_def_var(ncid_T,'map_to_global_node',NF90_INT,var1d_dims,id_map_T)
-          var4d_dims(1)=one_dim; var4d_dims(2)=nv_dim; 
-          var4d_dims(3)=node_dim; var4d_dims(4)=itime_dim
-          iret=nf90_def_var(ncid_T,'tracer_concentration',NF90_FLOAT,var4d_dims,ivar_T)
-          iret=nf90_enddef(ncid_T)
-
-          iret=nf90_create('SAL_nu.nc',OR(NF90_CLOBBER,NF90_NETCDF4),ncid_S)
-          iret=nf90_def_dim(ncid_S,'node',npout,node_dim)
-          iret=nf90_def_dim(ncid_S,'nLevels',nvrt,nv_dim)
-          iret=nf90_def_dim(ncid_S,'one',1,one_dim)
-          iret=nf90_def_dim(ncid_S,'time', NF90_UNLIMITED,itime_dim)
-
-          var1d_dims(1)=itime_dim
-          iret=nf90_def_var(ncid_S,'time',NF90_DOUBLE,var1d_dims,itime_id_S)
-          var1d_dims(1)=node_dim
-          iret=nf90_def_var(ncid_S,'map_to_global_node',NF90_INT,var1d_dims,id_map_S)
-          iret=nf90_def_var(ncid_S,'tracer_concentration',NF90_FLOAT,var4d_dims,ivar_S)
-          iret=nf90_enddef(ncid_S)
-        endif !ifile
 
         aa1(1)=timeout/86400
         iret=nf90_put_var(ncid_T,itime_id_T,aa1,(/irecout2/),(/1/))
         iret=nf90_put_var(ncid_S,itime_id_S,aa1,(/irecout2/),(/1/))
-        iret=nf90_put_var(ncid_T,id_map_T,imap(1:npout),(/1/),(/npout/))
-        iret=nf90_put_var(ncid_S,id_map_S,imap(1:npout),(/1/),(/npout/))
-        iret=nf90_put_var(ncid_T,ivar_T,tempout(:,imap(1:npout)),(/1,1,1,irecout2/),(/1,nvrt,npout,1/))
-        iret=nf90_put_var(ncid_S,ivar_S,saltout(:,imap(1:npout)),(/1,1,1,irecout2/),(/1,nvrt,npout,1/))
+        iret=nf90_put_var(ncid_T,ivar_T,transpose(tempout),(/1,1,1,irecout2/),(/1,nvrt,np,1/))
+        iret=nf90_put_var(ncid_S,ivar_S,transpose(saltout),(/1,1,1,irecout2/),(/1,nvrt,np,1/))
+
       enddo !it2=ilo,ntime
 
       status = nf90_close(sid)
@@ -821,4 +683,11 @@
       end subroutine check  
 
       end program gen_hot
+
+      function signa(x1,x2,x3,y1,y2,y3)
+
+      signa=((x1-x3)*(y2-y3)-(x2-x3)*(y1-y3))/2
+
+      return
+      end
 

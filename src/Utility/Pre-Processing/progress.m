@@ -1,4 +1,3 @@
-%Author: Ivica Janekovic
 function progress(size,current,text_mode)
 
 % progress(size,current,text_mode)

@@ -20,11 +20,11 @@
       posBlank=INDEX(eStrUnitTime(1:alen), ' ')
       Xname=eStrUnitTime(1:posBlank-1) ! should be days/hours/seconds
       IF (TRIM(Xname) .eq. 'days') THEN
-        ConvertToDay=1
+        ConvertToDay=MyREAL(1)
       ELSEIF (TRIM(Xname) .eq. 'hours') THEN
-        ConvertToDay=1/24
+        ConvertToDay=MyREAL(1)/MyREAL(24)
       ELSEIF (TRIM(Xname) .eq. 'seconds') THEN
-        ConvertToDay=1/86400
+        ConvertToDay=MyREAL(1)/MyREAL(86400)
       ELSE
         CALL WWM_ABORT('Error in the code for conversion')
       END IF
@@ -72,7 +72,7 @@
       eStrTime( 4: 4)=YnameYear( 4: 4)
       !
       ! month
-      IF (WRITEWINDBGFLAG == 1) WRITE(WINDBG%FHNDL,*) 'YnameMonth=', YnameMonth
+      WRITE(STAT%FHNDL,*) 'YnameMonth=', YnameMonth
       lenMonth=LEN_TRIM(YnameMonth)
       IF (lenMonth .eq. 2) THEN
         eStrTime( 5: 5)=YnameMonth( 1: 1)
@@ -152,23 +152,21 @@
             eStrTime(14:14)='0'
             eStrTime(15:15)=YnameSec( 1: 1)
           ELSE
-            IF (WRITEWINDBGFLAG == 1) THEN
-              WRITE(WINDBG%FHNDL,*) 'YnameSec=', TRIM(Ynamesec)
-              WRITE(WINDBG%FHNDL,*) 'lenSec=', lenSec
-              FLUSH(WINDBG%FHNDL)
-            END IF            
+            WRITE(STAT%FHNDL,*) 'YnameSec=', TRIM(Ynamesec)
+            WRITE(STAT%FHNDL,*) 'lenSec=', lenSec
+            FLUSH(STAT%FHNDL)
             CALL WWM_ABORT('DIE in trying to get the sec')
           END IF
         END IF
       END IF
-      IF (WRITEWINDBGFLAG == 1) WRITE(WINDBG%FHNDL,*) 'eStrTime=', eStrTime
+      WRITE(STAT%FHNDL,*) 'eStrTime=', eStrTime
       CALL CT2MJD(eStrTime, eTimeStart)
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
       SUBROUTINE DETERMINE_NEEDED_COMPUTATION(eVar)
-      USE DATAPOOL, only : VAROUT, OUTVARS_COMPLETE
+      USE DATAPOOL, only : VAROUT, OUTVARS_COMPLETE, istat
       implicit none
       type(VAROUT), intent(inout) :: eVar
       LOGICAL     ::   HS, TM01, TM02, TM10, KLM, WLM,                  &
@@ -185,7 +183,7 @@
       LOGICAL :: ComputeMean, ComputeDirSpread, ComputePeak
       LOGICAL :: ComputeCurr, ComputeUrsell, ComputeStokes
       integer iVar, idx, nbOutVarEff
-      integer istat
+      logical CFL_CASD1, CFL_CASD2, CFL_CASD3, CFL_CASD4
       HS           = eVar%LVAR( 1)
       TM01         = eVar%LVAR( 2)
       TM02         = eVar%LVAR( 3)
@@ -245,6 +243,10 @@
       CFL2         = eVar%LVAR(57)
       CFL3         = eVar%LVAR(58)
       ZETA_SETUP   = eVar%LVAR(59)
+      CFL_CASD1    = eVar%LVAR(60)
+      CFL_CASD2    = eVar%LVAR(61)
+      CFL_CASD3    = eVar%LVAR(62)
+      CFL_CASD4    = eVar%LVAR(63)
       ComputeMean=.FALSE.
       ComputeDirSpread=.FALSE.
       ComputePeak=.FALSE.
@@ -342,8 +344,7 @@
       END DO
       MaxIEcont=maxval(ContElements)
       SatMaxDeg=2*MaxIEcont
-      allocate(ListAdjWithDupl(SatMaxDeg,NP_TOTAL))
-      allocate(IEcontain(MaxIEcont,NP_TOTAL))
+      allocate(ListAdjWithDupl(SatMaxDeg,NP_TOTAL), IEcontain(MaxIEcont,NP_TOTAL), stat=istat)
       ListDegWork=0
       DO IE=1,NE_TOTAL
         DO I=1,3
@@ -364,24 +365,19 @@
           ListAdjWithDupl(2*pos+1,IP)=IP_N
           ListAdjWithDupl(2*pos+2,IP)=IP_P
           IF ((IP.eq.IP_N).or.(IP.eq.IP_P)) THEN
-            IF (WRITEDBGFLAG == 1) THEN
-              WRITE(DBG%FHNDL,*) 'IE=', IE
-              WRITE(DBG%FHNDL,*) 'I=', I, 'IP=', IP
-              WRITE(DBG%FHNDL,*) 'INEXT=', INEXT, ' IP_N=', IP_N
-              WRITE(DBG%FHNDL,*) 'IPREV=', IPREV, ' IP_P=', IP_P
-              CALL WWM_ABORT("logical error")
-            END IF            
+            WRITE(DBG%FHNDL,*) 'IE=', IE
+            WRITE(DBG%FHNDL,*) 'I=', I, 'IP=', IP
+            WRITE(DBG%FHNDL,*) 'INEXT=', INEXT, ' IP_N=', IP_N
+            WRITE(DBG%FHNDL,*) 'IPREV=', IPREV, ' IP_P=', IP_P
+            CALL WWM_ABORT("logical error")
           END IF
           IEcontain(pos+1,IP)=IE
           ListDegWork(IP)=pos+1
         END DO
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'Stage 1 finished'
-        FLUSH(STAT%FHNDL)
-      END IF
-      allocate(StatusAdj(SatMaxDeg))
-      allocate(TheBound % IOBP(np_total))
+!      WRITE(STAT%FHNDL,*) 'Stage 1 finished'
+!      FLUSH(STAT%FHNDL)
+      allocate(StatusAdj(SatMaxDeg), TheBound % IOBP(np_total), stat=istat)
       NumberAllTwo=0
       NumberBoundary=0
       NumberPathological=0
@@ -407,11 +403,11 @@
             END DO
             IF (nb .eq. 0) CALL WWM_ABORT("Clear bug in code")
             IF (nb .gt. 2) THEN
-              IF (WRITEDBGFLAG == 1) WRITE(DBG%FHNDL,*) 'IP=', IP, 'IPadj=', IPadj
+              WRITE(DBG%FHNDL,*) 'IP=', IP, 'IPadj=', IPadj
               DO J=1,eDeg
                 IE=IEcontain(J,IP)
-                IF (WRITEDBGFLAG == 1) WRITE(DBG%FHNDL,*) 'IE=', IE
-                IF (WRITEDBGFLAG == 1) WRITE(DBG%FHNDL,*) 'INE=', INEtotal(1,IE), INEtotal(2,IE), INEtotal(3,IE)
+                WRITE(DBG%FHNDL,*) 'IE=', IE
+                WRITE(DBG%FHNDL,*) 'INE=', INEtotal(1,IE), INEtotal(2,IE), INEtotal(3,IE)
               END DO
               CALL WWM_ABORT("Hopelessly pathological grid")
             END IF
@@ -435,14 +431,13 @@
           TheBound % nbVertBound=TheBound % nbVertBound+1
         END IF
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'NumberAllTwo      =', NumberAllTwo
-        WRITE(STAT%FHNDL,*) 'NumberBoundary    =', NumberBoundary
-        WRITE(STAT%FHNDL,*) 'NumberPathological=', NumberPathological
-        WRITE(STAT%FHNDL,*) 'Stage 2 finished'
-        FLUSH(STAT%FHNDL)
-      END IF
-      allocate(TheBound % ListBoundEdge(2, TheBound % nbEdgeBound))
+      WRITE(STAT%FHNDL,*) 'NumberAllTwo      =', NumberAllTwo
+      WRITE(STAT%FHNDL,*) 'NumberBoundary    =', NumberBoundary
+      WRITE(STAT%FHNDL,*) 'NumberPathological=', NumberPathological
+      FLUSH(STAT%FHNDL)
+!      WRITE(STAT%FHNDL,*) 'Stage 2 finished'
+!      FLUSH(STAT%FHNDL)
+      allocate(TheBound % ListBoundEdge(2, TheBound % nbEdgeBound), stat=istat)
       idxEdgeBound=0
       TheBound % IOBP = 0
       DO IP=1,NP_TOTAL
@@ -467,11 +462,9 @@
           END IF
         END DO
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'Stage 3 finished'
-        FLUSH(STAT%FHNDL)
-      END IF
-      allocate(TheBound % ListVertBound(TheBound % nbVertBound))
+!      WRITE(STAT%FHNDL,*) 'Stage 3 finished'
+!      FLUSH(STAT%FHNDL)
+      allocate(TheBound % ListVertBound(TheBound % nbVertBound), stat=istat)
       idx=0
       DO IP=1,np_total
         IF (TheBound % IOBP(IP) .eq. 1) THEN
@@ -493,7 +486,7 @@
       ListDegVertBound=0
 !      Print *, 'nbEdgeBound=', TheBound % nbEdgeBound
 !      Print *, 'MaxNbContEdge=', MaxNbContEdge, ' np_total=', np_total
-      allocate(MappingIP_iEdgeBound(MaxNbContEdge,np_total))
+      allocate(MappingIP_iEdgeBound(MaxNbContEdge,np_total), stat=istat)
       DO iEdgeBound=1,TheBound % nbEdgeBound
         DO I=1,2
           IP=TheBound % ListBoundEdge(I,iEdgeBound)
@@ -502,12 +495,9 @@
           ListDegVertBound(IP)=eDeg+1
         END DO
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'Stage 4 finished'
-        FLUSH(STAT%FHNDL)
-      END IF
-      allocate(TheBound % AdjacencyEdgeBound(2,TheBound % nbEdgeBound))
-      allocate(ListDegEdgeBound(TheBound % nbEdgeBound))
+!      WRITE(STAT%FHNDL,*) 'Stage 4 finished'
+!      FLUSH(STAT%FHNDL)
+      allocate(TheBound % AdjacencyEdgeBound(2,TheBound % nbEdgeBound), ListDegEdgeBound(TheBound % nbEdgeBound), stat=istat)
       ListDegEdgeBound=0
       DO IP=1,np_total
         IF (IsPointClassicalBoundary(IP) .eq. 1) THEN
@@ -544,8 +534,7 @@
               IF (nb .eq. 1) eRealDegBound=eRealDegBound+1
             END IF
           END DO
-          allocate(ListAdjVert(eRealDeg))
-          allocate(ListAdjVertBound(eRealDegBound))
+          allocate(ListAdjVert(eRealDeg), ListAdjVertBound(eRealDegBound), stat=istat)
           StatusAdj=0
           idxDeg=0
           idxDegBound=0
@@ -570,7 +559,7 @@
           END DO
           if (idxDegBound .ne. eRealDegBound) CALL WWM_ABORT("Logical error on eRealDegBound")
           nbContIE=ListDegWork(IP)
-          allocate(ListMatchVert(eRealDegBound))
+          allocate(ListMatchVert(eRealDegBound), stat=istat)
           ListMatchVert=ListAdjVertBound
           DO 
             WeDoOperation=.false.
@@ -603,7 +592,7 @@
               EXIT
             END IF
           END DO
-          allocate(ListAng(eRealDegBound))
+          allocate(ListAng(eRealDegBound), stat=istat)
           DO iVertBound=1,eRealDegBound
             IPadj=ListAdjVertBound(iVertBound)
             DeltaX=XPtotal(IPadj) - XPtotal(IP)
@@ -611,7 +600,7 @@
             eAng=ATAN2(DeltaY, DeltaX)
             ListAng(iVertBound)=eAng
           END DO
-          allocate(ListPrevVertBound(eRealDegBound), ListNextVertBound(eRealDegBound))
+          allocate(ListPrevVertBound(eRealDegBound), ListNextVertBound(eRealDegBound), stat=istat)
 !          Print *, 'Before determination of next/prev s'
           DO iVertBound=1,eRealDegBound
 !            Print *, 'iVertBound=', iVertBound
@@ -639,7 +628,7 @@
 !            Print *, 'iV=', iVertBound, ' prev/next=', ListPrevVertBound(iVertBound), ListNextVertBound(iVertBound)
           END DO
           deallocate(ListAng)
-          allocate(ListIedgeBound(eRealDegBound))
+          allocate(ListIedgeBound(eRealDegBound), stat=istat)
           DO iVertBound=1,eRealDegBound
             IP1=ListAdjVertBound(iVertBound)
             IF (IP .lt. IP1) THEN
@@ -689,35 +678,23 @@
               ListDegEdgeBound(jEdgeBound)=eDeg+1
             END IF
           END DO
-          deallocate(ListIedgeBound)
-          deallocate(ListMatchVert)
-          deallocate(ListPrevVertBound, ListNextVertBound)
-          deallocate(ListAdjVert, ListAdjVertBound)
+          deallocate(ListIedgeBound, ListMatchVert, ListPrevVertBound, ListNextVertBound, ListAdjVert, ListAdjVertBound)
         END IF
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'Stage 5 finished'
-        FLUSH(STAT%FHNDL)
-      END IF
-      IF (WRITEDBGFLAG == 1) THEN
-        DO iEdgeBound=1,TheBound % nbEdgeBound
-          WRITE(DBG%FHNDL,*) 'iEdgeBound/eDeg=', iEdgeBound, ListDegEdgeBound(iEdgeBound)
-        END DO
-      END IF
+!      WRITE(STAT%FHNDL,*) 'Stage 5 finished'
+!      FLUSH(STAT%FHNDL)
+!      DO iEdgeBound=1,TheBound % nbEdgeBound
+!        WRITE(DBG%FHNDL,*) 'iEdgeBound/eDeg=', iEdgeBound, ListDegEdgeBound(iEdgeBound)
+!      END DO
       DO iEdgeBound=1,TheBound % nbEdgeBound
         IF (ListDegEdgeBound(iEdgeBound) .ne. 2) THEN
-          IF (WRITEDBGFLAG == 1) THEN
-            WRITE(DBG%FHNDL,*) 'iEdgeBound=', iEdgeBound
-            WRITE(DBG%FHNDL,*) 'eDeg=', ListDegEdgeBound(iEdgeBound)
-          END IF
+          WRITE(DBG%FHNDL,*) 'iEdgeBound=', iEdgeBound
+          WRITE(DBG%FHNDL,*) 'eDeg=', ListDegEdgeBound(iEdgeBound)
           CALL WWM_ABORT("Degree error")
         END IF
       END DO
-      allocate(TheBound % NEIGHBORedge(TheBound % nbEdgeBound))
-      allocate(TheBound % CorrespVertex(TheBound % nbEdgeBound))
+      allocate(TheBound % NEIGHBORedge(TheBound % nbEdgeBound), TheBound % CorrespVertex(TheBound % nbEdgeBound), LenCycle(TheBound % nbEdgeBound), TheBound % TheCycleBelong(TheBound % nbEdgeBound), stat=istat)
       TheBound % NEIGHBORedge=0
-      allocate(LenCycle(TheBound % nbEdgeBound))
-      allocate(TheBound % TheCycleBelong(TheBound % nbEdgeBound))
       LenCycle=0
       NbCycle=0
       DO iEdgeBound=1,TheBound % nbEdgeBound
@@ -760,12 +737,13 @@
         END IF
       END DO
       TheBound % NbCycle=NbCycle
-      allocate(TheBound % LenCycle(NbCycle))
+      allocate(TheBound % LenCycle(NbCycle), stat=istat)
       DO i=1,NbCycle
         TheBound % LenCycle(i)=LenCycle(i)
       END DO
-      deallocate(StatusAdj, ListAdjWithDupl)
-      deallocate(MappingIP_iEdgeBound, ListDegEdgeBound)
+      deallocate(StatusAdj, ListAdjWithDupl, MappingIP_iEdgeBound, ListDegEdgeBound)
+      WRITE(STAT%FHNDL,*) 'Leaving SERIAL_GET_BOUNDARY_NEXTGENERATION'
+      FLUSH(STAT%FHNDL)
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
@@ -795,7 +773,6 @@
       integer, intent(in) :: INEglob(ne_glob,3)
       integer iret, var_id, two_dims
       integer nbVertBound_dims, nbEdgeBound_dims, NbCycle_dims
-      integer idx
       character (len = *), parameter :: CallFct="SERIAL_WRITE_BOUNDARY"
       character (len = *), parameter :: FULLNAME = "full-name"
       type(BoundaryInfo) TheBound
@@ -921,7 +898,7 @@
 !**********************************************************************
       SUBROUTINE GENERIC_NETCDF_ERROR_WWM_CLEAR(ncid, CallFct, idx, iret)
       USE NETCDF
-      USE DATAPOOL, only : wwmerr
+      USE DATAPOOL
       implicit none
       integer, intent(in) :: iret, idx, ncid
       character(*), intent(in) :: CallFct
@@ -940,7 +917,7 @@
 !**********************************************************************
       SUBROUTINE GENERIC_NETCDF_ERROR_WWM(CallFct, idx, iret)
       USE NETCDF
-      USE DATAPOOL, only : wwmerr
+      USE DATAPOOL
       implicit none
       integer, intent(in) :: iret, idx
       character(*), intent(in) :: CallFct
@@ -1196,6 +1173,30 @@
         eStr="ZETA_SETUP"
         eStrFullName="Free-surface elevation induced setup"
         eStrUnit="m"
+      ELSE IF (IDX.eq.60) THEN
+        eStr="CFL_CASD1"
+        eStrFullName="maximum value of CAS"
+        eStrUnit="unknown"
+      ELSE IF (IDX.eq.61) THEN
+        eStr="CFL_CASD2"
+        eStrFullName="maximum value of CAD"
+        eStrUnit="unknown"
+      ELSE IF (IDX.eq.62) THEN
+        eStr="CFL_CASD3"
+        eStrFullName="CFL value for CAS"
+        eStrUnit="unknown"
+      ELSE IF (IDX.eq.63) THEN
+        eStr="CFL_CASD4"
+        eStrFullName="CFL value for CAD"
+        eStrUnit="unknown"
+      ELSE IF (IDX.eq.64) THEN
+        eStr="NB_ITER_SOLV"
+        eStrFullName="Number of iteration of the solver"
+        eStrUnit="nondim."
+      ELSE IF (IDX.eq.65) THEN
+        eStr="HMAX"
+        eStrFullName="Wave breaking height"
+        eStrUnit="meter"
       ELSE
         CALL WWM_ABORT('Wrong Number')
       END IF
@@ -1242,13 +1243,13 @@
 !*                                                                    *
 !**********************************************************************
       SUBROUTINE WRITE_NETCDF_TIME(ncid, idx, eTimeDay)
-      USE DATAPOOL, only : DAY2SEC,RKIND, wwmerr
+      USE DATAPOOL
       USE NETCDF
       IMPLICIT NONE
       integer, intent(in) :: ncid, idx
       REAL(rkind), intent(IN) :: eTimeDay
       character (len = *), parameter :: CallFct="WRITE_NETCDF_TIME"
-      integer oceantimeday_id, oceantimestr_id, oceantime_id
+      integer var_id
       integer iret, I
       CHARACTER          :: eChar
       REAL(rkind) eTimeSec
@@ -1256,83 +1257,133 @@
       !
       CALL MJD2CT(eTimeDay,eTimeStr)
       eTimeSec=eTimeDay*DAY2SEC
-      iret=nf90_inq_varid(ncid, 'ocean_time', oceantime_id)
+      iret=nf90_inq_varid(ncid, 'ocean_time', var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 1, iret)
-      iret=nf90_put_var(ncid,oceantime_id,eTimeSec,start=(/idx/) )
+      iret=nf90_put_var(ncid,var_id,eTimeSec,start=(/idx/) )
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 2, iret)
       !
-      iret=nf90_inq_varid(ncid, 'ocean_time_day', oceantimeday_id)
+      iret=nf90_inq_varid(ncid, 'ocean_time_day', var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 3, iret)
-      iret=nf90_put_var(ncid,oceantimeday_id,eTimeDay,start=(/idx/) )
+      iret=nf90_put_var(ncid, var_id,eTimeDay,start=(/idx/) )
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 4, iret)
       !
-      iret=nf90_inq_varid(ncid, 'ocean_time_str', oceantimestr_id)
+      iret=nf90_inq_varid(ncid, 'ocean_time_str', var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 5, iret)
       DO i=1,15
         eChar=eTimeStr(i:i)
-        iret=nf90_put_var(ncid,oceantimestr_id,eChar,start=(/i, idx/) )
+        iret=nf90_put_var(ncid, var_id,eChar,start=(/i, idx/) )
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 6, iret)
       END DO
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE GET_IOBPD_OUTPUT(IOBPDoutput, np_write)
-      USE DATAPOOL, only : MDC, IOBPD, np_total, MULTIPLEOUT_HIS, MNP
-# ifdef MPI_PARALL_GRID
-      USE datapool, only : iplg, comm, nproc, istatus, ierr, myrank, itype
-# endif
+      SUBROUTINE GET_MULTIARR_OUTPUT_I(ARRoutput, ARR, len, np_write)
+      USE DATAPOOL
       IMPLICIT NONE
+      INTEGER, INTENT(OUT) :: ARRoutput(len, np_write)
+      INTEGER, INTENT(in)  :: ARR      (len, MNP)
+      INTEGER, intent(in)  :: len
       INTEGER, intent(in)  :: np_write
-      INTEGER, INTENT(OUT) :: IOBPDoutput(MDC, np_write)
 # ifdef MPI_PARALL_GRID
-      integer, allocatable :: rIOBPD(:,:), rStatus(:), Status(:)
-      integer iProc, IP, istat
+      integer, allocatable :: rARR(:,:), rStatus(:), Status(:)
+      integer iProc, IP
       IF (MULTIPLEOUT_HIS .eq. 1) THEN
-        IOBPDoutput=IOBPD
+        ARRoutput=ARR
       ELSE
-        allocate(rIOBPD(MDC, np_total), rStatus(np_total), Status(np_total), stat=istat)
+        allocate(rARR(len, np_total), rStatus(np_total), Status(np_total), stat=istat)
         IF (istat/=0) CALL WWM_ABORT('wwm_netcdf, allocate error 7')
-        IOBPDoutput=0
+        ARRoutput=0
         Status=0
         DO IP=1,MNP
-          IOBPDoutput(:, iplg(IP))=IOBPD(:,IP)
+          ARRoutput(:, iplg(IP))=ARR(:,IP)
           Status(iplg(IP)) = 1
         END DO
         IF (myrank .eq. 0) THEN
           DO iProc=2,nproc
-            CALL MPI_RECV(rIOBPD, MDC*np_total, itype, iProc-1, 193, comm, istatus, ierr)
+            CALL MPI_RECV(rARR, len*np_total, itype, iProc-1, 193, comm, istatus, ierr)
             CALL MPI_RECV(rStatus, np_total, itype, iProc-1, 197, comm, istatus, ierr)
             DO IP=1,np_total
               IF (rStatus(IP) .eq. 1) THEN
-                IOBPDoutput(:,IP)=rIOBPD(:,IP)
+                Status(IP)=1
+                ARRoutput(:,IP)=rARR(:,IP)
               END IF
             END DO
           END DO
           DO iProc=2,nproc
-            CALL MPI_SEND(IOBPDoutput, MDC*np_total, itype, iProc-1, 199, comm, ierr)
+            CALL MPI_SEND(ARRoutput, len*np_total, itype, iProc-1, 199, comm, ierr)
           END DO
         ELSE
-          CALL MPI_SEND(IOBPDoutput, MDC*np_total, itype, 0, 193, comm, ierr)
+          CALL MPI_SEND(ARRoutput, len*np_total, itype, 0, 193, comm, ierr)
           CALL MPI_SEND(Status, np_total, itype, 0, 197, comm, ierr)
-          CALL MPI_RECV(IOBPDoutput, MDC*np_total, itype, 0, 199, comm, istatus, ierr)
+          CALL MPI_RECV(ARRoutput, len*np_total, itype, 0, 199, comm, istatus, ierr)
         ENDIF
-        deallocate(rIOBPD, rStatus, Status)
+        deallocate(rARR, rStatus, Status)
       END IF
 # else
-      IOBPDoutput=IOBPD
+      ARRoutput=ARR
 # endif
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE WRITE_NETCDF_HEADERS_1(ncid, nbTime, MULTIPLEOUT, GRIDWRITE_W, IOBPD_HISTORY_W, np_write, ne_write)
+      SUBROUTINE GET_MULTIARR_OUTPUT_R(ARRoutput, ARR, len, np_write)
+      USE DATAPOOL
+      IMPLICIT NONE
+      REAL(rkind), INTENT(OUT) :: ARRoutput(len, np_write)
+      REAL(rkind), INTENT(in)  :: ARR      (len, MNP)
+      INTEGER, intent(in)  :: len
+      INTEGER, intent(in)  :: np_write
+# ifdef MPI_PARALL_GRID
+      REAL(rkind), allocatable :: rARR(:,:)
+      integer, allocatable :: rStatus(:), Status(:)
+      integer iProc, IP
+      IF (MULTIPLEOUT_HIS .eq. 1) THEN
+        ARRoutput=ARR
+      ELSE
+        allocate(rARR(len, np_total), rStatus(np_total), Status(np_total), stat=istat)
+        IF (istat/=0) CALL WWM_ABORT('wwm_netcdf, allocate error 7')
+        ARRoutput=0
+        Status=0
+        DO IP=1,MNP
+          ARRoutput(:, iplg(IP))=ARR(:,IP)
+          Status(iplg(IP)) = 1
+        END DO
+        IF (myrank .eq. 0) THEN
+          DO iProc=2,nproc
+            CALL MPI_RECV(rARR, len*np_total, rtype, iProc-1, 193, comm, istatus, ierr)
+            CALL MPI_RECV(rStatus, np_total, itype, iProc-1, 197, comm, istatus, ierr)
+            DO IP=1,np_total
+              IF (rStatus(IP) .eq. 1) THEN
+                Status(IP)=1
+                ARRoutput(:,IP)=rARR(:,IP)
+              END IF
+            END DO
+          END DO
+          DO iProc=2,nproc
+            CALL MPI_SEND(ARRoutput, len*np_total, rtype, iProc-1, 199, comm, ierr)
+          END DO
+        ELSE
+          CALL MPI_SEND(ARRoutput, len*np_total, rtype, 0, 193, comm, ierr)
+          CALL MPI_SEND(Status, np_total, itype, 0, 197, comm, ierr)
+          CALL MPI_RECV(ARRoutput, len*np_total, rtype, 0, 199, comm, istatus, ierr)
+        ENDIF
+        deallocate(rARR, rStatus, Status)
+      END IF
+# else
+      ARRoutput=ARR
+# endif
+      END SUBROUTINE
+!**********************************************************************
+!*                                                                    *
+!**********************************************************************
+      SUBROUTINE WRITE_NETCDF_HEADERS_1(ncid, nbTime, MULTIPLEOUT, GRIDWRITE_W, IOBPD_HISTORY_W, CG_HISTORY_W, np_write, ne_write)
       USE DATAPOOL
       USE NETCDF
       implicit none
       integer, intent(in) :: ncid, nbTime, MULTIPLEOUT
       integer, intent(in) :: np_write, ne_write
-      logical, intent(in) :: GRIDWRITE_W, IOBPD_HISTORY_W
+      logical, intent(in) :: GRIDWRITE_W, IOBPD_HISTORY_W, CG_HISTORY_W
       !
       character (len = *), parameter :: UNITS = "units"
       integer one_dims, two_dims, three_dims, fifteen_dims
@@ -1360,9 +1411,9 @@
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 5, iret)
       iret = nf90_def_dim(ncid, 'mne', ne_write, mne_dims)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 6, iret)
-      iret = nf90_def_dim(ncid, 'nfreq', MSC, nfreq_dims)
+      iret = nf90_def_dim(ncid, 'nfreq', NUMSIG, nfreq_dims)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 7, iret)
-      iret = nf90_def_dim(ncid, 'ndir', MDC, ndir_dims)
+      iret = nf90_def_dim(ncid, 'ndir', NUMDIR, ndir_dims)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 8, iret)
 # ifdef MPI_PARALL_GRID
       IF (MULTIPLEOUT.eq.1) THEN
@@ -1391,7 +1442,7 @@
 # endif
       !
       IF (PARAMWRITE_HIS) THEN
-        CALL WRITE_PARAM_1(ncid, one_dims)
+        CALL WRITE_PARAM_1(ncid, nfreq_dims, ndir_dims, one_dims)
       ENDIF
       !
       CALL WRITE_NETCDF_TIME_HEADER(ncid, nbTime, ntime_dims)
@@ -1441,7 +1492,7 @@
         END IF
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 32, iret)
 ! IOBP
-        iret=nf90_def_var(ncid,"IOBP",NF90_RUNTYPE,(/ p_dims/),var_id)
+        iret=nf90_def_var(ncid,"IOBP",NF90_INT,(/ p_dims/),var_id)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 33, iret)
 ! depth
         iret=nf90_def_var(ncid,'depth',NF90_RUNTYPE,(/ p_dims/),var_id)
@@ -1453,17 +1504,21 @@
         CALL SERIAL_WRITE_BOUNDARY(ncid, np_total, ne_total, INEtotal, Oper)
         !
       END IF
-      IF (IOBPD_HISTORY_W) THEN
 # ifdef MPI_PARALL_GRID
-        IF (MULTIPLEOUT.eq.1) THEN
-          p_dims=np_global_dims
-        ELSE
-          p_dims=mnp_dims
-        END IF
-# else
+      IF (MULTIPLEOUT.eq.1) THEN
+        p_dims=np_global_dims
+      ELSE
         p_dims=mnp_dims
+      END IF
+# else
+      p_dims=mnp_dims
 # endif
+      IF (IOBPD_HISTORY_W) THEN
         iret=nf90_def_var(ncid,'IOBPD',NF90_INT,(/ ndir_dims, p_dims, ntime_dims/), var_id)
+        CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 20, iret)
+      END IF
+      IF (CG_HISTORY_W) THEN
+        iret=nf90_def_var(ncid,'CG',NF90_RUNTYPE,(/ nfreq_dims, p_dims, ntime_dims/), var_id)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 20, iret)
       END IF
       END SUBROUTINE
@@ -1528,7 +1583,7 @@
           iret=nf90_inq_varid(ncid, "x", var_id)
         ENDIF
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 10, iret)
-        iret=nf90_put_var(ncid,var_id,XPtotal, start = (/1/), count = (/ np_total/))
+        iret=nf90_put_var(ncid,var_id,XPtotal)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 11, iret)
         !
         IF (LSPHE) THEN
@@ -1537,17 +1592,17 @@
           iret=nf90_inq_varid(ncid, "y", var_id)
         ENDIF
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 12, iret)
-        iret=nf90_put_var(ncid,var_id,YPtotal, start = (/1/), count = (/ np_total/))
+        iret=nf90_put_var(ncid,var_id,YPtotal)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 13, iret)
         !
         iret=nf90_inq_varid(ncid, "IOBP", var_id)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 14, iret)
-        iret=nf90_put_var(ncid,var_id,IOBPtotal, start = (/1/), count = (/ np_total/))
+        iret=nf90_put_var(ncid,var_id,IOBPtotal)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 15, iret)
         !
         iret=nf90_inq_varid(ncid, "depth", var_id)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 16, iret)
-        iret=nf90_put_var(ncid,var_id,DEPtotal, start = (/1/), count = (/ np_write/))
+        iret=nf90_put_var(ncid,var_id,DEPtotal)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 17, iret)
         !
         Oper=2
@@ -1561,11 +1616,11 @@
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
-      SUBROUTINE WRITE_PARAM_1(ncid, one_dims)
+      SUBROUTINE WRITE_PARAM_1(ncid, nfreq_dims, ndir_dims, one_dims)
       USE NETCDF
-      USE DATAPOOL, only : NF90_RUNTYPE
+      USE DATAPOOL
       implicit none
-      integer, intent(in) :: ncid, one_dims
+      integer, intent(in) :: ncid, nfreq_dims, ndir_dims, one_dims
       integer :: iret, var_id
       character (len = *), parameter :: UNITS = "units"
       iret = nf90_def_var(ncid,'frlow', NF90_RUNTYPE,(/ one_dims/), var_id)
@@ -1575,6 +1630,14 @@
       iret = nf90_def_var(ncid,'frhigh',NF90_RUNTYPE,(/ one_dims/),var_id)
       CALL REPORT_ERROR_DEF(iret, 'frhigh')
       iret = nf90_put_att(ncid,var_id,UNITS,'higher_frequency')
+      !
+      iret = nf90_def_var(ncid,'SPDIR',NF90_RUNTYPE,(/ ndir_dims/),var_id)
+      CALL REPORT_ERROR_DEF(iret, 'SPDIR')
+      iret = nf90_put_att(ncid,var_id,UNITS,'list of wave directions')
+      !
+      iret = nf90_def_var(ncid,'SPSIG',NF90_RUNTYPE,(/ nfreq_dims/),var_id)
+      CALL REPORT_ERROR_DEF(iret, 'SPSIG')
+      iret = nf90_put_att(ncid,var_id,UNITS,'list of wave frequencies')
       !
       iret = nf90_def_var(ncid,'MESNL',NF90_INT,(/ one_dims/),var_id)
       CALL REPORT_ERROR_DEF(iret, 'MESNL')
@@ -1615,83 +1678,105 @@
       iret = nf90_def_var(ncid,'LSPHE',NF90_INT,(/ one_dims/),var_id)
       CALL REPORT_ERROR_DEF(iret, 'LSPHE')
       iret = nf90_put_att(ncid,var_id,'description','spherical coordinates')
-      END SUBROUTINE WRITE_PARAM_1
+      END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
       SUBROUTINE WRITE_PARAM_2(ncid)
-      USE DATAPOOL, only : FRLOW, FRHIGH, ICOMP, AMETHOD, FMETHOD,        &
-     &    DMETHOD, SMETHOD, MESIN, MESBF, MESDS, MESNL, LSPHE
+      USE DATAPOOL
       USE NETCDF
       IMPLICIT NONE
       integer, intent(in) :: ncid
       integer iret, var_id
-      integer LSPHE_INT
       character (len = *), parameter :: CallFct="WRITE_PARAM_2"
+      real(rkind) :: eReal(1)
+      integer :: eInt(1)
+      !
+      eReal(1)=FRLOW
       iret=nf90_inq_varid(ncid, "frlow", var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 1, iret)
-      iret=nf90_put_var(ncid,var_id,FRLOW,start=(/1/) )
+      iret=nf90_put_var(ncid,var_id,eReal)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 2, iret)
       !
+      eReal(1)=FRHIGH
       iret=nf90_inq_varid(ncid, "frhigh", var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 3, iret)
-      iret=nf90_put_var(ncid,var_id,FRHIGH, start=(/1/) )
+      iret=nf90_put_var(ncid,var_id,eReal)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 4, iret)
       !
-      iret=nf90_inq_varid(ncid, "MESIN", var_id)
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 15, iret)
-      iret = nf90_put_var(ncid,var_id,MESIN, start=(/1/) )
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 16, iret)
-      !
-      iret=nf90_inq_varid(ncid, "MESBF", var_id)
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 17, iret)
-      iret=nf90_put_var(ncid,var_id,MESBF, start=(/1/) )
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 18, iret)
-      !
-      iret=nf90_inq_varid(ncid, "MESDS", var_id)
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 19, iret)
-      iret=nf90_put_var(ncid,var_id,MESDS, start=(/1/) )
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 20, iret)
-      !
-      iret=nf90_inq_varid(ncid, "MESNL", var_id)
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 21, iret)
-      iret=nf90_put_var(ncid,var_id,MESNL, start=(/1/) )
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 22, iret)
-      !
-      iret=nf90_inq_varid(ncid, "ICOMP", var_id)
+      iret=nf90_inq_varid(ncid, "SPDIR", var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 5, iret)
-      iret=nf90_put_var(ncid,var_id,ICOMP, start=(/1/) )
+      iret=nf90_put_var(ncid,var_id,SPDIR)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 6, iret)
       !
-      iret=nf90_inq_varid(ncid, "AMETHOD", var_id)
+      iret=nf90_inq_varid(ncid, "SPSIG", var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 7, iret)
-      iret=nf90_put_var(ncid,var_id,AMETHOD, start=(/1/) )
+      iret=nf90_put_var(ncid,var_id,SPSIG)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 8, iret)
       !
-      iret=nf90_inq_varid(ncid, "FMETHOD", var_id)
+      eInt(1)=MESIN
+      iret=nf90_inq_varid(ncid, "MESIN", var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 9, iret)
-      iret=nf90_put_var(ncid,var_id,FMETHOD, start=(/1/) )
+      iret = nf90_put_var(ncid,var_id,eInt)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 10, iret)
       !
-      iret=nf90_inq_varid(ncid, "DMETHOD", var_id)
+      eInt(1)=MESBF
+      iret=nf90_inq_varid(ncid, "MESBF", var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 11, iret)
-      iret=nf90_put_var(ncid,var_id,DMETHOD, start=(/1/) )
+      iret=nf90_put_var(ncid,var_id,eInt)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 12, iret)
       !
-      iret=nf90_inq_varid(ncid, "SMETHOD", var_id)
+      eInt(1)=MESDS
+      iret=nf90_inq_varid(ncid, "MESDS", var_id)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 13, iret)
-      iret=nf90_put_var(ncid,var_id,SMETHOD, start=(/1/) )
+      iret=nf90_put_var(ncid,var_id,eInt)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 14, iret)
       !
+      eInt(1)=MESNL
+      iret=nf90_inq_varid(ncid, "MESNL", var_id)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 15, iret)
+      iret=nf90_put_var(ncid,var_id,eInt)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 16, iret)
+      !
+      eInt(1)=ICOMP
+      iret=nf90_inq_varid(ncid, "ICOMP", var_id)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 17, iret)
+      iret=nf90_put_var(ncid,var_id,eInt)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 18, iret)
+      !
+      eInt(1)=AMETHOD
+      iret=nf90_inq_varid(ncid, "AMETHOD", var_id)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 19, iret)
+      iret=nf90_put_var(ncid,var_id,eInt)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 20, iret)
+      !
+      eInt(1)=FMETHOD
+      iret=nf90_inq_varid(ncid, "FMETHOD", var_id)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 21, iret)
+      iret=nf90_put_var(ncid,var_id,eInt)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 22, iret)
+      !
+      eInt(1)=DMETHOD
+      iret=nf90_inq_varid(ncid, "DMETHOD", var_id)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 23, iret)
+      iret=nf90_put_var(ncid,var_id,eInt)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 24, iret)
+      !
+      eInt(1)=SMETHOD
+      iret=nf90_inq_varid(ncid, "SMETHOD", var_id)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 25, iret)
+      iret=nf90_put_var(ncid,var_id,eInt)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 26, iret)
+      !
       iret=nf90_inq_varid(ncid, "LSPHE", var_id)
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 13, iret)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 27, iret)
       IF (LSPHE) THEN
-        LSPHE_INT=1
+        eInt(1)=1
       ELSE
-        LSPHE_INT=0
+        eInt(1)=0
       END IF
-      iret=nf90_put_var(ncid,var_id,LSPHE_INT, start=(/1/) )
-      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 14, iret)
+      iret=nf90_put_var(ncid,var_id,eInt)
+      CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 28, iret)
       END SUBROUTINE WRITE_PARAM_2
 !**********************************************************************
 !*                                                                    *
@@ -1820,9 +1905,9 @@
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 4, iret)
       iret = nf90_def_dim(ncid, 'nbstation', IOUTS, nbstat_dims)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 5, iret)
-      iret = nf90_def_dim(ncid, 'nfreq', MSC, nfreq_dims)
+      iret = nf90_def_dim(ncid, 'nfreq', NUMSIG, nfreq_dims)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 6, iret)
-      iret = nf90_def_dim(ncid, 'ndir', MDC, ndir_dims)
+      iret = nf90_def_dim(ncid, 'ndir', NUMDIR, ndir_dims)
       CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 7, iret)
       !
 # ifdef MPI_PARALL_GRID
@@ -1842,7 +1927,7 @@
 # endif
       !
       IF (PARAMWRITE_STAT) THEN
-        CALL WRITE_PARAM_1(ncid, one_dims)
+        CALL WRITE_PARAM_1(ncid, nfreq_dims, ndir_dims, one_dims)
       ENDIF
       !
       CALL WRITE_NETCDF_TIME_HEADER(ncid, nbTime, ntime_dims)
@@ -1999,12 +2084,12 @@
 # endif
         iret=nf90_inq_varid(ncid, "spsig", var_id)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 17, iret)
-        iret=nf90_put_var(ncid,var_id,SPSIG, start=(/1/), count =(/MSC/) )
+        iret=nf90_put_var(ncid,var_id,SPSIG, start=(/1/), count =(/NUMSIG/) )
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 18, iret)
         !
         iret=nf90_inq_varid(ncid, "spdir", var_id)
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 19, iret)
-        iret=nf90_put_var(ncid,var_id,SPDIR, start=(/1/), count =(/MDC/) )
+        iret=nf90_put_var(ncid,var_id,SPDIR, start=(/1/), count =(/NUMDIR/) )
         CALL GENERIC_NETCDF_ERROR_WWM(CallFct, 20, iret)
       ENDDO
       END SUBROUTINE

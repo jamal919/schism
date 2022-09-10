@@ -12,15 +12,11 @@ module ice_therm_mod
 !  real(rkind),parameter :: rhoice=  910.   ! Ice density
 !  real(rkind),parameter :: rhosno=  290.   ! Snow density
 
-!  real(rkind),parameter :: sice = 5.0      ! Ice salinity 3.2--5.0 ppt; not used
+  real(rkind),parameter :: sice = 5.0      ! Ice salinity 3.2--5.0 ppt.
 
-  integer, parameter :: iclasses=7     ! Number of ice thickness gradations for ice growth calcs.
-!  real(rkind),parameter :: h0=1.0 ! Lead, closing parameter 0.5 [m] standard
-!  Lead closing parameter, usualy 0.5-1 [m] - larger values slow down freezing-up but
-!  increase sea ice thickness
-  real(rkind) :: lead_closing
-! Semter parameter - smaller value could slow down melting
-  real(rkind) :: Saterm   !=0.5
+integer, parameter :: iclasses=7     ! Number of ice thickness gradations for ice growth calcs.
+  real(rkind),parameter :: h0=1.0 ! Lead, closing parameter 0.5 [m] standard
+  real(rkind),parameter :: Saterm=0.5      ! Sa - term parameter 0.5 [m] standard
   real(rkind),parameter :: hmin= 0.05      ! Cut-off ice thickness [m]
   real(rkind),parameter :: Armin=0.15      ! Minimum ice concentration
 
@@ -30,7 +26,7 @@ module ice_therm_mod
   real(rkind),parameter :: q0=1./cl        ! 1/volumetric heat of fusion
   real(rkind),parameter :: cpair=1004.     ! Specific heat of air [J/(kg * K)]
   real(rkind),parameter :: clhw=2.500E6    ! Specific latent heat [J/kg]: water -> water vapor;
-  real(rkind),parameter :: clhi=2.834E6    ! sea ice -> water vapor (latent heat)
+  real(rkind),parameter :: clhi=2.834E6    ! sea ice -> water vapor
   real(rkind),parameter :: cdsens=1.75E-3  ! Bulk sensible heat transfer coefficient, SIOM standard
   real(rkind),parameter :: cdlat =1.75E-3  ! Bulk latent heat transfer coefficients, SIOM standard
   real(rkind),parameter :: gamma_t=1.e-4   ! heat transfer coefficient ocean -> ice
@@ -50,17 +46,14 @@ module ice_therm_mod
 
   real(rkind),parameter :: boltzmann=5.67E-8   ! S. Boltzmann const.*longw. emissivity
   real(rkind),parameter :: d3=boltzmann*emiss  ! SIOM standard (MH)
-  real(rkind),parameter :: con   = 2.1656 ! Thermal conductivities: ice [W/m/K]
+  real(rkind),parameter :: con   = 2.1656 ! Thermal conductivities: ice;
   real(rkind),parameter :: consn = 0.31   ! snow
-!  real(rkind),parameter :: albsn=0.85     ! Albedo: frozen snow
-!  real(rkind),parameter :: albsnm=0.75    !         melting snow
-!  real(rkind),parameter :: albi=0.75      !         frozen ice
-!  real(rkind),parameter :: albm=0.66      !         melting ice
+  real(rkind),parameter :: albsn=0.85     ! Albedo: frozen snow
+  real(rkind),parameter :: albsnm=0.75    !         melting snow
+  real(rkind),parameter :: albi=0.75      !         frozen ice
+  real(rkind),parameter :: albm=0.66      !         melting ice
   real(rkind),parameter :: albw=0.10      !         open water
-  real(rkind) :: albsn,albsnm,albi,albm
 
   !Variables
-  !(npa). T@ top of ice/snow surface (T_sfc in Parkinson &Washington) [C]. NOT
-  !T@ocean-ice interface, which is at freezing point!
-  real(rkind),allocatable :: t_oi(:)
+  real(rkind),allocatable :: t_oi(:) !(npa). T@ top of ice/snow surface [C]
 end module ice_therm_mod

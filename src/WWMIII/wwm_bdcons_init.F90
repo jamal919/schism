@@ -29,7 +29,7 @@
         DXP3 =   IEN(4,IE)
         DYP3 = - IEN(3,IE)
 !AR: ... modifly wave direction by currents ...
-        DO ID=1,MDC
+        DO ID=1,NUMDIR
           EVX=COSTH(ID)
           EVY=SINTH(ID)
           DO I=1,3
@@ -86,7 +86,7 @@
 !        ENDIF
 #ifdef MPI_PARALL_GRID
       CALL exchange_p2di(IOBWB)
-      DO ID = 1, MDC
+      DO ID = 1, NUMDIR
         iwild = IOBPD(ID,:)
         CALL exchange_p2di(iwild)
         IOBPD(ID,:) = iwild
@@ -101,7 +101,7 @@
           WRITE(IOBPOUT%FHNDL,*) IP, ID, IOBWB(IP)
         END DO
         DO IP = 1, MNP
-          DO ID = 1, MDC
+          DO ID = 1, NUMDIR
             WRITE(IOBPDOUT%FHNDL,*) IP, ID, SPDIR(ID)*RADDEG, IOBPD(ID,IP), IOBP(IP)
           ENDDO
         END DO
@@ -223,18 +223,16 @@
           nbM1=nbM1+1
         END IF
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'Number of  0 in STATUS=', nb0
-        WRITE(STAT%FHNDL,*) 'Number of  1 in STATUS=', nb1
-        WRITE(STAT%FHNDL,*) 'Number of -1 in STATUS=', nbM1
-        FLUSH(STAT%FHNDL)
-      END IF
+      WRITE(STAT%FHNDL,*) 'Number of  0 in STATUS=', nb0
+      WRITE(STAT%FHNDL,*) 'Number of  1 in STATUS=', nb1
+      WRITE(STAT%FHNDL,*) 'Number of -1 in STATUS=', nbM1
+      FLUSH(STAT%FHNDL)
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
       SUBROUTINE SINGLE_READ_IOBP_TOTAL(IOBPtotal, IGRIDTYPE, eBND, np_total)
-      USE DATAPOOL, only : rkind, FILEDEF, istat, STAT, WRITESTATFLAG, wwmerr
+      USE DATAPOOL, only : rkind, FILEDEF, istat, STAT, wwmerr
 #ifdef NCDF
       USE NETCDF
 #endif
@@ -270,7 +268,11 @@
         END DO
         DO IP = 1, NP_TOTAL
           READ(eBND%FHNDL, *, IOSTAT = IFSTAT) ITMP, BNDTMP, BNDTMP, BNDTMP
+!          READ(eBND%FHNDL, *, IOSTAT = IFSTAT) BNDTMP, BNDTMP, BNDTMP
           IF ( IFSTAT /= 0 ) THEN
+            Print *, 'eBND%FNAME=', eBND%FNAME
+            Print *, 'ITMP=', ITMP, 'BNDTMP=', BNDTMP
+            Print *, 'IP=', IP, 'NP_TOTAL=', NP_TOTAL
             CALL WWM_ABORT('error in the bnd file 1')
           END IF
           ITMP=INT(BNDTMP)
@@ -284,6 +286,9 @@
         DO IP = 1, NP_TOTAL
           READ(eBND%FHNDL, *, IOSTAT = IFSTAT) ITMP, BNDTMP, BNDTMP, BNDTMP
           IF ( IFSTAT /= 0 ) THEN
+            Print *, 'eBND%FNAME=', eBND%FNAME
+            Print *, 'ITMP=', ITMP, 'BNDTMP=', BNDTMP
+            Print *, 'IP=', IP, 'NP_TOTAL=', NP_TOTAL
             CALL WWM_ABORT('error in the bnd file 2')
           END IF
           ITMP=INT(BNDTMP)
@@ -297,6 +302,9 @@
         DO IP = 1, NP_TOTAL
           READ(eBND%FHNDL, *, IOSTAT = IFSTAT) ITMP, BNDTMP, BNDTMP, BNDTMP
           IF ( IFSTAT /= 0 ) THEN
+            Print *, 'eBND%FNAME=', eBND%FNAME
+            Print *, 'ITMP=', ITMP, 'BNDTMP=', BNDTMP
+            Print *, 'IP=', IP, 'NP_TOTAL=', NP_TOTAL
             CALL WWM_ABORT('error in the bnd file 3')
           END IF
           ITMP=INT(BNDTMP)
@@ -310,6 +318,9 @@
         DO IP = 1, NP_TOTAL
           READ(eBND%FHNDL, *, IOSTAT = IFSTAT) ATMP, BTMP, BNDTMP
           IF ( IFSTAT /= 0 ) THEN
+            Print *, 'eBND%FNAME=', eBND%FNAME
+            Print *, 'ITMP=', ITMP, 'BNDTMP=', BNDTMP
+            Print *, 'IP=', IP, 'NP_TOTAL=', NP_TOTAL
             CALL WWM_ABORT('error in the bnd file 4')
           END IF
           ITMP=INT(BNDTMP)
@@ -341,7 +352,7 @@
 # ifdef MPI_PARALL_GRID
       IF (myrank == 0) THEN
 # endif
-        write(16,*) 'WWM: BC,',IOBPOUT%FHNDL, IOBPOUT%FNAME
+        write(*,*) IOBPOUT%FHNDL, IOBPOUT%FNAME
         DO IP = 1, NP_TOTAL
           WRITE(IOBPOUT%FHNDL,*) IP, IOBPtotal(IP), 'TEST'
         END DO
@@ -372,14 +383,36 @@
           nb4=nb4+1
         END IF
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'Number of 0 in IOBPtotal=', nb0
-        WRITE(STAT%FHNDL,*) 'Number of 1 in IOBPtotal=', nb1
-        WRITE(STAT%FHNDL,*) 'Number of 2 in IOBPtotal=', nb2
-        WRITE(STAT%FHNDL,*) 'Number of 3 in IOBPtotal=', nb3
-        WRITE(STAT%FHNDL,*) 'Number of 4 in IOBPtotal=', nb4
-        FLUSH(STAT%FHNDL)
-      END IF      
+      WRITE(STAT%FHNDL,*) 'Number of 0 in IOBPtotal=', nb0
+      WRITE(STAT%FHNDL,*) 'Number of 1 in IOBPtotal=', nb1
+      WRITE(STAT%FHNDL,*) 'Number of 2 in IOBPtotal=', nb2
+      WRITE(STAT%FHNDL,*) 'Number of 3 in IOBPtotal=', nb3
+      WRITE(STAT%FHNDL,*) 'Number of 4 in IOBPtotal=', nb4
+      FLUSH(STAT%FHNDL)
+      END SUBROUTINE
+!**********************************************************************
+!*                                                                    *
+!**********************************************************************
+      SUBROUTINE EXPORT_BOUNDARY_POINT
+      USE DATAPOOL
+      IMPLICIT NONE
+      character(len=100), parameter :: eFileWAM = "system_wam_bnd.dat"
+      real(rkind), allocatable :: IOBPexport(:)
+#ifdef MPI_PARALL_GRID
+      IF (myrank .eq. 0) THEN
+#endif
+        IF (LEXPORT_GRID_MOD_OUT) THEN
+          IF (TRIM(MODEL_OUT_TYPE) .eq. 'WAM') THEN
+            allocate(IOBPexport(np_total), stat=istat)
+            IF (istat/=0) CALL WWM_ABORT('wwm_bdcons, allocate error 1')
+            IOBPexport = MyREAL(IOBPtotal)
+            CALL GRID_EXPORT_WAM(eFileWAM, IOBPexport)
+            deallocate(IOBPexport)
+          END IF
+        END IF
+#ifdef MPI_PARALL_GRID
+      END IF
+#endif
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
@@ -406,7 +439,8 @@
 #else
       CALL SINGLE_READ_IOBP_TOTAL(IOBPtotal, IGRIDTYPE, BND, np_total)
 #endif
-      END SUBROUTINE
+      CALL EXPORT_BOUNDARY_POINT
+      END SUBROUTINE READ_IOBP_TOTAL
 !**********************************************************************
 !*                                                                    *
 !**********************************************************************
@@ -431,8 +465,8 @@
       END DO
       MaxIEcont=maxval(ContElements)
       SatMaxDeg=2*MaxIEcont
-      allocate(ListAdjWithDupl(SatMaxDeg,NP_TOTAL), stat=istat)
-      allocate(IEcontain(MaxIEcont,NP_TOTAL), stat=istat)
+      allocate(ListAdjWithDupl(SatMaxDeg,NP_TOTAL), IEcontain(MaxIEcont,NP_TOTAL), stat=istat)
+      IF (istat/=0) CALL WWM_ABORT('wwm_bdcons, allocate error 2')
       ListDegWork=0
       DO IE=1,NE_TOTAL
         DO I=1,3
@@ -453,12 +487,10 @@
           ListAdjWithDupl(2*pos+1,IP)=IP_N
           ListAdjWithDupl(2*pos+2,IP)=IP_P
           IF ((IP.eq.IP_N).or.(IP.eq.IP_P)) THEN
-            IF (WRITEDBGFLAG == 1) THEN
-              WRITE(DBG%FHNDL, *) 'IE=', IE
-              WRITE(DBG%FHNDL, *) 'I=', I, 'IP=', IP
-              WRITE(DBG%FHNDL, *) 'INEXT=', INEXT, ' IP_N=', IP_N
-              WRITE(DBG%FHNDL, *) 'IPREV=', IPREV, ' IP_P=', IP_P
-            END IF
+            WRITE(DBG%FHNDL, *) 'IE=', IE
+            WRITE(DBG%FHNDL, *) 'I=', I, 'IP=', IP
+            WRITE(DBG%FHNDL, *) 'INEXT=', INEXT, ' IP_N=', IP_N
+            WRITE(DBG%FHNDL, *) 'IPREV=', IPREV, ' IP_P=', IP_P
             CALL WWM_ABORT("logical error")
           END IF
           IEcontain(pos+1,IP)=IE
@@ -466,6 +498,7 @@
         END DO
       END DO
       allocate(StatusAdj(SatMaxDeg), stat=istat)
+      IF (istat/=0) CALL WWM_ABORT('wwm_bdcons, allocate error 2')
       NumberAllTwo=0
       NumberBoundary=0
       NumberPathological=0
@@ -489,14 +522,11 @@
 !           Print *, '  nb=', nb
             IF (nb .eq. 0) CALL WWM_ABORT("Clear bug in code")
             IF (nb .gt. 2) THEN
-              IF (WRITEDBGFLAG == 1) WRITE(DBG%FHNDL,*) 'IP=', IP, 'IPadj=', IPadj
+              WRITE(DBG%FHNDL,*) 'IP=', IP, 'IPadj=', IPadj
               DO J=1,eDeg
                 IE=IEcontain(J,IP)
-                IF (WRITEDBGFLAG == 1) THEN
-                  WRITE(DBG%FHNDL,*) 'IE=', IE
-                  WRITE(DBG%FHNDL,*) 'INE=', INEtotal(1,IE), INEtotal(2,IE), INEtotal(3,IE)
-                  FLUSH(DBG%FHNDL)
-                END IF
+                WRITE(DBG%FHNDL,*) 'IE=', IE
+                WRITE(DBG%FHNDL,*) 'INE=', INEtotal(1,IE), INEtotal(2,IE), INEtotal(3,IE)
               END DO
               CALL WWM_ABORT("Hopelessly pathological grid")
             END IF
@@ -510,12 +540,10 @@
         IF (nb1 .gt. 2) NumberPathological=NumberPathological + 1
       END DO
       deallocate(StatusAdj, ListAdjWithDupl)
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'NumberAllTwo      =', NumberAllTwo
-        WRITE(STAT%FHNDL,*) 'NumberBoundary    =', NumberBoundary
-        WRITE(STAT%FHNDL,*) 'NumberPathological=', NumberPathological
-        FLUSH(STAT%FHNDL)
-      END IF      
+      WRITE(STAT%FHNDL,*) 'NumberAllTwo       =', NumberAllTwo
+      WRITE(STAT%FHNDL,*) 'NumberBoundary     =', NumberBoundary
+      WRITE(STAT%FHNDL,*) 'NumberPathological =', NumberPathological
+      FLUSH(STAT%FHNDL)
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
@@ -523,29 +551,23 @@
       SUBROUTINE SET_IOBP_NEXTGENERATION
       USE DATAPOOL
       IMPLICIT NONE
-      INTEGER     :: IP, IFSTAT, SPsize
-      REAL(rkind) :: BNDTMP
+      INTEGER     :: IP, SPsize
       INTEGER     :: STATUS(MNP)
       INTEGER     :: idx, PosWBAC
+#ifdef MPI_PARALL_GRID
+      INTEGER     :: IPglob
+#endif
       IOBPD   = 0
       CALL READ_IOBP_TOTAL
       CALL PRINT_STATISTICS_IOBP_TOTAL
-      IOBP    = 0
-      DO IP = 1, NP_TOTAL
 #ifdef MPI_PARALL_GRID
-# ifndef PDLIB
-        IF (ipgl(ip)%rank == myrank) THEN
-          IOBP(ipgl(ip)%id) = IOBPtotal(IP)
-        END IF
-# else
-        IF (ipgl(ip)%id .gt. 0) THEN
-          IOBP(ipgl(ip)%id) = IOBPtotal(IP)
-        END IF
-# endif
-#else
-        IOBP(IP) = IOBPtotal(IP)
-#endif
+      DO IP=1,MNP
+        IPglob=iplg(IP)
+        IOBP(IP) = IOBPtotal(IPglob)
       END DO
+#else
+      IOBP = IOBPtotal
+#endif
 #ifdef SCHISM
       DO IP = 1, NP_RES ! reset boundary flag in the case that wave boundary are not used but defined in the boundary file
         IF (.NOT. LBCWA .AND. .NOT. LBCSP) THEN
@@ -570,10 +592,8 @@
       DO IP = 1, MNP
         IF (IOBP(IP) == 2 .OR. IOBP(IP) == 4) IWBMNP = IWBMNP + 1
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'IWBMNP=', IWBMNP
-        FLUSH(STAT%FHNDL)
-      END IF      
+      WRITE(STAT%FHNDL,*) 'IWBMNP=', IWBMNP
+      FLUSH(STAT%FHNDL)
       ALLOCATE( IWBNDLC(IWBMNP), IWBNDLC_REV(MNP), stat=istat)
       IF (istat/=0) CALL WWM_ABORT('wwm_bdcons, allocate error 2')
       IWBNDLC_REV=0
@@ -595,10 +615,8 @@
       DO IP = 1, NP_TOTAL
         IF (IOBPtotal(IP) == 2 .OR. IOBPtotal(IP) == 4) IWBMNPGL = IWBMNPGL + 1
       END DO
-      IF (WRITESTATFLAG == 1) THEN
-        WRITE(STAT%FHNDL,*) 'IWBMNPGL=', IWBMNPGL
-        FLUSH(STAT%FHNDL)
-      END IF  
+      WRITE(STAT%FHNDL,*) 'IWBMNPGL=', IWBMNPGL
+      FLUSH(STAT%FHNDL)
       ALLOCATE( IWBNDGL(IWBMNPGL), stat=istat)
       IF (istat/=0) CALL WWM_ABORT('wwm_bdcons, allocate error 3')
       idx=0
@@ -624,21 +642,14 @@
         ! For hackish purposes, sometimes, we want to have an interior point
         ! set to Neumann condition 2 for example.
         ! Use that option only if you are sure of yourself.
-        DO IP = 1, NP_TOTAL
 #ifdef MPI_PARALL_GRID
-# ifndef PDLIB
-          IF (ipgl(ip)%rank == myrank) THEN
-            IOBP(ipgl(ip)%id) = IOBPtotal(IP)
-          END IF
-# else
-          IF (ipgl(ip)%id .gt. 0) THEN
-            IOBP(ipgl(ip)%id) = IOBPtotal(IP)
-          END IF
-# endif
-#else
-          IOBP(IP) = IOBPtotal(IP)
-#endif
+        DO IP=1,MNP
+          IPglob=iplg(IP)
+          IOBP(IP) = IOBPtotal(IPglob)
         END DO
+#else
+        IOBP = IOBPtotal
+#endif
       END IF
 !
 ! allocate wave boundary arrays ... 
@@ -648,17 +659,17 @@
       ELSE
         SPsize=1
       ENDIF
-      IF (LBCWA) THEN
+      IF (LBCWA .OR. BOUC_NETCDF_OUT_PARAM) THEN
         ALLOCATE( SPPARM(8,SPsize), stat=istat)
         IF (istat/=0) CALL WWM_ABORT('wwm_bdcons, allocate error 4')
         SPPARM = 0.
       ENDIF
-      IF (LBCWA .OR. LBCSP) THEN
-        ALLOCATE( WBAC(MSC,MDC,SPsize), stat=istat)
+      IF (LBCWA .OR. LBCSP .OR. BOUC_NETCDF_OUT_SPECTRA) THEN
+        ALLOCATE( WBAC(NUMSIG,NUMDIR,SPsize), stat=istat)
         IF (istat/=0) CALL WWM_ABORT('wwm_bdcons, allocate error 5')
         WBAC = 0.
         IF (LBINTER) THEN
-          ALLOCATE( WBACOLD(MSC,MDC,SPsize), WBACNEW(MSC,MDC,SPsize), DSPEC(MSC,MDC,SPsize), stat=istat)
+          ALLOCATE( WBACOLD(NUMSIG,NUMDIR,SPsize), WBACNEW(NUMSIG,NUMDIR,SPsize), DSPEC(NUMSIG,NUMDIR,SPsize), stat=istat)
           IF (istat/=0) CALL WWM_ABORT('wwm_bdcons, allocate error 6')
           WBACOLD = 0.
           WBACNEW = 0.

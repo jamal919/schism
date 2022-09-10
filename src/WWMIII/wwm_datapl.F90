@@ -1,4 +1,3 @@
-!2dR ... kill save and save all
 #include "wwm_functions.h"
 ! add line
 !**********************************************************************
@@ -17,32 +16,25 @@
       use wwm_pdlib
 #else
 # if defined(SCHISM) || defined(WWM_MPI)
-      use schism_msgp !, only: comm,             & ! MPI communicator
-! WARNING: DO NOT USE SCHISM CONECTIVITY ARRAYS WITHOTU CHECKING, AS WWM
-! CANNOT HANDLE QUADS!
-      use schism_glbl, only  : MNE => nea_wwm,       & ! Elements of the augmented domain
+      use schism_msgp ! , only: comm,             & ! MPI communicator
+      use schism_glbl, only    : MNE => nea,       & ! Elements of the augmented domain
      &                         MNP => npa,       & ! Nodes in the augmented domain
      &                         NP_RES => np,     & ! Local number of resident nodes
      &                         np,               &
-     &                         npg,              & ! number of ghost nodes
-     &                         MNEI => mnei_wwm,     & ! Max number of neighboring elements surrounding a node, nodes is mnei+1!
+     &                         npg,              & ! nuber of ghost nodes
+     &                         MNEI => mnei,     & ! Max number of neighboring elements surrounding a node, nodes is mnei+1!
      &                         DEP8 => dp,       & ! depth in the augmented domain
      &                         XLON=>xlon,       & !longitude (in radians)
      &                         YLAT=>ylat,       &
      &                         XPTMP => xnd,     & ! X-Coordinate augmented domain
      &                         YPTMP => ynd,     &
-!Error: ne_global not right for quads but this seems to be only used for
-!diagnosis
      &                         NE_GLOBAL => ne_global, &! Global number of elements
      &                         NP_GLOBAL => np_global, &! Global number of nodes
-     &                         INETMP => elnode_wwm, & ! Element connection table of the augmented domain?
+     &                         INETMP => elnode, &! Element connection table of the augmented domain?
      &                         iplg,             & ! node local to global mapping
      &                         ipgl,             & ! node global to local mapping
-!     &                         ielg,             & ! element local to global mapping
-     &                         nx1=>nx,          & ! nx is often used as a function parameter. So I renamed it to avoid name conflicts
-     &                         tanbeta_x,        & !bed slope in x direction
-     &                         tanbeta_y           !bed slope in ydirection
-
+     &                         ielg,             & ! element local to global maping
+     &                         nx1=>nx             ! nx is often used as a function parameter. So I renamed it to avoid name conflicts
 
 #  if !defined ROMS_WWM_PGMCL_COUPLING && !defined MODEL_COUPLING_ATM_WAV && !defined MODEL_COUPLING_OCN_WAV
       use MPI
@@ -50,48 +42,34 @@
      
 # endif
 # ifdef SCHISM
-     use schism_glbl, only :   &  
-     &                         DMIN_SCHISM => h0,            & ! Dmin
+         use schism_glbl, only : NE_RES => ne,                 & ! Local number of resident elements
+     &                         DMIN_SCHISM => h0,             & ! Dmin
+     &                         NNE => nne,                   & !
+     &                         ISELF => iself,               & !
      &                         NVRT => nvrt,                 & ! Max. Number of vertical Layers ...
-     &                         KBP  => kbp,                  & ! Bottom index
-     &                         IDRY => idry,                 & ! Dry/Wet flag
+     &                         KBP  => KBP,                  & ! Bottom index
+     &                         IDRY => IDRY,                 & ! Dry/Wet flag
      &                         ZETA => znl,                  & ! Z-Levels of SCHISM
      &                         ibnd_ext_int => ibnd_ext_int, & ! bounday flag ...
+     &                         nsa,                          & ! Sides in the augmented domain
+     &                         NS_RES => ns,                 & ! Local number of resident sides
+     &                         isidenode,                    & ! 2 nodes of a side
+     &                         idry_s,                       & ! wet/dry for a side
      &                         eta1,eta2,                    & ! elevation at 2 time steps
      &                         uu2,vv2,                      & ! horizontal vel.
-     &                         curx_wwm,cury_wwm,             & ! BM:coupling current from SCHISM
      &                         KZ,THETA_F,                   & !vertical coord. parameters
      &                         SIGMACOR=>SIGMA,              & !sigma coord.
      &                         WINDX0=>WINDX,                & !x-wind
      &                         WINDY0=>WINDY,                & !x-wind
-     &                         MSC_SCHISM => MSC2,           & !msc2 from SCHISM ...
-     &                         MDC_SCHISM => MDC2,           & !mdc2 from SCHISM ...
+     &                         NUMSIG_SCHISM => MSC2,            & !NUMSIG2 from SCHISM ...
+     &                         NUMDIR_SCHISM => MDC2,            & !NUMDIR2 from SCHISM ...
      &                         WWAVE_FORCE=>wwave_force,     & !wave-induced force
      &                         OUTT_INTPAR=>out_wwm,         & !outputs from WWM
-     &                         WAVE_SBRTOT => wave_sbrtot,   & ! Total wave energy dissipation rate by depth-induced breaking [W/m²]
-     &                         WAVE_SBFTOT => wave_sbftot,   & ! Total wave energy dissipation rate by bottom friction [W/m²]
-     &                         WAVE_SINTOT => wave_sintot,   & ! Total wave energy input rate from atmospheric forcing [W/m²]
-     &                         WAVE_SDSTOT => wave_sdstot,   & ! Total wave energy dissipation rate by whitecapping [W/m²]
-     &                         OUTT_INTPARROL=>out_wwm_rol,  & !outputs from WWM
      &                         WIND_INTPAR=>out_wwm_windpar, & ! boundary layer stuff from wwm ...
      &                         ISBND,                        & !bnd flags
      &                         RKIND,                        &
-     &                         JPRESS,SBR,SBF,SROL,SDS, & !for vortex formulation
-     &                         EPS_W, EPS_R, EPS_BR,         & ! energy dissipation of wave and roller, and total forcing
-     &                         STOKES_HVEL, STOKES_HVEL_SIDE, & !horizontal Stokes drift velocities (u,v)
-     &                         STOKES_WVEL, STOKES_WVEL_SIDE, & !vertical Stokes drift velocities
-     &                         ROLLER_STOKES_HVEL,ROLLER_STOKES_HVEL_SIDE, & ! horizontal Stokes drift velocities (u,v)for the surface rollers
-     &                         SHOREWAFO,                    & ! wave forces at the shoreline
-     &                         SAV_ALPHA, SAV_H,             &
-     &                         fwvor_advxy_stokes,            & ! BM: accounting (1) or not (0) for the different 
-     &                         fwvor_advz_stokes,             & ! terms involved in the vortex force formalism (RADFLAG='VOR')
-     &                         fwvor_gradpress,               &
-     &                         fwvor_breaking,                &
-     &                         fwvor_streaming,               &
-     &                         wafo_obcramp                   ! BM: flag (0/1:off/on) to apply a ramp on wave forces at open boundary
-!     &                         wafo_opbnd_ramp                  ! The corresponding ramp value defined at sides
-
-
+     &                         STOKES_VEL,JPRESS,SBR,SBF,    & !for vortex formulation
+     &                         SAV_ALPHA, SAV_H
 # endif
 #endif
       IMPLICIT NONE
@@ -110,9 +88,9 @@
 #ifndef SCHISM
 # ifndef PDLIB
 #  ifdef USE_SINGLE
-         integer,parameter :: rkind = 4
+      serfwe   integer,parameter :: rkind = 4
 #  else
-         integer,parameter :: rkind = 8      ! Default real datatype
+      werwe   integer,parameter :: rkind = 8      ! Default real datatype
 #  endif
 # endif
 #endif
@@ -123,38 +101,37 @@
          REAL(rkind), allocatable           :: nwild_loc(:)
          REAL(rkind), allocatable           :: nwild_loc_res(:)
 #endif
-         REAL(rkind),  PARAMETER            :: ZERO     = 0._rkind
-         REAL(rkind),  PARAMETER            :: ONE      = 1._rkind
-         REAL(rkind),  PARAMETER            :: TWO      = 2._rkind
-         REAL(rkind),  PARAMETER            :: THREE    = 3._rkind
-         REAL(rkind),  PARAMETER            :: FOUR     = 4._rkind
-         REAL(rkind),  PARAMETER            :: FIVE     = 5._rkind
-         REAL(rkind),  PARAMETER            :: SIX      = 6._rkind
-         REAL(rkind),  PARAMETER            :: SEVEN    = 7._rkind
-         REAL(rkind),  PARAMETER            :: EIGHT    = 8._rkind
-         REAL(rkind),  PARAMETER            :: NINE     = 9._rkind
-         REAL(rkind),  PARAMETER            :: TEN      = 10._rkind
-         
-         REAL(rkind),  PARAMETER            :: ZEROFIVE = 0.5_rkind
+         REAL(rkind), PARAMETER             :: ZERO     = 0._rkind
+         REAL(rkind), PARAMETER             :: ONE      = 1._rkind
+         REAL(rkind), PARAMETER             :: TWO      = 2._rkind
+         REAL(rkind), PARAMETER             :: THREE    = 3._rkind
+         REAL(rkind), PARAMETER             :: FOUR     = 4._rkind
+         REAL(rkind), PARAMETER             :: FIVE     = 5._rkind
+         REAL(rkind), PARAMETER             :: SIX      = 6._rkind
+         REAL(rkind), PARAMETER             :: SEVEN    = 7._rkind
+         REAL(rkind), PARAMETER             :: EIGHT    = 8._rkind
+         REAL(rkind), PARAMETER             :: NINE     = 9._rkind
+         REAL(rkind), PARAMETER             :: TEN      = 10._rkind
+         REAL(rkind), PARAMETER             :: ZEROFIVE = 0.5_rkind
 
-         REAL(rkind),  PARAMETER            :: TENM8    = 1.0E-1_rkind
-         REAL(rkind),  PARAMETER            :: TENM10   = 1.0E-1_rkind
+         REAL(rkind), PARAMETER             :: TENM8    = 1.0E-1_rkind
+         REAL(rkind), PARAMETER             :: TENM10   = 1.0E-1_rkind
 
-
-         REAL(rkind),  PARAMETER            :: ONESIXTH = ONE/SIX
-         REAL(rkind),  PARAMETER            :: ONETHIRD = ONE/THREE
-         REAL(rkind),  PARAMETER            :: TWOTHIRD = TWO/THREE
-         REAL(rkind),  PARAMETER            :: ONEHALF  = ONE/TWO
+         REAL(rkind), PARAMETER             :: ONESIXTH = ONE/SIX
+         REAL(rkind), PARAMETER             :: ONETHIRD = ONE/THREE
+         REAL(rkind), PARAMETER             :: TWOTHIRD = TWO/THREE
+         REAL(rkind), PARAMETER             :: ONEHALF  = ONE/TWO
 
          REAL(rkind), PARAMETER             :: PI        = 3.141592653589793_rkind
          REAL(rkind), PARAMETER             :: PIHALF    = PI*ONEHALF
          REAL(rkind), PARAMETER             :: PI2       = TWO*PI
+         REAL(rkind), PARAMETER             :: PI3       = PI**3
          REAL(rkind), PARAMETER             :: INVPI     = ONE/PI
          REAL(rkind), PARAMETER             :: INVPI2    = ONE/PI2
-         REAL(rkind), PARAMETER             :: SQRTPI    = SQRT(PI)
          REAL(rkind), PARAMETER             :: TPI       = PI2
          REAL(rkind), PARAMETER             :: INVTPI    = INVPI2
          REAL(rkind), PARAMETER             :: G9        = 9.806_rkind
+         REAL(rkind), PARAMETER             :: CONST_ECMWF = -2.0*0.076/G9
 
          REAL(rkind)                        :: DMIN      = 0.01_rkind
 
@@ -192,21 +169,14 @@
          INTEGER                            :: NMAX
          REAL(rkind), PARAMETER             :: DEPFAC   = 6.d0
          REAL(rkind)                        :: DSIGTAB
-
-		 ! MP: the following parameters are used for erf function tabulation
-		 ! within SHOWEX bottom friction source term
-		 INTEGER, PARAMETER                 :: SIZEERFTABLE=300         
-         REAL(rkind)                        :: ERFTABLE(0:SIZEERFTABLE) 
-         REAL(rkind)                        :: DELXERF                  
-         REAL(rkind), PARAMETER             :: XERFMAX =  4.
-		 ! MP: the following parameters are used for fw tabulation
-		 ! within SHOWEX bottom friction source term and W3SRC4MD (wwm_ardhuin_new.F90) 
-	     INTEGER, PARAMETER                 :: SIZEFWTABLE=300  
-         REAL(rkind)                        :: FWTABLE(0:SIZEFWTABLE)
-         REAL(rkind)                        :: DELAB
-         REAL(rkind), PARAMETER             :: ABMIN = -1. 
-         REAL(rkind), PARAMETER             :: ABMAX = 8.
-         
+         INTEGER, ALLOCATABLE               :: NumberIterationSolver(:)
+!
+! WW3 diagonalization 
+!
+         REAL(rkind)                        :: LIM_XP
+         REAL(rkind)                        :: LIM_FACP
+         REAL(rkind), allocatable           :: LIM_SIG(:)
+         LOGICAL                            :: LIMIT_SRC_TERM = .FALSE.
 !
 ! Fundamental data types 
 !
@@ -218,6 +188,7 @@
            integer nbTime
            integer idVar
            real(rkind), allocatable :: ListTime(:)
+           logical MULTIPLE_IN
          END TYPE VAR_NETCDF_CF
 !
 ! ... logicals ... wwmDlogic.mod
@@ -232,35 +203,42 @@
 #endif
          INTEGER    :: ITEST      = 0 
          INTEGER    :: KKK        = 1
+         LOGICAL    :: ABORT_BLOWUP = .FALSE.
+         INTEGER    :: LEVEL_HS_BLOW = 50
 
-         INTEGER    :: HMNP, HMNE, HMSC, HMDC, HFRLOW, HFRHIGH
+         INTEGER    :: HMNP, HMNE, HNUMSIG, HNUMDIR, HFRLOW, HFRHIGH
 
          INTEGER    :: MNP_WIND
+
          REAL(rkind), allocatable :: XP_WIND(:), YP_WIND(:)
+
          REAL(rkind)       :: WINDFAC    = 1.0
          REAL(rkind)       :: SHIFT_WIND_TIME = 0.0_rkind
          REAL(rkind)       :: WALVFAC    = 1.0
          REAL(rkind)       ::  CURFAC    = 1.0
 
          REAL(rkind)       :: SLMAX      = 0.2
+         REAL(rkind)       :: ALPHA_GSE(3) 
          REAL(rkind)       :: MAXCFLSIG  = 1.0
          REAL(rkind)       :: MAXCFLTH   = 1.0
          REAL(rkind)       :: MAXCFLCXY  = 1.0
          REAL(rkind)       :: MAXCFLCAD  = 1.0
          REAL(rkind)       :: MAXCFLCAS  = 1.0
 
-         LOGICAL           :: LSIGBOUND  = .FALSE.
-         LOGICAL           :: LTHBOUND   = .FALSE.
-         LOGICAL           :: LSOUBOUND  = .FALSE.
-         LOGICAL           :: IOBPD_HISTORY = .FALSE.
-         LOGICAL           :: DOPEAK_BOUNDARY = .TRUE.
-         LOGICAL           :: DOPEAK_GLOBAL = .TRUE.
+         LOGICAL    :: LSIGBOUND  = .FALSE.
+         LOGICAL    :: LTHBOUND   = .FALSE.
+         LOGICAL    :: LSOUBOUND  = .FALSE.
+         LOGICAL    :: IOBPD_HISTORY = .FALSE.
+         LOGICAL    :: TEXT_OUTPUT_PRINT = .FALSE.
+         LOGICAL    :: CG_HISTORY = .FALSE.
+         LOGICAL    :: DOPEAK_BOUNDARY = .TRUE.
+         LOGICAL    :: DOPEAK_GLOBAL = .TRUE.
 
-         LOGICAL :: FREQ_SHIFT_IMPL
-         LOGICAL :: REFRACTION_IMPL
-         LOGICAL :: SOURCE_IMPL
-         LOGICAL :: APPLY_DXP_CORR = .FALSE.
-         LOGICAL :: USE_EXACT_FORMULA_SPHERICAL_AREA = .FALSE.
+         LOGICAL    :: FREQ_SHIFT_IMPL
+         LOGICAL    :: REFRACTION_IMPL
+         LOGICAL    :: SOURCE_IMPL
+         LOGICAL    :: APPLY_DXP_CORR = .FALSE.
+         LOGICAL    :: USE_EXACT_FORMULA_SPHERICAL_AREA = .FALSE.
 
          LOGICAL    :: LTEST       = .FALSE.
          LOGICAL    :: LDIFR       = .FALSE.
@@ -290,8 +268,8 @@
          LOGICAL    :: LSTEA       = .FALSE.
          LOGICAL    :: LQSTEA      = .FALSE.
          LOGICAL    :: LCONV       = .FALSE.
-         LOGICAL    :: LLIMT       = .TRUE.
-         LOGICAL    :: LCFL        = .FALSE.
+         LOGICAL    :: LCFL        = .TRUE.
+         LOGICAL    :: LCFL_CASD   = .FALSE.
          LOGICAL    :: LWCAP       = .TRUE.
          LOGICAL    :: LJASN       = .TRUE.
          LOGICAL    :: LMAXETOT    = .TRUE.
@@ -322,13 +300,14 @@
          LOGICAL    :: LOPTSIG     = .FALSE.
          LOGICAL    :: LWINDSWAN   = .FALSE.
          LOGICAL    :: LZYLINDER   = .TRUE.
-         LOGICAL    :: LSOURCESWAM = .FALSE. 
-         LOGICAL    :: LSOURCESWWIII = .FALSE. 
          LOGICAL    :: CART2LATLON = .FALSE. 
          LOGICAL    :: LATLON2CART = .FALSE.  
+         LOGICAL    :: LGSE        = .TRUE.
+         LOGICAL    :: USE_OPTI_SPEC_SHAPE_BOUC = .FALSE.
+         LOGICAL    :: USE_OPTI_SPEC_SHAPE_INIT = .FALSE.
 
 
-         integer :: idxWind
+         INTEGER    :: idxWind
 
 
          LOGICAL    :: LWRITE_ORIG_WIND                = .FALSE.
@@ -336,13 +315,32 @@
          LOGICAL    :: LWRITE_ALL_WW3_RESULTS          = .FALSE.
          LOGICAL    :: LWRITE_INTERPOLATED_WW3_RESULTS = .FALSE.
 
+         character(len=20) :: MODEL_OUT_TYPE = "WW3"
+
          LOGICAL    :: MULTIPLE_IN_GRID = .TRUE.
          LOGICAL    :: MULTIPLE_IN_BOUND = .TRUE.
          LOGICAL    :: MULTIPLE_IN_WIND = .TRUE.
          LOGICAL    :: MULTIPLE_IN_WATLEV = .TRUE.
          LOGICAL    :: MULTIPLE_IN_CURR = .TRUE.
          LOGICAL    :: MULTIPLE_OUT_INFO = .TRUE.
-
+!
+! SIN4 parameters
+!
+         REAL(rkind) :: ZWND, ALPHA0, Z0MAX, Z0RAT
+         REAL(rkind) :: BETAMAX, SINTHP, SWELLF, SWELLFPAR
+         REAL(rkind) :: SWELLF2, SWELLF3, SWELLF4, SWELLF5
+         REAL(rkind) :: SWELLF6, SWELLF7, TAUWSHELTER, ZALP, SINBR
+!
+! SIN4 parameters
+!
+         REAL(rkind) :: SDSC1, FXPM3, FXFM3
+         REAL(rkind) :: FXFMAGE, SDSC2, SDSCUM, SDSSTRAIN, SDSC4
+         REAL(rkind) :: SDSC5, SDSC6, SDSBR, SDSBR2, SDSP, SDSISO
+         REAL(rkind) :: SDSBCK, SDSABK, SDSPBK, SDSBINT, SDSHCK
+         REAL(rkind) :: SDSDTH, SDSCOS, SDSBRF1, SDSBRFDF
+         REAL(rkind) :: SDSBM0, SDSBM1, SDSBM2, SDSBM3, SDSBM4
+         REAL(rkind) :: SDSHFGEN, SDSLFGEN, WHITECAPWIDTH, FXINCUT, FXDSCUT
+         
 ! Entries needed for output of spectra
          LOGICAL    :: EXTRAPOLATION_ALLOWED_BOUC = .FALSE.
          integer, allocatable :: CF_IX_BOUC(:)
@@ -416,8 +414,8 @@
 
          TYPE FD_FORCING_GRID
             integer nx_dim, ny_dim
-            real, dimension(:,:), pointer :: LON
-            real, dimension(:,:), pointer :: LAT
+            real(rkind), dimension(:,:), pointer :: LON
+            real(rkind), dimension(:,:), pointer :: LAT
          END TYPE FD_FORCING_GRID
          
          TYPE BoundaryInfo
@@ -435,28 +433,24 @@
             integer, dimension(:), pointer :: IOBP
          END TYPE BoundaryInfo
          
-         
-         TYPE (TIMEDEF)         :: MAIN, OUT_HISTORY, OUT_STATION, SEWI, SECU, SEWL, SEBO,  ASSI, HOTF, OUT_BOUC
+         TYPE (TIMEDEF)  :: MAIN, OUT_HISTORY, OUT_STATION, SEWI, SECU, SEWL, SEBO,  ASSI, HOTF, OUT_BOUC
 
-         LOGICAL :: LEXPORT_GRID_WW3 = .FALSE.
-         LOGICAL :: LEXPORT_BOUC_WW3 = .FALSE.
-         LOGICAL :: LEXPORT_CURR_WW3 = .FALSE.
-         LOGICAL :: LEXPORT_WALV_WW3 = .FALSE.
-         LOGICAL :: LEXPORT_WIND_WW3 = .FALSE.
+         LOGICAL :: LEXPORT_GRID_MOD_OUT = .FALSE.
+         LOGICAL :: LEXPORT_BOUC_MOD_OUT = .FALSE.
+         LOGICAL :: LEXPORT_CURR_MOD_OUT = .FALSE.
+         LOGICAL :: LEXPORT_WALV_MOD_OUT = .FALSE.
+         LOGICAL :: LEXPORT_WIND_MOD_OUT = .FALSE.
          REAL(rkind) :: EXPORT_BOUC_DELTC
          REAL(rkind) :: EXPORT_CURR_DELTC
          REAL(rkind) :: EXPORT_WALV_DELTC
          REAL(rkind) :: EXPORT_WIND_DELTC
-         TYPE (TIMEDEF)        :: OUT_BOUC_WW3, OUT_WIND_WW3, OUT_CURR_WW3, OUT_WALV_WW3
+         TYPE (TIMEDEF) :: OUT_BOUC_WW3, OUT_WIND_WW3, OUT_CURR_WW3, OUT_WALV_WW3
          INTEGER :: FHNDL_EXPORT_GRID_WW3
          INTEGER :: FHNDL_EXPORT_BOUC_WW3
          INTEGER :: FHNDL_EXPORT_WIND_WW3
          INTEGER :: FHNDL_EXPORT_CURR_WW3
          INTEGER :: FHNDL_EXPORT_WALV_WW3
          
-         
-
-
          REAL(rkind)            :: DT_DIFF_19901900 = 47892._rkind
          REAL(rkind)            :: RTIME = 0.
          REAL(rkind)            :: DT4D, DT4F, DT4S, DT4A, DT_ITER
@@ -542,7 +536,7 @@
          REAL(rkind)      :: FRINTH
          REAL(rkind)      :: XIS, XISLN
          REAL(rkind)      :: DDIR
-         REAL(rkind)      :: DELTH ! PI2/MDC
+         REAL(rkind)      :: DELTH ! PI2/NUMDIR
          REAL(rkind)      :: FDIR
          REAL(rkind)      :: MINDIR
          REAL(rkind)      :: MAXDIR
@@ -579,11 +573,6 @@
          REAL(rkind), ALLOCATABLE      :: CG(:,:), DCGDX(:,:), DCGDY(:,:)
          REAL(rkind), ALLOCATABLE      :: WC(:,:)
 
-#ifdef SCHISM
-!         REAL(rkind), ALLOCATABLE    :: CGX(:,:,:)
-!         REAL(rkind), ALLOCATABLE    :: CGY(:,:,:)
-#endif
-
          INTEGER   :: DIMMODE
 
 #ifndef MPI_PARALL_GRID
@@ -591,9 +580,15 @@
          INTEGER   :: MNE
          INTEGER   :: NVRT
 #endif
-         INTEGER   :: MDC
-         INTEGER   :: MSC, MSCL
+
+#ifndef SCHISM
+        INTEGER, PARAMETER      :: NVRT = 10
+#endif
+
+         INTEGER   :: NUMDIR
+         INTEGER   :: NUMSIG, NUMSIGL
          INTEGER   :: NSPEC
+
          INTEGER, allocatable :: ID_NEXT(:), ID_PREV(:)
 
          LOGICAL   :: LCYCLEHOT
@@ -601,7 +596,9 @@
 
          REAL(rkind), ALLOCATABLE       :: XP(:)
          REAL(rkind), ALLOCATABLE       :: YP(:)
+
          INTEGER, ALLOCATABLE      :: INE(:,:)
+
          INTEGER, ALLOCATABLE      :: INE_WIND(:,:)
          INTEGER, ALLOCATABLE      :: WIND_ELE(:)
          REAL(rkind), ALLOCATABLE :: XYPWIND(:,:)
@@ -635,7 +632,6 @@
          INTEGER, ALLOCATABLE       :: cf_c12(:,:)
          INTEGER, ALLOCATABLE       :: CF_IX(:), CF_IY(:)
          REAL(rkind), ALLOCATABLE   :: CF_coeff(:,:)
-         integer, allocatable :: SHIFTXY(:,:)
          INTEGER                    :: REC1_wind_old, REC2_wind_old
          INTEGER                    :: REC1_wind_new, REC2_wind_new
          INTEGER                    :: REC1_curr_old, REC2_curr_old
@@ -663,7 +659,7 @@
          !
          LOGICAL                          :: L_NESTING = .FALSE.
          INTEGER                          :: NB_GRID_NEST = 0
-         integer, parameter               :: MaxNbNest = 20
+         integer, parameter               :: MaxNbNest = 3 
          character(len=20)                :: ListBEGTC(MaxNbNest)
          REAL(rkind)                      :: ListDELTC(MaxNbNest)
          character(len=20)                :: ListUNITC(MaxNbNest)
@@ -677,14 +673,14 @@
          LOGICAL                          :: L_BOUC_SPEC = .FALSE.
          TYPE NESTING_INFORMATION
            integer IWBMNP
-           TYPE(TIMEDEF), allocatable     :: eTime
+           TYPE(TIMEDEF)                  :: eTime
            integer, dimension(:), pointer :: IOBPtotal
            integer, dimension(:), pointer :: IWBNDLC
            type(GridInformation) :: eGrid
            integer, dimension(:), pointer :: HOT_IE
-           integer, dimension(:,:), pointer :: HOT_W
+           real(rkind), dimension(:,:), pointer :: HOT_W
            integer, dimension(:), pointer :: BOUC_IE
-           integer, dimension(:,:), pointer :: BOUC_W
+           real(rkind), dimension(:,:), pointer :: BOUC_W
          END TYPE NESTING_INFORMATION
          type(NESTING_INFORMATION), allocatable :: ListNestInfo(:)
          
@@ -711,17 +707,6 @@
          REAL(rkind), ALLOCATABLE        :: AC1(:,:,:)
          REAL(rkind), ALLOCATABLE        :: AC2(:,:,:)
 !
-! ... surface roller arrays
-!
-         REAL(rkind), ALLOCATABLE        :: EROL1(:), EROL2(:) ! Bulk energy of surface rollers [m^3/s^2]
-         REAL(rkind), ALLOCATABLE        :: SINBETAROL(:)      ! Surface roller slope [-]
-         REAL(rkind), ALLOCATABLE        :: KROLP(:)           ! Peak wave number [m^-1], mainly for forcing terms in VOR formalism
-         REAL(rkind), ALLOCATABLE        :: SIGROLP(:)         ! Peak wave frequency [s^-1], mainly for forcing terms in VOR formalism
-         REAL(rkind), ALLOCATABLE        :: DROLP(:)           ! Mean wave direction [rad]: surface roller direction of propagation
-         REAL(rkind), ALLOCATABLE        :: CROLP(:)           ! Peak wave phase [m/s]: surface roller propagation speed, used for computing dissipation
-         REAL(rkind), ALLOCATABLE        :: CROL(:,:)          ! Peak wave phase components [m/s]: used for comuting advection
-         REAL(rkind), ALLOCATABLE        :: AROL(:)            ! Alpha constant in roller source term [-]; array mostly used to cancel roller near shoreline
-!
 ! ... implicit splitting
 !
          REAL(rkind), ALLOCATABLE      :: DAC_ADV(:,:,:,:)
@@ -731,8 +716,8 @@
 !
 ! ... implicit source terms
 !
-         REAL(rkind), ALLOCATABLE        :: IMATDAA(:,:,:)
-         REAL(rkind), ALLOCATABLE        :: IMATRAA(:,:,:)
+         REAL(rkind), ALLOCATABLE        :: DPHIDNA(:,:,:)
+         REAL(rkind), ALLOCATABLE        :: PHIA(:,:,:)
 !
 ! ... boundary mappings
 !
@@ -765,8 +750,8 @@
          REAL(rkind), ALLOCATABLE    :: SDIR  (:,:)
          REAL(rkind), ALLOCATABLE    :: SPRD  (:,:)
 
-         INTEGER              :: WBMSC
-         INTEGER              :: WBMDC
+         INTEGER              :: WBNUMSIG
+         INTEGER              :: WBNUMDIR
 !
 ! ... part ...
 !
@@ -819,7 +804,7 @@
          REAL(rkind),   ALLOCATABLE             :: ALL_VAR_WW3(:,:,:)
 
 
-         INTEGER                                :: NP_WW3, MSC_WW3, MDC_WW3, MAXSTEP_WW3, TSTART_WW3(2)
+         INTEGER                                :: NP_WW3, NUMSIG_WW3, NUMDIR_WW3, MAXSTEP_WW3, TSTART_WW3(2)
 
          REAL(rkind)                            :: DTBOUND_WW3, DDIR_WW3
          REAL(rkind),   ALLOCATABLE             :: FQ_WW3(:)
@@ -925,8 +910,6 @@
          LOGICAL                          :: LMONO_OUT = .FALSE.
 
          CHARACTER(LEN=3)                 :: RADFLAG  = 'LON'
-         LOGICAL                          :: LPP_FILT_FLAG = .FALSE.
-         REAL(rkind)                      :: LPP_FRAC = 0.50
 
          INTEGER                          :: ICPLT = 1
          INTEGER                          :: NLVT
@@ -940,74 +923,54 @@
 !
 ! ... source term ... wwmDsi.mod
 !
-         INTEGER                :: MESIN = 2 
-         INTEGER                :: MEVEG = 0
-         INTEGER                :: MESBR = 1
-         INTEGER                :: MESDS = 2
-         INTEGER                :: MESNL = 1
-         INTEGER                :: MESBF = 1
-         INTEGER                :: MESTR = 1
-         INTEGER                :: MESCU = 0
-         INTEGER                :: ICRIT = 1
-         INTEGER                :: IBREAK = 1
-         ! MP: Parameterization for the breaking coefficient
-         INTEGER                :: BR_COEF_METHOD = 1
-         INTEGER                :: IFRIC = 1
-         INTEGER                :: BC_BREAK = 1
-         INTEGER                :: IROLLER = 0
-         INTEGER                :: ZPROF_BREAK = 1
+         INTEGER                :: ISOURCE = 1
+         INTEGER                :: MESIN   = 1
+         INTEGER                :: MESBR   = 1
+         INTEGER                :: MESDS   = 1 
+         INTEGER                :: MESNL   = 1
+         INTEGER                :: MESBF   = 1
+         INTEGER                :: MESTR   = 0 
+         INTEGER                :: MEVEG   = 0
+         INTEGER                :: MELIM   = 1
+         INTEGER                :: ICRIT   = 1
+         INTEGER                :: IBREAK  = 1
+         INTEGER                :: IFRIC   = 1
           
 
          REAL(rkind)             :: FRICC = -0.067
-         ! MP D50 for SHOWEX friction source term
-         REAL(rkind), ALLOCATABLE :: D50_SHOWEX(:)
          REAL(rkind)             :: TRICO = 0.05
          REAL(rkind)             :: TRIRA = 2.5
          REAL(rkind)             :: TRIURS = 0.1
-         REAL(rkind)             :: B_ALP = 1
-         REAL(rkind)             :: ALPROL = 0.65
-         REAL(rkind)             :: BRCR = 0.73
-         ! MP: Coefficient for BRCR adaptative
-         REAL(rkind)             :: a_BRCR
-         REAL(rkind)             :: b_BRCR
-         REAL(rkind)             :: min_BRCR
-         REAL(rkind)             :: max_BRCR
-         ! MP: Coefficient for Biphase computation
-         REAL(rkind)             :: a_BIPH = 0.2
+         REAL(rkind)             :: ALPBJ
+         REAL(rkind)             :: BRHD = 0.78
 
          REAL(rkind), ALLOCATABLE      :: ETRIAD(:), SATRIAD(:,:)
 
          INTEGER          :: ISPTR, ISP1TR, ISMTR, ISM1TR
          REAL(rkind)             :: WISPTR, WISP1TR, WISMTR, WISM1TR
 
-         REAL(rkind)                   :: PGIVE(8), PWIND(31), PQUAD(6), PWCAP(12)
-         REAL(rkind)                   :: PTAIL(8), PSHAP(6), PBOTF(6), PTRIAD(5), TRI_ARR(5)
-         REAL(rkind)                   :: PSURF(6)
+         REAL(rkind)                   :: TAIL_ARR(8), PSHAP(6), PBOTF(6), PTRIAD(5), TRI_ARR(5)
+         REAL(rkind)                   :: PSURF(6), PGIVE(8)
 
-         ! MP: Add variables for depth-induced breaking
-         REAL(rkind), ALLOCATABLE      :: QBLOCAL(:), A_BR_COEF(:), BRCRIT(:) !, SBR(:,:), SBF(:,:)
+         REAL(rkind), ALLOCATABLE      :: QBLOCAL(:) !, SBR(:,:), SBF(:,:)
 #ifndef SCHISM
          REAL(rkind), allocatable      :: STOKES_X(:,:), STOKES_Y(:,:), JPRESS(:)
 #endif
          REAL(rkind), ALLOCATABLE      :: DISSIPATION(:)
          REAL(rkind), ALLOCATABLE      :: AIRMOMENTUM(:)
 
-! MP : not needed...
-!!
-!! ... Wave breaking-induced source term summed over sub-cycles (needed for computing SBR and for the roller source term when used)
-!!
-!!         REAL(rkind), ALLOCATABLE :: SSBR_TOTAL(:,:,:)
-
-
-         INTEGER                :: MELIM   = 1
          INTEGER                :: IDIFFR  = 1
 !
 !  nonlinear interactions ...
 !
-         INTEGER                :: WWINT(20)
-         INTEGER                :: MSC4MI, MSC4MA, MDC4MI, MDC4MA, MSCMAX, MDCMAX
+         INTEGER                       :: NUMSIG4MI, NUMSIG4MA, NUMDIR4MI, NUMDIR4MA, NUMSIGMAX, NUMDIRMAX
          REAL(rkind)                   :: DAL1, DAL2, DAL3
-         REAL(rkind)                   :: WWAWG(8), WWSWG(8)
+         INTEGER                       :: IDP, IDP1, IDM, IDM1
+         INTEGER                       :: ISP, ISP1, ISM, ISM1
+         INTEGER                       :: ISHGH, ISCLW, ISCHG, IDLOW, IDHGH
+         REAL(rkind)                   :: AWG1, AWG2, AWG3, AWG4, AWG5, AWG6, AWG7, AWG8
+         REAL(rkind)                   :: SWG1, SWG2, SWG3, SWG4, SWG5, SWG6, SWG7, SWG8
+         REAL(rkind)                   :: SNL4C1, SNL4C2,SNL4CS1, SNL4CS2, SNL4CS3, LAMBDANL4
          REAL(rkind), ALLOCATABLE      :: AF11(:)
 !
 ! ... output parameter ... wwmDoutput.mod
@@ -1015,9 +978,11 @@
          INTEGER, PARAMETER     :: OUTVARS  = 35 
          INTEGER, PARAMETER     :: CURRVARS = 5
          INTEGER, PARAMETER     :: WINDVARS = 10 
+!AR: potential bug to selfe in the trunk it is 59
 
-         INTEGER, PARAMETER     :: OUTVARS_COMPLETE  = 59
+         INTEGER, PARAMETER     :: OUTVARS_COMPLETE  = 65
          LOGICAL                :: PARAMWRITE_HIS = .TRUE.
+         LOGICAL                :: PARAMWRITE_BOUC = .TRUE.
          LOGICAL                :: PARAMWRITE_STAT = .TRUE.
          LOGICAL                :: GRIDWRITE = .TRUE.
          TYPE VAROUT
@@ -1068,6 +1033,9 @@
          LOGICAL        :: WriteOutputProcess_stat
 
          CHARACTER(LEN=20)      :: OUTSTYLE
+         LOGICAL                :: HISTORY_XFN = .FALSE.
+         LOGICAL                :: HISTORY_NC  = .FALSE.
+         LOGICAL                :: HISTORY_SHP = .FALSE.
 
          CHARACTER(LEN=20)      :: OUTT_VARNAMES(OUTVARS)
          CHARACTER(LEN=20)      :: CURR_VARNAMES(CURRVARS)
@@ -1078,9 +1046,6 @@
          LOGICAL                :: LWSHP   = .FALSE.
          LOGICAL                :: LOUTS   = .FALSE.
          INTEGER                :: IOUTS
-
-         LOGICAL                :: LFRCOUT = .FALSE.
-         REAL(rkind)            :: FRCOUT = 0.4
 
          LOGICAL                :: LWW3GLOBALOUT = .FALSE.
          REAL(rkind), ALLOCATABLE      :: WW3GLOBAL(:,:)
@@ -1109,7 +1074,7 @@
          REAL(rkind), ALLOCATABLE :: WATLEVLOC_STATIONS(:)
          REAL(rkind), ALLOCATABLE :: WKLOC_STATIONS(:,:)
          REAL(rkind), ALLOCATABLE :: CURTXYLOC_STATIONS(:,:)
-         REAL(rkind), ALLOCATABLE :: ACLOC_STATIONS(:,:,:)
+         REAL(rkind), ALLOCATABLE :: WALOC_STATIONS(:,:,:)
          REAL(rkind), ALLOCATABLE :: USTARLOC_STATIONS(:)
          REAL(rkind), ALLOCATABLE :: WINDYLOC_STATIONS(:)
          REAL(rkind), ALLOCATABLE :: WINDXLOC_STATIONS(:)
@@ -1125,17 +1090,20 @@
          REAL(rkind), ALLOCATABLE :: CD_SUM(:)
          REAL(rkind), ALLOCATABLE :: DEPLOC_SUM(:)
          REAL(rkind), ALLOCATABLE :: WATLEVLOC_SUM(:)
-         REAL(rkind), ALLOCATABLE :: ACLOC_SUM(:,:,:)
+         REAL(rkind), ALLOCATABLE :: WALOC_SUM(:,:,:)
          REAL(rkind), ALLOCATABLE :: WKLOC_SUM(:,:)
          REAL(rkind), ALLOCATABLE :: CURTXYLOC_SUM(:,:)
 #endif
 #if defined NCDF && defined MPI_PARALL_GRID
-         integer, dimension(:), pointer :: ac2_hot_rqst
+         integer, dimension(:), pointer   :: ac2_hot_rqst
          integer, dimension(:,:), pointer :: ac2_hot_stat
-         integer, dimension(:), pointer :: ac2_hot_type
-         integer, dimension(:), pointer :: var_oned_hot_rqst
+         integer, dimension(:), pointer   :: ac2_hot_type
+         integer, dimension(:), pointer   :: var_oned_hot_rqst
          integer, dimension(:,:), pointer :: var_oned_hot_stat
-         integer, dimension(:), pointer :: var_oned_hot_type
+         integer, dimension(:), pointer   :: var_oned_hot_type
+         integer, dimension(:), pointer   :: netcdf_his_rqst
+         integer, dimension(:,:), pointer :: netcdf_his_stat
+         integer, dimension(:), pointer   :: netcdf_his_type
 #endif
          TYPE LINEOUTS
             CHARACTER(LEN=20) :: NAME
@@ -1155,13 +1123,14 @@
          END TYPE
 
          TYPE (LINEOUTS), ALLOCATABLE :: LINES(:)
-
+!
+! global hmax for wave breaking
+!
          REAL(rkind), ALLOCATABLE ::   HMAX(:)
          INTEGER, ALLOCATABLE     ::   ISHALLOW(:)
 
          REAL(rkind), ALLOCATABLE ::   RSXX(:), RSXY(:), RSYY(:), FORCEXY(:,:)
          REAL(rkind), ALLOCATABLE ::   SXX3D(:,:), SXY3D(:,:), SYY3D(:,:)
-
 !
 ! switch for the numerics ... wwmDnumsw.mod
 !
@@ -1187,17 +1156,20 @@
          REAL(rkind)            :: STP_SOLVERTHR = 1.E-10_rkind
          LOGICAL                :: LNONL = .FALSE.
          REAL(rkind)            :: WAE_SOLVERTHR = 1.e-10_rkind
+         LOGICAL                :: WAE_JGS_CFL_LIM = .FALSE.
+         integer, allocatable   :: CFLadvgeoI(:)
+         integer, allocatable   :: NumberOperationJGS(:)
          LOGICAL                :: L_SOLVER_NORM = .FALSE.
          REAL(rkind)            :: JGS_DIFF_SOLVERTHR = 1.e-5
          LOGICAL                :: JGS_CHKCONV = .TRUE.
-         LOGICAL                :: LACCEL = .FALSE. 
          INTEGER                :: ASPAR_LOCAL_LEVEL = 0
+         LOGICAL                :: IMPL_GEOADVECT = .TRUE.
                              ! value 0 CAD_THE, CAS_THE and ASPAR_JAC used
                              ! value 1 ASPAR_JAC used
                              ! value 2 no allocation
          REAL(rkind), allocatable :: U_JACOBI(:,:,:)
          REAL(rkind), allocatable :: ASPAR_JAC(:,:,:), B_JAC(:,:,:)
-         REAL(rkind), allocatable :: K_CRFS_MSC(:,:,:), K_CRFS_U(:,:)
+         REAL(rkind), allocatable :: K_CRFS_NUMSIG(:,:,:), K_CRFS_U(:,:)
 
          REAL(rkind)          :: RTHETA  = 0.5
          REAL(rkind)          :: QSCONV1 = 0.97
@@ -1217,6 +1189,8 @@
          INTEGER, ALLOCATABLE   :: POS_IP_ADJ(:,:,:)
          INTEGER, ALLOCATABLE   :: CCON(:)
          INTEGER, ALLOCATABLE   :: IE_CELL(:)
+         INTEGER, ALLOCATABLE   :: IP_CON(:,:)
+         INTEGER, ALLOCATABLE   :: CON_IP(:)
          INTEGER, ALLOCATABLE   :: POS_CELL(:)
          INTEGER, ALLOCATABLE   :: IE_CELL2(:,:)
          INTEGER, ALLOCATABLE   :: POS_CELL2(:,:)
@@ -1228,15 +1202,14 @@
          INTEGER, ALLOCATABLE   :: ITER_EXPD(:)
          INTEGER                :: ITER_MAX
          REAL(rkind),  ALLOCATABLE   :: SI(:)
-         REAL(rkind),  ALLOCATABLE   :: IEN(:,:)
+         REAL(rkind),  ALLOCATABLE   :: IEN(:,:), IEND(:,:,:)
+         
+         REAL(rkind),  ALLOCATABLE   :: FLALLGL(:,:,:,:), KELEMGL(:,:,:,:)
 
          REAL(rkind), ALLOCATABLE    :: CFLCXY(:,:)
+         REAL(rkind), ALLOCATABLE    :: CFL_CASD(:,:)
 
          INTEGER, ALLOCATABLE        :: COUNTGROUP(:,:)
-         LOGICAL                     :: WAE_JGS_CFL_LIM = .FALSE.
-         integer, allocatable        :: CFLadvgeoI(:)
-         integer, allocatable        :: NumberOperationJGS(:)
-         integer, allocatable        :: NumberIterationSolver(:)
 !
 !  convergence analysis and volume check ... wwmDconv.mod
 !
@@ -1260,7 +1233,9 @@
 ! Dislin
 !
          LOGICAL                      :: LDISLIN = .FALSE.
-
+!
+! WAM Sources 
+!
          REAL(rkind)                  :: XNLEV(1) = 10.
 
          REAL(rkind), PARAMETER       :: XEPS = RHOA/RHOW
@@ -1270,10 +1245,9 @@
          REAL(rkind), PARAMETER       :: FRTAIL = 0.2
          REAL(rkind), PARAMETER       :: WP1TAIL = 1./3.
          REAL(rkind), PARAMETER       :: USTARM = 5.
-         REAL(rkind)                  :: SINBR   = 0.
 
          INTEGER, PARAMETER           :: ISHALLO = 0  ! ISHALLO = 1 is not working yet ...
-         INTEGER, ALLOCATABLE         :: MSC_HF(:)
+         INTEGER, ALLOCATABLE         :: NUMSIG_HF(:)
 
          REAL(rkind), ALLOCATABLE     :: TAUTOT(:)   ! Total Stress from the Waves
          REAL(rkind), ALLOCATABLE     :: TAUWX(:)    ! X Component of the total stress (m^2/s/s)
@@ -1292,20 +1266,18 @@
          REAL(rkind), ALLOCATABLE     :: USTDIR(:)   ! Direction of Stress
          REAL(rkind), ALLOCATABLE     :: CD(:)       ! Drag Coefficient
          REAL(rkind), ALLOCATABLE     :: FMEAN(:)    ! Mean Freq.
-         REAL(rkind), ALLOCATABLE     :: EMEAN(:)    ! Mean Energy
+         REAL(rkind), ALLOCATABLE     :: EMEAN(:)
          REAL(rkind), ALLOCATABLE     :: TH(:)       ! Directions ...
          REAL(rkind), ALLOCATABLE     :: COFRM4(:) 
-!         REAL(rkind), ALLOCATABLE     :: DELFL(:)
          REAL(rkind), ALLOCATABLE     :: ENH(:,:,:)
-         REAL(rkind), ALLOCATABLE     :: THWOLD(:,:), THWNEW(:), Z0OLD(:,:), Z0NEW(:), ROAIRO(:,:), ROAIRN(:)
-         REAL(rkind), ALLOCATABLE     :: ZIDLOLD(:,:), ZIDLNEW(:), U10NEW(:), USNEW(:), U10OLD(:,:)
-         REAL(rkind), ALLOCATABLE     :: FCONST(:,:), RNLCOEF(:,:), FTRF(:), FMEANWS(:), USOLD(:,:)
+         REAL(rkind), ALLOCATABLE     :: THWOLD(:), THWNEW(:), Z0OLD(:), Z0NEW(:), ROAIRO(:), ROAIRN(:)
+         REAL(rkind), ALLOCATABLE     :: ZIDLOLD(:), ZIDLNEW(:), U10NEW(:), USNEW(:), U10OLD(:)
+         REAL(rkind), ALLOCATABLE     :: FCONST(:,:), RNLCOEF(:,:), FTRF(:), FMEANWS(:), USOLD(:)
 
          INTEGER, ALLOCATABLE         :: IKP(:), IKP1(:), IKM(:), IKM1(:), K1W(:,:), K2W(:,:), K11W(:,:), K21W(:,:)
          INTEGER, ALLOCATABLE         :: INLCOEF(:,:), MIJ(:)
 
          REAL(rkind), ALLOCATABLE     :: FKLAP(:), FKLAP1(:), FKLAM(:), FKLAM1(:), FRH(:)
-         REAL(rkind), ALLOCATABLE     :: FL(:,:,:), FL3(:,:,:), SL(:,:,:)
 
          LOGICAL, PARAMETER    :: LBIWBK = .FALSE. !! Shallow Water Wave Breaking ECMWF
          LOGICAL, PARAMETER    :: LCFLX  = .FALSE. !! Compute Flux to the Ocean 
@@ -1346,7 +1318,7 @@
          INTEGER, PARAMETER     :: NFREHF=49
          INTEGER, PARAMETER     :: JPLEVC=1
  
-         REAL(rkind)            :: SWELLFT(IAB)
+         REAL(rkind)            :: SWELLFT(0:IAB)
          REAL(rkind)            :: FLOGSPRDM1, CL11, CL21, ACL1, ACL2
 
          REAL(rkind)            :: DELTAUW
@@ -1355,10 +1327,7 @@
          REAL(rkind)            :: DELALP
          REAL(rkind)            :: DELTAIL 
          REAL(rkind)            :: DELTR
-         REAL(rkind)            :: ZALP
-         REAL(rkind)            :: BETAMAX
          REAL(rkind)            :: ALPHA
-         REAL(rkind)            :: TAUWSHELTER
 !
 ! Data types for the forcing exchanges
 !
@@ -1374,6 +1343,7 @@
          integer :: rank_boundary=0 ! could be set to another rank.
          integer :: rank_hasboundary = -1
          integer :: bound_nbproc
+
          integer, dimension(:), pointer :: Indexes_boundary
          integer, dimension(:), pointer :: bound_listproc
          integer, dimension(:), pointer :: spparm_rqst
@@ -1419,10 +1389,7 @@
 !
 ! Variables for the JACOBI SOLVER
 !
-!      REAL(rkind), allocatable :: A_THE(:,:,:), C_THE(:,:,:)
-!      REAL(rkind), allocatable :: A_SIG(:,:,:), C_SIG(:,:,:)
          REAL(rkind), allocatable :: CAD_THE(:,:,:), CAS_SIG(:,:,:)
-
 
 #ifdef WWM_SOLVER
       TYPE LocalColorInfo
@@ -1456,15 +1423,15 @@
          integer, dimension(:), pointer :: NNZ_len_r
          integer, dimension(:,:), pointer :: NNZ_index_s
          integer, dimension(:,:), pointer :: NNZ_index_r
-         ! variables for partition of MSC*MDC freq/dir into blocks.
+         ! variables for partition of NUMSIG*NUMDIR freq/dir into blocks.
          integer Nblock
          integer maxBlockLength
          integer, dimension(:), pointer :: BlockLength
          integer, dimension(:,:), pointer :: ISindex
          integer, dimension(:,:), pointer :: IDindex
-         ! variables for partitioning MSC
+         ! variables for partitioning NUMSIG
          integer, dimension(:), pointer :: ISbegin, ISend, ISlen
-         integer NbMSCblock
+         integer NbNUMSIGblock
          !
          integer, dimension(:), pointer :: Jstatus_L
          integer, dimension(:), pointer :: Jstatus_U
@@ -1513,6 +1480,7 @@
          integer, dimension(:), pointer :: sync_p2dsend_type
          integer, dimension(:), pointer :: sync_p2drecv_type
       END TYPE LocalColorInfo
+
       TYPE I5_SolutionData
          real(rkind), dimension(:,:,:), pointer :: AC1
          real(rkind), dimension(:,:,:), pointer :: AC3
@@ -1524,6 +1492,7 @@
          real(rkind), dimension(:,:,:), pointer :: ASPAR_pc
          real(rkind), dimension(:,:,:), pointer :: B_block
       END TYPE I5_SolutionData
+
       type(LocalColorInfo) :: MainLocalColor
       type(I5_SolutionData) :: SolDat
       integer :: NblockFreqDir = 10
@@ -1571,9 +1540,4 @@
       LOGICAL DO_SYNC_UPP_2_LOW
       LOGICAL DO_SYNC_FINAL
 #endif
-!
-! Writing comments all along the code
-!
-      INTEGER :: WRITEDBGFLAG = 0, WRITESTATFLAG = 0, WRITEWINDBGFLAG = 0  
-
       END MODULE

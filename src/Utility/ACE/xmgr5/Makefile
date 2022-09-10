@@ -30,13 +30,12 @@ HELPVIEWER = -DGR_HELPVIEWER='"netscape"'
 # netcdf, pgsql
 #LIBS = -L/usr/X11R6/lib -L/usr/local/ace/lib -lfpp -L/usr/local/pgsql/lib -lpq -lgd -lXm -lXt -lXp -lXext -lX11 -lICE -lSM -lICE -dynamic -lXmu -ldl -lm
 #LIBS = -L/usr/X11R6/lib64 -L/usr/local/ace/lib -lfpp -L/usr/local/pgsql/lib -lpq -L/usr/local/lib -lgd -lXm -lXt -lXp -lXext -lX11 -lICE -lSM -lICE -dynamic -lXmu -ldl -lm
-LIBS = -L/usr/X11R6/lib64 -L../lib -L/usr/local/intel64/broadwell/gcc/pgsql-10.2-1/lib -L/usr/local/lib -lfpp -lgd -lXm -lXt -lXext -lX11 -lICE -lSM -lICE -dynamic -lXmu -ldl -lm
+LIBS = -L/usr/X11R6/lib64 -L../lib -L/usr/local/pgsql/lib -L/usr/local/lib -lfpp -lgd -lXm -lXt -lXext -lX11 -lICE -lSM -lICE -dynamic -lXmu -ldl -lm
 #LIBS = -L/usr/X11R6/lib -L/usr/local/ace/lib -lfpp -L/usr/local/pgsql/lib -lpq -L/usr/local/lib -lgd -lXm -lXt -lXp -lXext -lX11 -lICE -lSM -lICE -dynamic -lXmu -ldl -lm
 #INCLUDES = -I/usr/X11R6/include -I/usr/local/ace/include
 #INCLUDES = -I/usr/X11R6/include -I/usr/local/ace/netcdf/include -I/usr/local/ace/include
 # netcdf, pgsql
-INCLUDES = -I/usr/X11R6/include -I..//include -I/usr/local/intel64/broadwell/gcc/pgsql-10.2-1/include -I/usr/local/include
-##INCLUDES = -I/usr/X11R6/include -I/usr/local/ace/include -I/usr/local/intel64/broadwell/gcc/pgsql-10.2-1/include -I/usr/local/include
+INCLUDES = -I/usr/X11R6/include -I/usr/local/ace/include -I/usr/local/pgsql/include -I/usr/local/include
 CC = gcc -g
 # Compile in support for postgres.
 #PGSQL = -DPGSQL

@@ -13,7 +13,6 @@
 !   limitations under the License.
 
 !  Adapted from FESOM's ice module.
-!  Changed by Joseph Zhang marked by 'YJZ'
 
 !  subroutine ice_thermodynamics (driver)
 !  subroutine therm_ice
@@ -32,14 +31,14 @@ subroutine ice_thermodynamics
   ! of ice-ocean heat flux considering friction velocity) by Ralph Timmermann.
   ! Note that adjustments are not indivually labeled any more.
   use schism_glbl,only: rkind,npa,tr_nd,iplg,pr,fluxprc,rho0,windx,windy, &
-  &nvrt,srad,albedo,hradd,airt2,shum2,errmsg,xlon,ylat,fresh_wa_flux,net_heat_flux
+  &nvrt,srad,hradd,airt2,shum2,errmsg,xlon,ylat,fresh_wa_flux,net_heat_flux
   use schism_msgp, only: myrank,nproc,parallel_abort,parallel_finalize
   use ice_module
   use ice_therm_mod
 
   implicit none
   real(rkind) :: h,hsn,A,t,fsh,flo,Ta,qa,preslev,acl,precrate
-  real(rkind) :: ug,ustar,T_oc,S_oc,fw,ehf,srad2
+  real(rkind) :: ug,ustar,T_oc,S_oc,fw,ehf,h_ml
   integer :: i,j
 
   do i=1,npa 
@@ -61,7 +60,7 @@ subroutine ice_thermodynamics
       precrate=1.e-5 
       T_oc=-1
       S_oc=34 
-      srad2=1
+      srad(i)=1
       hradd(i)=1
       airt2(i)=0 !C
       shum2(i)=1.e-3
@@ -70,22 +69,19 @@ subroutine ice_thermodynamics
     else
       preslev=pr(i)/100 !air pressure in hPa      
       precrate=fluxprc(i)/rho0 !precipitation [m water/s]
-      !In dry ocean case, use last wet values
       T_oc=tr_nd(1,nvrt,i) !T@ mixed layer - may want to average top layers??
       S_oc=tr_nd(2,nvrt,i) !S
-      srad2=srad(i)/(1-albedo(i)) !(denom checked) solar without albedo
       ug=sqrt(windx(i)**2+windy(i)**2)
     endif !ice_tests
 
     ustar=sqrt(cdwat*((u_ice(i)-u_ocean(i))**2+(v_ice(i)-v_ocean(i))**2)) !ice-ocean frictional vel
-!YJZ
-!    h_ml=0.1 !Mixed layer (ML) depth [m]
+    h_ml=10. !Mixed layer (ML) depth [m]
 
 !    write(99,*)'doing node:',i,ustar,ug,u_ice(i),v_ice(i),u_ocean(i),v_ocean(i),ice_tr(1:3,i),&
-!    &dt_ice,srad(i),hradd(i),airt2(i),shum2(i),preslev,precrate,T_oc,S_oc,h_ml0
+!    &dt_ice,srad(i),hradd(i),airt2(i),shum2(i),preslev,precrate,T_oc,S_oc,h_ml
 
-    call therm_ice(ice_tr(1,i),ice_tr(3,i),ice_tr(2,i),t_oi(i),srad2,hradd(i),airt2(i), &
-  &shum2(i),preslev,precrate,ug,ustar,T_oc,S_oc,h_ml0,dt_ice,iplg(i), &
+    call therm_ice(ice_tr(1,i),ice_tr(3,i),ice_tr(2,i),t_oi(i),srad(i),hradd(i),airt2(i), &
+  &shum2(i),preslev,precrate,ug,ustar,T_oc,S_oc,h_ml,dt_ice,iplg(i), &
   &fresh_wa_flux(i),net_heat_flux(i))
 
 !    write(99,*)'After therm_ice:',t_oi(i),fresh_wa_flux(i),net_heat_flux(i),ice_tr(1:3,i)
@@ -102,12 +98,6 @@ subroutine ice_thermodynamics
   &ice_tr(2,i)/=ice_tr(2,i).or.ice_tr(3,i)/=ice_tr(3,i)) then
       write(errmsg,*)'ice_thermodynamics: nan',iplg(i),t_oi(i), &
   &fresh_wa_flux(i),net_heat_flux(i),ice_tr(:,i)
-      call parallel_abort(errmsg)
-    endif
-
-    if(abs(ice_tr(1,i))>1.e3.or.abs(ice_tr(3,i))>1.d3) then
-      write(errmsg,*)'ice_thermodynamics: overflow, ',iplg(i),ice_tr(1:3,i), &
-     &t_oi(i),fresh_wa_flux(i),net_heat_flux(i)
       call parallel_abort(errmsg)
     endif
   enddo !i=1,npa
@@ -131,17 +121,15 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   ! h - ice mass [m]
   ! hsn - snow mass [m]
   ! A - ice compactness [-]
-  ! toi - temperature of snow/ice top surface [C] (T_sfc in P&W)
-  ! fsh - shortwave radiation [W/m/m] (before albedo correction) (positive down)
-  ! flo - longwave radiation [W/m/m] (positive down)
+  ! toi - temperature of snow/ice top surface [C]
+  ! fsh - shortwave radiation [W/m/m] (before albedo correction)
+  ! flo - longwave radiation [W/m/m]
   ! tair - air temperature [C]
-  ! qa - specific humidity [-]
   ! preslev - air pressure [hPa]
   ! precrate - precipitation rate [m water /s]
   ! ug - wind speed [m/s]
   ! T_oc, S_oc - ocean temperature and salinity beneath the ice (mixed layer) [C,PSU]
-  !              In case of dry, use last wet values
-  ! h_ml - mixed layer depth - should be specified [m]
+  ! h_ml - mixed layer depth - should be specified. [m]
   ! dt - ice time step [sec]
   ! ustar - friction velocity [m/s]
   ! inode - global node # (info only)
@@ -154,13 +142,11 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   ! hsn - snow mass
   ! A - ice compactness 
   ! toi - temperature of snow/ice top surface [C]
-  ! fw - freshwater flux due to ice melting [m water/dt]; >0 to freshen the
-  ! ocean surface
-  ! ehf - net heat flux at the ocean surface [W/m/m]; >0 to warm the ocean
+  ! fw - freshwater flux due to ice melting [m water/dt]
+  ! ehf - net heat flux at the ocean surface [W/m/m]        !RTnew
 
   use schism_glbl,only: rkind
   use ice_therm_mod
-  use ice_module, only: salt_ice,salt_water
 
   implicit none
   integer, intent(in) :: inode
@@ -192,31 +178,30 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   
   !write(*,*) T_oc vor ocean_budget,T_oc
   !No ice cover
-  !rhow: Growth rate for thin ice (open ocean); >0: ice grows [m/s]
-  call ocean_budget(preslev,qa,fsh,flo,T_oc,ug,tair,rhow)
+  call ocean_budget(preslev,qa,fsh,flo,T_oc,ug,tair,rhow)  ! rhow: Growth rate for thin ice (open ocean)
 
 !  write(99,*)'enter therm_ice:',dhgrowth,thsn,thick,rhow,h,A,Armin,hmin
   
   !Ice cover with no snow?
   if (thick>hmin) then
-    ! K loop for all ice classes
-    ! write(mype+30,*) 'iclasses',istep,inode,iclasses,thick
-    do k=1,iclasses ! K loop
-      thact = (2*k-1)*thick/dble(iclasses)  ! Thicknesses of actual ice class
-      !  write(mype+30,*) 'in iclasses',&
-      !   thact,hsn,t,tair,qa,preslev,fsh,flo,ug,S_oc,shice
-      call ice_budget(thact,hsn,toi,tair,qa,preslev,fsh,flo,ug,S_oc,shice) ! Thick ice K-class growth rate
-      rhice=rhice+shice/dble(iclasses)      ! Add to average heat flux
-    end do ! k loop
+  ! K loop for all ice classes
+  ! write(mype+30,*) 'iclasses',istep,inode,iclasses,thick
+   do k=1,iclasses ! K loop
+    thact = (2*k-1)*thick/dble(iclasses)  ! Thicknesses of actual ice class
+  !  write(mype+30,*) 'in iclasses',&
+  !   thact,hsn,t,tair,qa,preslev,fsh,flo,ug,S_oc,shice
+    call ice_budget(thact,hsn,toi,tair,qa,preslev,fsh,flo,ug,S_oc,shice) ! Thick ice K-class growth rate
+    rhice=rhice+shice/dble(iclasses)      ! Add to average heat flux
+   end do ! k loop
   END IF
 !  write(99,*) 'after iclasses',inode,iclasses,rhice
   
   !---------------------------------------------------------------
   ! Convert growth rates [m ice/sec] into growth per time step DT.
   !---------------------------------------------------------------
-  rhow=rhow*dt !>0: ice grows  [m]
+  rhow=rhow*dt !<0: ice grows?  [m]
 !  rA=rhow ! for historical reasons {remove}
-  rhice=rhice*dt !>0: ice grows?  [m]
+  rhice=rhice*dt !<0: ice grows?  [m]
   
   !---------------------------------------------------------------
   ! Multiply ice growth of open water and ice-covered areas
@@ -227,11 +212,11 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   sh=show+shice !m
   
   ahf=-cl*sh/dt    !Atmospheric heat flux, average over grid cell [W/m**2]
-                   !ahf<0 (sh>0): ice grows
+                   !ahf>0 (sh<0): melting
 
 !  write(99,*)'STEP1:',rhow,rhice,show,shice,sh,ahf
   
-  if(tair>=0.) then ! Precipitation going to ocean
+  if(Tair>=0.) then ! Precipitation going to ocean
     prec=precrate*dt ![m]
     snow=0.
   else
@@ -279,7 +264,7 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   ! and heat available in mixed layer, with
   !	T_oc	temperature of ocean surface layer
   !	Tfrez	freezing point of sea water
-  !	h_ml	thickness of uppermost layer
+  !	H_ML	thickness of uppermost layer
   !
   !RT:
   ! There are three possibilities to do this.
@@ -287,13 +272,13 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   !     Any heat available is then instantaneously used to melt ice.
   !     (so-called ice-bath approach)
   !     This is what used to be used in the Lemke sea ice-mixed layer model.
-  ! qhst=h+rh -(T_oc-TFrez(S_oc))*h_ml*cc/cl
+  ! qhst=h+rh -(T_oc-TFrez(S_oc))*H_ML*cc/cl
   !
   ! 2.: Parameterize the ocean-to-ice heat flux (o2ihf)
   !     as a function of temperature difference. For a first step 
   !     we can assume a constant exchange coefficient gamma_t:
   ! o2ihf= (T_oc-TFrez(S_oc))*gamma_t*cc*A     &
-  !        +(T_oc-Tfrez(S_oc))*h_ml/dt*cc*(1-A)  ! [W/m2]
+  !        +(T_oc-Tfrez(S_oc))*H_ML/dt*cc*(1-A)  ! [W/m2]
   ! qhst=h+rh-o2ihf*dt/cl                        ! [m]
   !
   ! 3.  Parameterize the ocean-to-ice heat flux (o2ihf)
@@ -301,8 +286,8 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   !     friction velocity:
   
   !Option 2
-  o2ihf=(T_oc-TFrez(S_oc))*0.012*ustar*cc*A+  &
-      &(T_oc-Tfrez(S_oc))*h_ml/dt*cc*(1-A)  ! [W/m2]
+  o2ihf=(T_oc-TFrez(S_oc))*0.012*ustar*cc*A  &
+        +(T_oc-Tfrez(S_oc))*H_ML/dt*cc*(1-A)  ! [W/m2]
   qhst=h+rh-o2ihf*dt/cl  ! [m]
 
 !  write(99,*)'STEP4:',rh,h,o2ihf,qhst
@@ -354,13 +339,7 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   !rtsd  fw=-qfm  !++RT: Why minus??? prec is positive for downward fresh water
            !      water flux too. And besides, salinity of sea ice is
            !      about 5 psu, not zero. In BRIOS we use:
-  !fw=qfm*(34.-5.)/34./dt !m/s
-!YJZ
-  if(salt_water==0) then
-    fw=qfm/dt !m/s
-  else
-    fw=qfm*(salt_water-salt_ice)/salt_water/dt !m/s
-  endif
+  fw=qfm*(34.-5.)/34./dt !m/s
            !++RT This is the fresh water flux that should be passed to
            !     the ocean for coupling.                           -RT--
   !-------------------------------------------------------------------
@@ -369,11 +348,8 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   !  minus ML heat content of previous time step
   ! Note: In coupled ocean-ice models, the heat content of the
   !	mixed layer should be calculated in the ocean part
-  !qtm<0: ice melts (heat content goes down in ML), so qtm=sflux in SCHISM
   !-------------------------------------------------------------------
-  qtm=-tmp2-(T_oc-TFrez(S_oc))*h_ml*cc/cl !m
-!YJZ: this formulation is clearer
-  ehf=qtm/dt*cl ![W/m/m]
+  qtm=-tmp2-(T_oc-TFrez(S_oc))*H_ML*cc/cl !m
   
   !++RT: This qtm can be used as the ocean surface heat loss.
   !++RT: However, I suggest to use ehf further down.
@@ -399,19 +375,10 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   !RT: This is what I suggest to use as the ocean surface boundary
   !RT: condition for coupling:
   !ehf>0: heat to warm the ocean
-!YJZ: use the formulation above
-!  ehf=ahf+cl*(dhgrowth+(rhosnow/rhoice)*dhsngrowth) !W/m/m
-
+  ehf=ahf+cl*(dhgrowth+(rhosnow/rhoice)*dhsngrowth) !W/m/m
   !RT FR099:
   !fw<0: evaporation
-!YJZ
-  if(salt_water==0) then
-    tmp3=1
-  else
-    tmp3=(salt_water-salt_ice)/salt_water
-  endif
-  !fw=-dhgrowth*rhoice/rhowat*(34.-5.)/34.-dhsngrowth*rhosnow/rhowat+prec !m/s
-  fw=-dhgrowth*rhoice/rhowat*tmp3-dhsngrowth*rhosnow/rhowat+prec !m/s
+  fw=-dhgrowth*rhoice/rhowat*(34.-5.)/34.-dhsngrowth*rhosnow/rhowat+prec !m/s
   !RT-
 
 !  write(99,*)'STEP7:',h,dhgrowth,dhsngrowth,prec,dhgrowth,ehf,fw
@@ -421,10 +388,9 @@ subroutine therm_ice(h,hsn,A,toi,fsh,flo,tair,qa,preslev,precrate, &
   !======================================================
   
   rh=-min(h,-rh)   ! Make sure we do not try to melt more ice than is available
-  rA= rhow -(T_oc-TFrez(S_oc))*h_ml*cc/cl !m
+  rA= rhow -(T_oc-TFrez(S_oc))*H_ML*cc/cl !m
   
-  !A=A+Saterm*min(rh,0.d0)*A/max(h,hmin)+max(rA,0.d0)*(1.-A)/h0   ! Total change. [-]
-  A=A+Saterm*min(rh,0.d0)*A/max(h,hmin)+max(rA,0.d0)*(1.-A)/lead_closing   ! Total change. [-]
+  A=A+Saterm*min(rh,0.d0)*A/max(h,hmin)+max(rA,0.d0)*(1.-A)/h0   ! Total change. [-]
   
   A=min(A,h*1.e6)     ! A -> 0 for h -> 0; impose h>=1.e-6m
   A=min(max(A,0.d0),1.d0) ! A >= 0, A <= 1
@@ -460,12 +426,12 @@ subroutine ice_budget(hice,hsn,toi,tair,qa,preslev,fsh,flo,ug,S_oc,fh)
   !RT   I am also gonna do the final crosscheck then.
   !--RT
   
-  ! Thick ice growth rate from air-ice exchange [m ice/sec]
+  ! Thick ice growth rate [m ice/sec]
   
   ! INPUT:
   ! hice - actual ice thickness [m]
   ! hsn - snow thickness, used for albedo parameterization [m]
-  ! toi - temperature of snow/ice surface [C] (T_sfc in P&W)
+  ! toi - temperature of snow/ice surface [C]
   ! tair - air temperature [C]
   ! qa - specific humidity
   ! preslev - air pressure [hPa]
@@ -474,9 +440,7 @@ subroutine ice_budget(hice,hsn,toi,tair,qa,preslev,fsh,flo,ug,S_oc,fh)
   ! ug - wind speed [m/sec]
   ! S_oc - ocean salinity for the temperature of the ice base calculation [ppt]
   
-  ! OUTPUT: 
-  ! fh (growth rate); 
-  ! toi: modified when thick ice occurs
+  ! OUTPUT: fh (growth rate); toi
   
   use schism_glbl,only: rkind
   use schism_msgp, only : parallel_abort
@@ -517,38 +481,39 @@ subroutine ice_budget(hice,hsn,toi,tair,qa,preslev,fsh,flo,ug,S_oc,fh)
   endif ! freezing or melting?  ----
   
   
-  ! total incoming atmospheric heat flux (part of f(x0))
+  ! total incoming atmospheric heat flux
   a1=(1.0-alb)*fsh +flo +d1*ug*tair +d2i*ug*qa
   
   !
-  ! NEWTON-RHAPSON TO GET TEMPERATURE AT THE TOP OF THE ICE LAYER (toi)
-  ! Eq. (16) of Parkinson & Washington?
+  ! NEWTON-RHAPSON TO GET TEMPERATURE AT THE TOP OF THE ICE LAYER
+  !
   do iter=1,imax
     if(toi+tqi==0) call parallel_abort('ice_budget: toi+tqi=0')
-    !Changed 10^a to exp(a*log(10)) compared to P&W
     b=6.11*0.622/preslev*exp(qsi*toi/(toi+tqi)) ! specific humidity for ice
-    a3=d2i*ug*b*qsi*tqi/((toi+tqi)**2)        !negative gradient coefficient for the humidity part
-    a2=-d1*ug*toi-d2i*ug*b-d3*((toi+tmelt)**4)  ! remaining f(x0) from sensible, latent heat, upward long wave
+    a3=d2i*ug*b*qsi*tqi/((toi+tqi)**2)        ! gradient coefficient for the humidity part
+    a2=-d1*ug*toi-d2i*ug*b-d3*((toi+tmelt)**4)  ! radiation, sensible and latent heat
     !hice>0 checked in the calling routine
     if(hice==0) call parallel_abort('ice_budget: hice=0')
-    c=con/hice                              !negative gradient coefficient for heat conductivity part
-    a3=a3+4.0*d3*((toi+tmelt)**3)+c+d1*ug   !negative gradient coefficient for sensible & latent heat 
-    c=c*(TFrez(S_oc)-toi)                   !downward conductivity term (f(x0))
+    c=con/hice                              ! gradient coefficient for heat conductivity part
+    a3=a3+4.0*d3*((toi+tmelt)**3)+c+d1*ug     ! gradient coefficient for sensible & latent heat 
+    c=c*(TFrez(S_oc)-toi)                        ! downward conductivity term
   
     if(a3==0) call parallel_abort('ice_budget: a3=0')
-    toi=min(0.d0,toi+(a1+a2+c)/a3)  !Newton-Raphson
+    toi=min(0.d0,toi+(a1+a2+c)/a3)                ! NEW ICE TEMPERATURE AS THE SUM OF ALL COMPONENTS
   enddo !iter
   
   !Heat fluxes [W/m**2]
   hfrad= (1.0-alb)*fsh & ! absorbed short wave radiation
-                 &+flo & ! long wave radiation coming in
+                  +flo & ! long wave radiation coming in
  &-d3*((toi+tmelt)**4) ! long wave radiation going out
   
   hfsen=d1*ug*(tair-toi)                   ! sensible heat
   hflat=d2i*ug*(qa-b)                     ! latent   heat
   hftot=hfrad+hfsen+hflat                 ! total (atm.)
   
-  fh=-hftot/cl    ! growth rate [m ice/sec]; >0: ice grows
+  fh=-hftot/cl                           ! growth rate [m ice/sec]
+  !                                      +: ML gains energy, ice melts
+  !                                      -: ML loses energy, ice grows
 end subroutine ice_budget
 
 !======================================================
@@ -587,22 +552,20 @@ subroutine ocean_budget(preslev,qa,fsh,flo,toc,ug,tair,fh)
 !   qa= (0.622/preslev)*6.11*exp(qsw*td/(td+tqw))
 !  endif
   
-  !specific humidity @ surface
-  !Since preslev is in hPa, Eq. (10) of Parkinson & Washington is deivided by
-  !100
-  b=6.11*0.622/preslev*exp(qsw*toc/(toc+tqw))
+  b=6.11*0.622/preslev*exp(qsw*toc/(toc+tqw)) 
   
   !                                 Heat fluxes [W/m**2]
   hfradow= (1.0-albw)*fsh & ! absorbed short wave radiation
-                    &+flo & ! long wave radiation coming in
-        &-d3*((toc+tmelt)**4) ! long wave radiation going out
+                     +flo & ! long wave radiation coming in
+        -d3*((toc+tmelt)**4) ! long wave radiation going out
   
   hfsenow=d1 *ug*(tair-toc)                 ! sensible heat
   hflatow=d2w*ug*(qa-b)                   ! latent   heat
-  hftotow=hfradow+hfsenow+hflatow ! total downward [W/m/m]
+  hftotow=hfradow+hfsenow+hflatow ! total
   
-  fh= -hftotow/cl   ! growth rate [m ice/sec]
-  !fh>0: ice grows
+  fh= -hftotow/cl                         ! growth rate [m ice/sec]
+  !                                      +: ML gains energy, ice melts
+  !                                      -: ML loses energy, ice grows
 end subroutine ocean_budget
 
 !==========================================================

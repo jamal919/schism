@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/schism/!svn/ver/4542/tags/v5.6.1/cmake
+END
+SCHISM.ymir.intel
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/SCHISM.ymir.intel
+END
+SCHISM.local.cmake.example
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/SCHISM.local.cmake.example
+END
+SCHISM.local.cmake.win
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/SCHISM.local.cmake.win
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/README
+END
+SCHISMCompile.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/SCHISMCompile.cmake
+END

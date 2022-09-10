@@ -1,4 +1,4 @@
-!     Generate .gr3 (e.g. shapiro.gr3)  using bottom slope as a criterion.
+!     Generate .gr3 using bottom slope as a criterion.
 !     Works for mixed tri/quads 
 !     Inputs: hgrid.gr3 (not in lon/lat!); consts below
 !     Output: slope_filter.gr3
@@ -13,12 +13,10 @@
       dimension x(mnp),y(mnp),dp(mnp),area(mne),dldxy(2,3),slope(mne)
       dimension nne(mnp),indel(mnei,mnp),hdif(mnp),hdif_e(mne),rlh(4)
 
-      !Formula: depth=hdif_max*tanh(2*gam/threshold_slope), where gam is
+      !Formula: hvis=hdif_max*tanh(2*gam/threshold_slope), where gam is
       !slope
       hdif_max=0.5 !max 
-
-      print*, 'Input ref slope:'
-      read*, threshold_slope 
+      threshold_slope=0.05 !ref slope
 
       open(14,file='hgrid.gr3',status='old')
       open(13,file='slope_filter.gr3',status='replace')

@@ -1,0 +1,125 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules
+END
+CMakeParseArguments.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/CMakeParseArguments.cmake
+END
+PrintVariable.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/PrintVariable.cmake
+END
+AddPackageDependency.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/AddPackageDependency.cmake
+END
+FindPythonInterp.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindPythonInterp.cmake
+END
+FindNetCDF.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindNetCDF.cmake
+END
+FindPackgeHandleStandardArgs.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindPackgeHandleStandardArgs.cmake
+END
+FindPackageHandleStandardArgs.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindPackageHandleStandardArgs.cmake
+END
+SelectPackageConfigurations.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/SelectPackageConfigurations.cmake
+END
+FindGOTM.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindGOTM.cmake
+END
+ResolveCompilerPaths.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/ResolveCompilerPaths.cmake
+END
+MPIWrap.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/MPIWrap.cmake
+END
+FindPETSc.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindPETSc.cmake
+END
+SelectLibraryConfigurations.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/SelectLibraryConfigurations.cmake
+END
+MakeDefineOption.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/MakeDefineOption.cmake
+END
+FindParmetis.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindParmetis.cmake
+END
+FindMPI.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindMPI.cmake
+END
+SCHISMTest.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/SCHISMTest.cmake
+END
+FindHDF5.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindHDF5.cmake
+END
+FindPythonLibs.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindPythonLibs.cmake
+END
+FindPackageMultipass.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/schism/!svn/ver/4542/tags/v5.6.1/cmake/modules/FindPackageMultipass.cmake
+END

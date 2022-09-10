@@ -47,7 +47,7 @@
          IF (.NOT. LINID) THEN
            CALL SET_WIND( IP, WIND10, WINDTH )
            CALL SET_FRICTION( IP, WALOC, WIND10, WINDTH, FPM )
-           CALL SIN_LIN_CAV(IP,WIND10,WINDTH,FPM,SSINL)
+           CALL SIN_LIN_CAV(IP,WINDTH,FPM,SSINL)
            PHI = PHI + SSINL
          ELSE
            SSINL = ZERO
@@ -65,13 +65,11 @@
          INTEGER                       :: IS, ID
          REAL(rkind)                   :: VEC2RAD, FPM
          REAL(rkind)                   :: PHI(NUMSIG,NUMDIR)
-         REAL(rkind)                   :: FL3(NUMDIR,NUMSIG), FL(NUMDIR,NUMSIG), SL(NUMDIR,NUMSIG)
-
+         REAL(rkind)                :: FL3(NUMDIR,NUMSIG), FL(NUMDIR,NUMSIG), SL(NUMDIR,NUMSIG)
          THWOLD(IP) = THWNEW(IP)
          THWNEW(IP) = VEC2RAD(WINDXY(IP,1),WINDXY(IP,2))
          U10NEW(IP) = MAX(TWO,SQRT(WINDXY(IP,1)**2+WINDXY(IP,2)**2)) * WINDFAC
-         Z0NEW(IP)  = Z0OLD(IP)
-
+         Z0NEW(IP) = Z0OLD(IP)
          DO IS = 1, NUMSIG
            DO ID = 1, NUMDIR
              FL3(ID,IS) =  WALOC(IS,ID) * PI2 * SPSIG(IS)
@@ -83,6 +81,7 @@
              WALOC(IS,ID) = FL3(ID,IS) / PI2 / SPSIG(IS)
            END DO
          END DO
+
       END SUBROUTINE
 !**********************************************************************
 !*                                                                    *

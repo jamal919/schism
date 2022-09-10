@@ -1,0 +1,329 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/schism/!svn/ver/4542/tags/v5.6.1/mk
+END
+Make.defs.yellowstone
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.yellowstone
+END
+Make.defs.centos.gnu.ompi
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.centos.gnu.ompi
+END
+Make.defs.vortex
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.vortex
+END
+Make.defs.gordon
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.gordon
+END
+Make.defs.fedora.gnu.ompi
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.fedora.gnu.ompi
+END
+Make.defs.cori
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.cori
+END
+cull_depends.py
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/cull_depends.py
+END
+Make.defs.JUROPA
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.JUROPA
+END
+Make.defs.typhoon
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.typhoon
+END
+Make.defs.stampede
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.stampede
+END
+Make.defs.dwr.intel
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.dwr.intel
+END
+Make.defs.lavezzola
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.lavezzola
+END
+Make.defs.comet
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.comet
+END
+Make.defs.ches.gnu
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.ches.gnu
+END
+Make.defs.sirius
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.sirius
+END
+Make.defs.cori2
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.cori2
+END
+Make.defs.aron.cluster
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.aron.cluster
+END
+Make.defs.whirlwind.intel
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.whirlwind.intel
+END
+Make.defs.ches
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.ches
+END
+Make.defs.bora
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.bora
+END
+Make.defs.stampede2
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.stampede2
+END
+Make.defs.pleiades
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.pleiades
+END
+Make.defs.bfg.gnu
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.bfg.gnu
+END
+Make.defs.aron.gnu
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.aron.gnu
+END
+example_modules
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/example_modules
+END
+Make.defs.HZG
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.HZG
+END
+Make.defs.maine
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.maine
+END
+Make.defs.pleiades_knl
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.pleiades_knl
+END
+Make.defs.ymir.intel
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.ymir.intel
+END
+Make.defs.ivica
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.ivica
+END
+Make.defs.ubuntu.intel.mpich
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.ubuntu.intel.mpich
+END
+Make.defs.mathieu
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.mathieu
+END
+Make.defs.storm.gnu
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.storm.gnu
+END
+Make.defs.lnec.medusa
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.lnec.medusa
+END
+Make.defs.dan.fx100
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.dan.fx100
+END
+Make.defs.aron
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.aron
+END
+Make.defs.whirlwind.gnu
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.whirlwind.gnu
+END
+Make.defs.aron.lenovo
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.aron.lenovo
+END
+Make.defs.lnec.ws.gnu
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.lnec.ws.gnu
+END
+Make.defs.franzius
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.franzius
+END
+Make.defs.vortex.intel
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.vortex.intel
+END
+Make.defs.storm
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.storm
+END
+sfmakedepend.pl
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/sfmakedepend.pl
+END
+Make.defs.config
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.config
+END
+Make.defs.worker.bfg
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.worker.bfg
+END
+Make.defs.whirlwind
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.whirlwind
+END
+Make.defs.ymir.gnu
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.ymir.gnu
+END
+Make.defs.ubuntu.gnu.mpich
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.ubuntu.gnu.mpich
+END
+Make.defs.dkrz
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.dkrz
+END
+Make.defs.ubuntu.gnu.ompi
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.ubuntu.gnu.ompi
+END
+Make.defs.vortex.gnu
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.vortex.gnu
+END
+include_modules
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/schism/!svn/ver/4542/tags/v5.6.1/mk/include_modules
+END
+Make.defs.tsunami
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.tsunami
+END
+Make.defs.dan.cluster
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/schism/!svn/ver/4542/tags/v5.6.1/mk/Make.defs.dan.cluster
+END

@@ -2,7 +2,7 @@
 subroutine ice_evp
   use schism_glbl,only: rkind,time_stamp,rnday,eta2,np,ne,nea, &
  &elnode,i34,dldxy,cori,grav,isbnd,indel,nne,area,iself,fdb,lfdb, &
- &xnd,ynd,iplg,ielg,elside,mnei,rho0,idry,errmsg
+ &xnd,ynd,iplg,ielg,elside,mnei,rho0,errmsg
   use schism_msgp, only: myrank,nproc,parallel_abort,exchange_p2d
   use ice_module
   implicit none
@@ -11,7 +11,7 @@ subroutine ice_evp
  &pp0,delta,delta_inv,rr1,rr2,rr3,sig1,sig2,x10,x20,y10,y20,rl10, &
  &rl20,sintheta,bb1,bb2,h_ice_el,a_ice_el,h_snow_el,dsig_1,dsig_2,mass, &
  &cori_nd,umod,gam1,rx,ry,rxp,ryp,eps11,eps12,eps22, &
- &zeta,delta_nd,zeta_over_T
+ &zeta,delta_nd
 
   integer :: iball(mnei)
   real(rkind) :: swild(2,3),swild2(nea),deta(2,nea)
@@ -41,18 +41,11 @@ subroutine ice_evp
       h_ice_el=sum(ice_tr(1,elnode(1:3,i)))/3.0
       a_ice_el=sum(ice_tr(2,elnode(1:3,i)))/3.0
       pp0=h_ice_el*pstar*exp(-c_pressure*(1-a_ice_el)) !P_0
-      zeta=pp0*0.5/max(delta_ice(i),delta_min) !viscosity/moduli
+      zeta=pp0*0.5/max(delta_ice(i),delta_min)
 
-!      !Hunke limiter
-      zeta_over_T=zeta*t_evp_inv
-!      if(evp_limiter>0.d0) then
-!        sum1=evp_limiter*area(i)/dtevp/dtevp
-!        zeta_over_T=min(zeta_over_T,sum1)
-!      endif
-
-      rr1=zeta_over_T*(eps11+eps22-delta_ice(i)) !RHS for 1st eq
-      rr2=zeta_over_T*(eps11-eps22)
-      rr3=zeta_over_T*eps12
+      rr1=zeta*t_evp_inv*(eps11+eps22-delta_ice(i)) !RHS for 1st eq
+      rr2=zeta*t_evp_inv*(eps11-eps22)
+      rr3=zeta*t_evp_inv*eps12
       sig1=sigma11(i)+sigma22(i) !from previous step
       sig2=sigma11(i)-sigma22(i)
 
@@ -99,12 +92,8 @@ subroutine ice_evp
         deta(1,i)=swild2(i)*sum(v_ocean(elnode(1:i34(i),i)))/i34(i)/grav
         deta(2,i)=-swild2(i)*sum(u_ocean(elnode(1:i34(i),i)))/i34(i)/grav
       else
-        if(maxval(idry(elnode(1:i34(i),i)))/=0) then !dry
-          deta(1:2,i)=0
-        else !wet
-          deta(1,i)=dot_product(eta2(elnode(1:i34(i),i)),dldxy(1:i34(i),1,i))
-          deta(2,i)=dot_product(eta2(elnode(1:i34(i),i)),dldxy(1:i34(i),2,i))
-        endif !dry
+        deta(1,i)=dot_product(eta2(elnode(1:i34(i),i)),dldxy(1:i34(i),1,i))
+        deta(2,i)=dot_product(eta2(elnode(1:i34(i),i)),dldxy(1:i34(i),2,i))
       endif !
     enddo !i
 

@@ -13,9 +13,8 @@
 !   limitations under the License.
 
 !===============================================================================
-! Read in *.gr3-like (rank-specific) outputs from SCHISM and combine them into one global output
+! Read in *.gr3-like (rank-specific) outputs from SELFE and combine them into one global output
 ! e.g. maxelev.gr3; may have multiple scalar fields
-! Works with mixed hgrid
 
 ! Inputs:
 !        (0) screen: filenm - name of file (e.g. maxelev);
@@ -53,14 +52,14 @@ program combine_gr3
   allocate(x(np),y(np),elevmax(nscal,np),stat=istat)
   if(istat/=0) stop 'Allocation error: x,y'
 
-  open(10,file='outputs/'//filenm(1:lfilenm)//'_000000',status='old')
+  open(10,file='outputs/'//filenm(1:lfilenm)//'_0000',status='old')
   read(10,*)icount,nproc
   close(10)
 
 !-------------------------------------------------------------------------------
 ! Combine
 !-------------------------------------------------------------------------------
-  fdb=filenm(1:lfilenm)//'_000000'
+  fdb=filenm(1:lfilenm)//'_0000'
   lfdb=len_trim(fdb)
 
   do irank=0,nproc-1

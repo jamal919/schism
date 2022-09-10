@@ -1,5 +1,5 @@
 %From YC
-%Read in an existing netcdf files (converted from grib2) and output SCHISM nc input; need to 
+%Read in an existing netcdf files (convert from grib2) and output SELFE nc input; need to 
 % add file names below; modify other parts as approx. (e.g. start time stamp)
 clear all; close all;
 %scrsz = get(0,'ScreenSize'); %screen size
@@ -133,7 +133,7 @@ for i=1:length(time) %length(time)
   pres(find(pres<fill_in+1))=1.e5; %nan;
 %  prc(find(prc<fill_in+1))=0; %nan;
 
-  %Write nc file of SCHISM format (Warning: use single precision!)
+  %Write nc file of SELFE format (Warning: use single precision!)
   if(i>1 && rem(i,24)==0)
 
   disp(strcat('Outputting Day: ',num2str(day)));

@@ -1,9 +1,8 @@
 !     gfortran -ffree-line-length-none -O2 -static -static-libgfortran -finit-local-zero -fopenmp -o test1 test1.f90 
 !     pgf90 -O2 -mcmodel=medium -Mbounds -mp -o test1 test1.f90
-!     ifort -g -mcmodel=medium  -Bstatic -assume byterecl -qopenmp -o test1 test1.f90
+!     ifort -g -mcmodel=medium  -Bstatic -assume byterecl -openmp -o test1 test1.f90
 
-!Warning: best to check if the parallel loop size >  # of threads. When they r equal, strange things happen on gcc.
-!Accroding to some ref, dynamic arrays (alloc) can only be shared
+!Warning: best to check if the loop size >  # of threads. When they r equal, strange things happen on gcc.
 
       module glbl
       implicit none

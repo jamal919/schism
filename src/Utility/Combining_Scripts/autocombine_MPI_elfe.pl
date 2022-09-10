@@ -11,30 +11,27 @@
 
 #use Cwd;
 
-if(@ARGV < 2) 
+if(@ARGV != 2) 
 { 
-  print "$0 <start # of stacks> <end # of stacks> <optional wet/dry (0: last wet values)>\n";
+  print "$0 <start # of stacks> <end # of stacks>\n";
   exit(1);
 }
 print "$0 @ARGV\n";
 $start_stack=$ARGV[0]; $end_stack=$ARGV[1]; 
-$iwetdry=1;
-if(@ARGV==3) {$iwetdry=$ARGV[2];}
 
 if(!-e "outputs") {die "No outputs dir!";}
 ##Get nproc and ntracers
 ##open(FL,"<outputs/local_to_global_0000"); @all=<FL>; close(FL);
 ##($_,$_,$_,$nproc,@ntr[0..9])=split(" ",$all[0]);
 
-$code="~yinglong/bin/combine_output11";
+$code="~yinglong/bin/combine_output11.WW";
 
 for($next_stack=$start_stack+1; $next_stack<=$end_stack+1; $next_stack++)
 {
-  while(!-e "outputs/schout_000000_$next_stack\.nc") {sleep 120;} #sleep 2 min.
+  while(!-e "outputs/schout_0000_$next_stack\.nc") {sleep 300;} #sleep 5 min.
 #  sleep 180; #wait a little longer to make sure outputs are written
   $current_stack=$next_stack-1;
-  system "cd outputs; $code -b $current_stack -e $current_stack -w $iwetdry > combine.out";
-  print "done combining stack $current_stack...\n";
+  system "cd outputs; $code -b $current_stack -e $current_stack > combine.out";
 } #for
 
-#if(-e "outputs/$end_stack\_hvel.64") {system "cd outputs/; echo schout_[0-9]?????_*.nc | xargs rm -f";}
+#if(-e "outputs/$end_stack\_hvel.64") {system "cd outputs/; echo *_[0-9]???_*.6? | xargs rm -f";}
