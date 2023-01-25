@@ -324,7 +324,7 @@
   
     <li class="md-nav__item">
       <a href="../../getting-started/grid-generation.html" class="md-nav__link">
-        Grid generation
+        Mesh generation
       </a>
     </li>
   
@@ -340,6 +340,109 @@
       <a href="../../getting-started/pre-processing.html" class="md-nav__link">
         Preprocessing
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_7">
+          Preprocessing with PySCHISM
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Preprocessing with PySCHISM" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_7">
+          <span class="md-nav__icon md-icon"></span>
+          Preprocessing with PySCHISM
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/pre-processing-with-pyschism/overview.html" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/pre-processing-with-pyschism/installation.html" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/pre-processing-with-pyschism/boundary.html" class="md-nav__link">
+        Boundary Conditions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/pre-processing-with-pyschism/atmos.html" class="md-nav__link">
+        Atmospheric forcing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/pre-processing-with-pyschism/nwm.html" class="md-nav__link">
+        Souce and Sink
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -1038,14 +1141,14 @@
       
       
         <label class="md-nav__link" for="__nav_8">
-          Mesh generation
+          Mesh generation - advanced topics
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Mesh generation" data-md-level="1">
+      <nav class="md-nav" aria-label="Mesh generation - advanced topics" data-md-level="1">
         <label class="md-nav__title" for="__nav_8">
           <span class="md-nav__icon md-icon"></span>
-          Mesh generation
+          Mesh generation - advanced topics
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1440,20 +1543,20 @@ The driver can be called like this:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>mpirun -n 20 ./river_map_mpi_driver
 </code></pre></div>
 <p>The first argument takes a *.json file that specifies multiple sets of DEMs (arranged from high priority to low priority), for example:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">&quot;CuDEM&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CuDEM&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">        </span><span class="nt">&quot;glob_pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/sciclone/schism10/feiye/STOFS3D-v5/Inputs/v14/DEMs/CuDEM/Lonlat/*.tif&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="nt">&quot;file_list&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="nt">&quot;boxes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w"></span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="p">},</span><span class="w"></span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nt">&quot;CRM&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CRM&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">        </span><span class="nt">&quot;glob_pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/sciclone/schism10/feiye/STOFS3D-v5/Inputs/v14/DEMs/CRM/Lonlat/*.tif&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">        </span><span class="nt">&quot;file_list&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">        </span><span class="nt">&quot;boxes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w"></span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">&quot;CuDEM&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CuDEM&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">        </span><span class="nt">&quot;glob_pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/sciclone/schism10/feiye/STOFS3D-v5/Inputs/v14/DEMs/CuDEM/Lonlat/*.tif&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="nt">&quot;file_list&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="nt">&quot;boxes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nt">&quot;CRM&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CRM&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">        </span><span class="nt">&quot;glob_pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/sciclone/schism10/feiye/STOFS3D-v5/Inputs/v14/DEMs/CRM/Lonlat/*.tif&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">        </span><span class="nt">&quot;file_list&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">        </span><span class="nt">&quot;boxes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="p">}</span>
 </code></pre></div></p>
 <h2 id="products">Products<a class="headerlink" href="#products" title="Permanent link">&para;</a></h2>
 <p>The outputs of the script include the following files:</p>

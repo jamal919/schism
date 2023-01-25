@@ -324,7 +324,7 @@
   
     <li class="md-nav__item">
       <a href="../getting-started/grid-generation.html" class="md-nav__link">
-        Grid generation
+        Mesh generation
       </a>
     </li>
   
@@ -340,6 +340,109 @@
       <a href="../getting-started/pre-processing.html" class="md-nav__link">
         Preprocessing
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_7">
+          Preprocessing with PySCHISM
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Preprocessing with PySCHISM" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_7">
+          <span class="md-nav__icon md-icon"></span>
+          Preprocessing with PySCHISM
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/pre-processing-with-pyschism/overview.html" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/pre-processing-with-pyschism/installation.html" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/pre-processing-with-pyschism/boundary.html" class="md-nav__link">
+        Boundary Conditions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/pre-processing-with-pyschism/atmos.html" class="md-nav__link">
+        Atmospheric forcing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/pre-processing-with-pyschism/nwm.html" class="md-nav__link">
+        Souce and Sink
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -1036,14 +1139,14 @@
       
       
         <label class="md-nav__link" for="__nav_8">
-          Mesh generation
+          Mesh generation - advanced topics
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Mesh generation" data-md-level="1">
+      <nav class="md-nav" aria-label="Mesh generation - advanced topics" data-md-level="1">
         <label class="md-nav__title" for="__nav_8">
           <span class="md-nav__icon md-icon"></span>
-          Mesh generation
+          Mesh generation - advanced topics
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1382,7 +1485,7 @@
 <p>The National Unified Operational Prediction Capability (NUOPC) is a consortium of Navy, NOAA, and Air Force modelers and their research partners. It aims to advance the weather prediction modeling systems used by meteorologists, mission planners, and decision makers. NUOPC partners are working toward a common model architecture - a standard way of building models - in order to make it easier to collaboratively build modeling systems. To this end, they have developed the NUOPC Layer that defines conventions and a set of generic components for building coupled models using the Earth System Modeling Framework (ESMF).</p>
 <p>SCHISM can be such a model component within an NUOPC-coupled system.  A so-called "cap" wraps SCHISM and exposes it via the NUOPC Application Programming Interface (API).  The interfaces exposed through the API are (1) import of fields, (2) export of fields, and (3) control structure.</p>
 <h2 id="obtaining-and-building-the-cap">Obtaining and building the cap<a class="headerlink" href="#obtaining-and-building-the-cap" title="Permanent link">&para;</a></h2>
-<p>The <a href="nuopc.html">NUOPC</a>(esmf.html) cap are jointly hosted in a separate repository on <a href="https://github.com/schism-dev/schism-esmf">https://github.com/schism-dev/schism-esmf</a>.  It requires that the SCHISM core is built and pointed to by the environment variable <code>$SCHISM_BUILD_DIR</code> </p>
+<p>The <a href="nuopc.html">NUOPC</a> and the <a href="esmf.html">ESMF</a> caps are jointly hosted in a separate repository on <a href="https://github.com/schism-dev/schism-esmf">https://github.com/schism-dev/schism-esmf</a>.  It requires that the SCHISM core is built and pointed to by the environment variable <code>$SCHISM_BUILD_DIR</code> </p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>export SCHISM_ESMF_DIR=/my/path/to/schism-esmf
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git clone https://github.com/schism-dev/schism-esmf.git $SCHISM_ESMF_DIR
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>cd $SCHISM_ESMF_DIR
