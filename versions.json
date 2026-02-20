@@ -1,1 +1,14 @@
-[{"version": "master", "title": "stable", "aliases": ["stable"]}]
+[
+  {
+    "version": "master",
+    "title": "stable",
+    "aliases": [
+      "stable"
+    ]
+  },
+  {
+    "version": "docs_update",
+    "title": "docs_update",
+    "aliases": []
+  }
+]
