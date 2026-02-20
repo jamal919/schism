@@ -2,13 +2,13 @@
   {
     "version": "master",
     "title": "stable",
-    "aliases": []
+    "aliases": [
+      "stable"
+    ]
   },
   {
     "version": "docs_update",
     "title": "docs_update",
-    "aliases": [
-      "stable"
-    ]
+    "aliases": []
   }
 ]
