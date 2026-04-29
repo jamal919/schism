@@ -12,10 +12,10 @@
          USE DATAPOOL, only : OUTSTYLE, LOUTITER,                       &
      &        LENERGY, LWXFN, OUT_HISTORY, OUT_STATION, INP, LSP1D,     &
      &        LSP2D, INP, CHK, LOUTS, IOUTS, LSIGMAX, LLOUTS,           &
-     &        ILOUTS, OUT, DAY2SEC, FRHIGH, DBG, LINES, VAROUT_HISTORY, &
+     &        OUT, DAY2SEC, FRHIGH, DBG, LINES, VAROUT_HISTORY, &
      &        VAROUT_STATION, GRIDWRITE, RKIND, LVAR_READ,              &
      &        PARAMWRITE_HIS, PARAMWRITE_STAT, wwmerr, LCFL, myrank,    &
-     &        istat,WRITEDBGFLAG
+     &        istat,WRITEDBGFLAG, STNIN
 #ifdef NCDF
          USE NETCDF
          USE DATAPOOL, only : USE_SINGLE_OUT_STAT, USE_SINGLE_OUT_HIS,  &
@@ -28,21 +28,20 @@
          USE DATAPOOL, only : WriteOutputProcess_hot
          USE DATAPOOL, only : WriteOutputProcess_his
          USE DATAPOOL, only : WriteOutputProcess_stat
-
+         !
          IMPLICIT NONE
          CHARACTER(LEN=40)  :: FILEOUT
          INTEGER, PARAMETER :: INUMOUTS = 200 
-         CHARACTER(LEN=20)  :: BEGTC, UNITC, ENDTC, NOUTS(INUMOUTS), NLOUTS(INUMOUTS)
+         CHARACTER(LEN=20)  :: BEGTC, UNITC, ENDTC, NOUTS(INUMOUTS)
          REAL(rkind)        :: XOUTS(INUMOUTS), YOUTS(INUMOUTS), CUTOFF(INUMOUTS)
-         REAL(rkind)        :: XLOUTS(INUMOUTS), YLOUTS(INUMOUTS)
-         REAL(rkind) :: DEFINETC
-         INTEGER     :: MULTIPLEOUT
-         LOGICAL     :: USE_SINGLE_OUT
-         REAL(rkind) :: DELTC
-         INTEGER     :: I
-         LOGICAL     :: PARAMWRITE
-         LOGICAL     :: AC, WK, ACOUT_1D, ACOUT_2D
-         LOGICAL     ::   HS, TM01, TM02, TM10, KLM, WLM,               &
+         REAL(rkind)        :: DEFINETC
+         INTEGER            :: MULTIPLEOUT
+         LOGICAL            :: USE_SINGLE_OUT
+         REAL(rkind)        :: DELTC
+         INTEGER            :: I
+         LOGICAL            :: PARAMWRITE
+         LOGICAL            :: AC, WK, ACOUT_1D, ACOUT_2D
+         LOGICAL            :: HS, TM01, TM02, TM10, KLM, WLM,          &
      &      ETOTC, ETOTS, DM, DSPR,                                     &
      &      TPPD, CPPD, KPPD, CGPD,                                     &
      &      TPP, CPP, WNPP, CGPP, KPP, LPP, PEAKD, PEAKDSPR,            &
@@ -53,7 +52,7 @@
      &      STOKESBOTTX, STOKESBOTTY,                                   &
      &      STOKESSURFX, STOKESSURFY, STOKESBAROX, STOKESBAROY,         &
      &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP
-
+         !
          NAMELIST /HISTORY/ BEGTC, DELTC, UNITC, ENDTC, DEFINETC,       &
      &      OUTSTYLE, FILEOUT, LOUTITER, IOBPD,                         &
      &      LENERGY, LWXFN, GRIDWRITE, PARAMWRITE,                      &
@@ -69,11 +68,11 @@
      &      STOKESBOTTX, STOKESBOTTY,                                   &
      &      STOKESSURFX, STOKESSURFY, STOKESBAROX, STOKESBAROY,         &
      &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP
-
+         !
          NAMELIST /STATION/ BEGTC, DELTC, UNITC, ENDTC, DEFINETC,       &
      &      OUTSTYLE, USE_SINGLE_OUT, MULTIPLEOUT, PARAMWRITE,          &
      &      FILEOUT, LOUTITER, IOUTS, NOUTS, XOUTS, YOUTS,              &
-     &      CUTOFF, LSIGMAX, LSP1D, LSP2D, LLOUTS, ILOUTS, NLOUTS,      &
+     &      CUTOFF, LSIGMAX, LSP1D, LSP2D, LLOUTS,                      &
      &      AC, WK, ACOUT_1D, ACOUT_2D,                                 &
      &      HS, TM01, TM02, TM10, KLM, WLM,                             &
      &      ETOTC, ETOTS, DM, DSPR, TPPD, CPPD, KPPD, CGPD, TPP,        &
@@ -85,87 +84,84 @@
      &      STOKESBOTTX, STOKESBOTTY,                                   &
      &      STOKESSURFX, STOKESSURFY, STOKESBAROX, STOKESBAROY,         &
      &      RSXX, RSXY, RSYY, CFL1, CFL2, CFL3, ZETA_SETUP
-
+         !
          XOUTS = 0.
          YOUTS = 0.
-         XLOUTS = 0.
-         YLOUTS = 0.
          NOUTS = ''
-         NLOUTS = ''
          CUTOFF = 0.
 
 !
 !     **** HISTORY section
 !
 #ifdef NCDF
-         MULTIPLEOUT=0
-         USE_SINGLE_OUT=.TRUE.
-         DEFINETC=-1
+         MULTIPLEOUT    = 0
+         USE_SINGLE_OUT = .TRUE.
+         DEFINETC       = -1
 #endif
-         FILEOUT = "zorglub"
-         HS=.FALSE.
-         TM01=.FALSE.
-         TM02=.FALSE.
-         TM10=.FALSE.
-         KLM=.FALSE.
-         WLM=.FALSE.
-         ETOTC=.FALSE.
-         ETOTS=.FALSE.
-         DM=.FALSE.
-         DSPR=.FALSE.
-         TPPD=.FALSE.
-         CPPD=.FALSE.
-         KPPD=.FALSE.
-         CGPD=.FALSE.
-         TPP=.FALSE.
-         CPP=.FALSE.
-         WNPP=.FALSE.
-         CGPP=.FALSE.
-         KPP=.FALSE.
-         LPP=.FALSE.
-         PEAKD=.FALSE.
-         PEAKDSPR=.FALSE.
-         DPEAK=.FALSE.
-         UBOT=.FALSE.
-         ORBITAL=.FALSE.
-         BOTEXPER=.FALSE.
-         TMBOT=.FALSE.
-         URSELL=.FALSE.
-         UFRIC=.FALSE.
-         Z0=.FALSE.
-         ALPHA_CH=.FALSE.
-         WINDX=.FALSE.
-         WINDY=.FALSE.
-         CD=.FALSE.
-         CURRTX=.FALSE.
-         CURRTY=.FALSE.
-         WATLEV=.FALSE.
-         WATLEVOLD=.FALSE.
-         DEPDT=.FALSE.
-         DEP=.FALSE.
-         WINDMAG=.FALSE.
-         TAUW=.FALSE.
-         TAUWX=.FALSE.
-         TAUWY=.FALSE.
-         TAUHF=.FALSE.
-         TAUTOT=.FALSE.
-         STOKESBOTTX=.FALSE.
-         STOKESBOTTY=.FALSE.
-         STOKESSURFX=.FALSE.
-         STOKESSURFY=.FALSE.
-         STOKESBAROX=.FALSE.
-         STOKESBAROY=.FALSE.
-         RSXX=.FALSE.
-         RSXY=.FALSE.
-         RSYY=.FALSE.
-         CFL1=.FALSE.
-         CFL2=.FALSE.
-         CFL3=.FALSE.
-         ZETA_SETUP=.FALSE.
-         BEGTC = MAIN%BEGT
-         DELTC = -1
-         UNITC = MAIN%UNIT
-         ENDTC = MAIN%ENDT
+         FILEOUT        = "zorglub"
+         HS             = .FALSE.
+         TM01           = .FALSE.
+         TM02           = .FALSE.
+         TM10           = .FALSE.
+         KLM            = .FALSE.
+         WLM            = .FALSE.
+         ETOTC          = .FALSE.
+         ETOTS          = .FALSE.
+         DM             = .FALSE.
+         DSPR           = .FALSE.
+         TPPD           = .FALSE.
+         CPPD           = .FALSE.
+         KPPD           = .FALSE.
+         CGPD           = .FALSE.
+         TPP            = .FALSE.
+         CPP            = .FALSE.
+         WNPP           = .FALSE.
+         CGPP           = .FALSE.
+         KPP            = .FALSE.
+         LPP            = .FALSE.
+         PEAKD          = .FALSE.
+         PEAKDSPR       = .FALSE.
+         DPEAK          = .FALSE.
+         UBOT           = .FALSE.
+         ORBITAL        = .FALSE.
+         BOTEXPER       = .FALSE.
+         TMBOT          = .FALSE.
+         URSELL         = .FALSE.
+         UFRIC          = .FALSE.
+         Z0             = .FALSE.
+         ALPHA_CH       = .FALSE.
+         WINDX          = .FALSE.
+         WINDY          = .FALSE.
+         CD             = .FALSE.
+         CURRTX         = .FALSE.
+         CURRTY         = .FALSE.
+         WATLEV         = .FALSE.
+         WATLEVOLD      = .FALSE.
+         DEPDT          = .FALSE.
+         DEP            = .FALSE.
+         WINDMAG        = .FALSE.
+         TAUW           = .FALSE.
+         TAUWX          = .FALSE.
+         TAUWY          = .FALSE.
+         TAUHF          = .FALSE.
+         TAUTOT         = .FALSE.
+         STOKESBOTTX    = .FALSE.
+         STOKESBOTTY    = .FALSE.
+         STOKESSURFX    = .FALSE.
+         STOKESSURFY    = .FALSE.
+         STOKESBAROX    = .FALSE.
+         STOKESBAROY    = .FALSE.
+         RSXX           = .FALSE.
+         RSXY           = .FALSE.
+         RSYY           = .FALSE.
+         CFL1           = .FALSE.
+         CFL2           = .FALSE.
+         CFL3           = .FALSE.
+         ZETA_SETUP     = .FALSE.
+         BEGTC          = MAIN%BEGT
+         DELTC          = -1
+         UNITC          = MAIN%UNIT
+         ENDTC          = MAIN%ENDT
          READ(INP%FHNDL, NML = HISTORY)
          wwm_print_namelist(HISTORY)
          FLUSH(CHK%FHNDL)
@@ -173,19 +169,19 @@
            DELTC=MAIN%DELT
          END IF
 #ifdef NCDF
-         PARAMWRITE_HIS=PARAMWRITE
-         USE_SINGLE_OUT_HIS=USE_SINGLE_OUT
-         MULTIPLEOUT_HIS=MULTIPLEOUT
+         PARAMWRITE_HIS     = PARAMWRITE
+         USE_SINGLE_OUT_HIS = USE_SINGLE_OUT
+         MULTIPLEOUT_HIS    = MULTIPLEOUT
          IF (rkind.eq.4) THEN
-           NF90_OUTTYPE_HIS=NF90_REAL
+           NF90_OUTTYPE_HIS = NF90_REAL
          ELSE
            IF (USE_SINGLE_OUT_HIS) THEN
-             NF90_OUTTYPE_HIS=NF90_REAL
+             NF90_OUTTYPE_HIS = NF90_REAL
            ELSE
-             NF90_OUTTYPE_HIS=NF90_DOUBLE
+             NF90_OUTTYPE_HIS = NF90_DOUBLE
            ENDIF
          ENDIF
-         OUT_HISTORY % DEFINETC=DEFINETC
+         OUT_HISTORY % DEFINETC = DEFINETC
          IF (DEFINETC .lt. 0) THEN
            OUT_HISTORY % IDEF = -1
          ELSE
@@ -253,68 +249,68 @@
            END IF
          ENDIF
 
-         OUT_HISTORY%FNAME = FILEOUT
+         OUT_HISTORY%FNAME   = FILEOUT
 
-         LVAR_READ( 1)=HS
-         LVAR_READ( 2)=TM01
-         LVAR_READ( 3)=TM02
-         LVAR_READ( 4)=TM10
-         LVAR_READ( 5)=KLM
-         LVAR_READ( 6)=WLM
-         LVAR_READ( 7)=ETOTC
-         LVAR_READ( 8)=ETOTS
-         LVAR_READ( 9)=DM
-         LVAR_READ(10)=DSPR
-         LVAR_READ(11)=TPPD
-         LVAR_READ(12)=CPPD
-         LVAR_READ(13)=KPPD
-         LVAR_READ(14)=CGPD
-         LVAR_READ(15)=TPP
-         LVAR_READ(16)=CPP
-         LVAR_READ(17)=WNPP
-         LVAR_READ(18)=CGPP
-         LVAR_READ(19)=KPP
-         LVAR_READ(20)=LPP
-         LVAR_READ(21)=PEAKD
-         LVAR_READ(22)=PEAKDSPR
-         LVAR_READ(23)=DPEAK
-         LVAR_READ(24)=UBOT
-         LVAR_READ(25)=ORBITAL
-         LVAR_READ(26)=BOTEXPER
-         LVAR_READ(27)=TMBOT
-         LVAR_READ(28)=URSELL
-         LVAR_READ(29)=UFRIC
-         LVAR_READ(30)=Z0
-         LVAR_READ(31)=ALPHA_CH
-         LVAR_READ(32)=WINDX
-         LVAR_READ(33)=WINDY
-         LVAR_READ(34)=CD
-         LVAR_READ(35)=CURRTX
-         LVAR_READ(36)=CURRTY
-         LVAR_READ(37)=WATLEV
-         LVAR_READ(38)=WATLEVOLD
-         LVAR_READ(39)=DEPDT
-         LVAR_READ(40)=DEP
-         LVAR_READ(41)=WINDMAG
-         LVAR_READ(42)=TAUW
-         LVAR_READ(43)=TAUWX
-         LVAR_READ(44)=TAUWY
-         LVAR_READ(45)=TAUHF
-         LVAR_READ(46)=TAUTOT
-         LVAR_READ(47)=STOKESBOTTX
-         LVAR_READ(48)=STOKESBOTTY
-         LVAR_READ(49)=STOKESSURFX
-         LVAR_READ(50)=STOKESSURFY
-         LVAR_READ(51)=STOKESBAROX
-         LVAR_READ(52)=STOKESBAROY
-         LVAR_READ(53)=RSXX
-         LVAR_READ(54)=RSXY
-         LVAR_READ(55)=RSYY
-         LVAR_READ(56)=CFL1
-         LVAR_READ(57)=CFL2
-         LVAR_READ(58)=CFL3
-         LVAR_READ(59)=ZETA_SETUP
-         VAROUT_HISTORY%LVAR=LVAR_READ
+         LVAR_READ( 1)       = HS
+         LVAR_READ( 2)       = TM01
+         LVAR_READ( 3)       = TM02
+         LVAR_READ( 4)       = TM10
+         LVAR_READ( 5)       = KLM
+         LVAR_READ( 6)       = WLM
+         LVAR_READ( 7)       = ETOTC
+         LVAR_READ( 8)       = ETOTS
+         LVAR_READ( 9)       = DM
+         LVAR_READ(10)       = DSPR
+         LVAR_READ(11)       = TPPD
+         LVAR_READ(12)       = CPPD
+         LVAR_READ(13)       = KPPD
+         LVAR_READ(14)       = CGPD
+         LVAR_READ(15)       = TPP
+         LVAR_READ(16)       = CPP
+         LVAR_READ(17)       = WNPP
+         LVAR_READ(18)       = CGPP
+         LVAR_READ(19)       = KPP
+         LVAR_READ(20)       = LPP
+         LVAR_READ(21)       = PEAKD
+         LVAR_READ(22)       = PEAKDSPR
+         LVAR_READ(23)       = DPEAK
+         LVAR_READ(24)       = UBOT
+         LVAR_READ(25)       = ORBITAL
+         LVAR_READ(26)       = BOTEXPER
+         LVAR_READ(27)       = TMBOT
+         LVAR_READ(28)       = URSELL
+         LVAR_READ(29)       = UFRIC
+         LVAR_READ(30)       = Z0
+         LVAR_READ(31)       = ALPHA_CH
+         LVAR_READ(32)       = WINDX
+         LVAR_READ(33)       = WINDY
+         LVAR_READ(34)       = CD
+         LVAR_READ(35)       = CURRTX
+         LVAR_READ(36)       = CURRTY
+         LVAR_READ(37)       = WATLEV
+         LVAR_READ(38)       = WATLEVOLD
+         LVAR_READ(39)       = DEPDT
+         LVAR_READ(40)       = DEP
+         LVAR_READ(41)       = WINDMAG
+         LVAR_READ(42)       = TAUW
+         LVAR_READ(43)       = TAUWX
+         LVAR_READ(44)       = TAUWY
+         LVAR_READ(45)       = TAUHF
+         LVAR_READ(46)       = TAUTOT
+         LVAR_READ(47)       = STOKESBOTTX
+         LVAR_READ(48)       = STOKESBOTTY
+         LVAR_READ(49)       = STOKESSURFX
+         LVAR_READ(50)       = STOKESSURFY
+         LVAR_READ(51)       = STOKESBAROX
+         LVAR_READ(52)       = STOKESBAROY
+         LVAR_READ(53)       = RSXX
+         LVAR_READ(54)       = RSXY
+         LVAR_READ(55)       = RSYY
+         LVAR_READ(56)       = CFL1
+         LVAR_READ(57)       = CFL2
+         LVAR_READ(58)       = CFL3
+         LVAR_READ(59)       = ZETA_SETUP
+         VAROUT_HISTORY%LVAR = LVAR_READ
          CALL DETERMINE_NEEDED_COMPUTATION(VAROUT_HISTORY)
          IF (.not. LCFL) THEN
            IF (CFL1.or.CFL2.or.CFL3) THEN
@@ -325,81 +321,94 @@
 !     **** STATION section
 !
 #ifdef NCDF
-         MULTIPLEOUT=0
-         USE_SINGLE_OUT=.TRUE.
-         DEFINETC=-1
+         MULTIPLEOUT    = 0
+         USE_SINGLE_OUT = .TRUE.
+         DEFINETC       = -1
 #endif
-         FILEOUT = "zorglub"
-         AC=.FALSE.
-         WK=.FALSE.
-         ACOUT_1D=.FALSE.
-         ACOUT_2D=.FALSE.
-         HS=.FALSE.
-         TM01=.FALSE.
-         TM02=.FALSE.
-         TM10=.FALSE.
-         KLM=.FALSE.
-         WLM=.FALSE.
-         ETOTC=.FALSE.
-         ETOTS=.FALSE.
-         DM=.FALSE.
-         DSPR=.FALSE.
-         TPPD=.FALSE.
-         CPPD=.FALSE.
-         KPPD=.FALSE.
-         CGPD=.FALSE.
-         TPP=.FALSE.
-         CPP=.FALSE.
-         WNPP=.FALSE.
-         CGPP=.FALSE.
-         KPP=.FALSE.
-         LPP=.FALSE.
-         PEAKD=.FALSE.
-         PEAKDSPR=.FALSE.
-         DPEAK=.FALSE.
-         UBOT=.FALSE.
-         ORBITAL=.FALSE.
-         BOTEXPER=.FALSE.
-         TMBOT=.FALSE.
-         URSELL=.FALSE.
-         UFRIC=.FALSE.
-         Z0=.FALSE.
-         ALPHA_CH=.FALSE.
-         WINDX=.FALSE.
-         WINDY=.FALSE.
-         CD=.FALSE.
-         CURRTX=.FALSE.
-         CURRTY=.FALSE.
-         WATLEV=.FALSE.
-         WATLEVOLD=.FALSE.
-         DEPDT=.FALSE.
-         DEP=.FALSE.
-         WINDMAG=.FALSE.
-         TAUW=.FALSE.
-         TAUWX=.FALSE.
-         TAUWY=.FALSE.
-         TAUHF=.FALSE.
-         TAUTOT=.FALSE.
-         STOKESBOTTX=.FALSE.
-         STOKESBOTTY=.FALSE.
-         STOKESSURFX=.FALSE.
-         STOKESSURFY=.FALSE.
-         STOKESBAROX=.FALSE.
-         STOKESBAROY=.FALSE.
-         RSXX=.FALSE.
-         RSXY=.FALSE.
-         RSYY=.FALSE.
-         CFL1=.FALSE.
-         CFL2=.FALSE.
-         CFL3=.FALSE.
-         ZETA_SETUP=.FALSE.
-         BEGTC = MAIN%BEGT
-         DELTC = MAIN%DELT
-         UNITC = MAIN%UNIT
-         ENDTC = MAIN%ENDT
+         FILEOUT        = "zorglub"
+         AC             = .FALSE.
+         WK             = .FALSE.
+         ACOUT_1D       = .FALSE.
+         ACOUT_2D       = .FALSE.
+         HS             = .FALSE.
+         TM01           = .FALSE.
+         TM02           = .FALSE.
+         TM10           = .FALSE.
+         KLM            = .FALSE.
+         WLM            = .FALSE.
+         ETOTC          = .FALSE.
+         ETOTS          = .FALSE.
+         DM             = .FALSE.
+         DSPR           = .FALSE.
+         TPPD           = .FALSE.
+         CPPD           = .FALSE.
+         KPPD           = .FALSE.
+         CGPD           = .FALSE.
+         TPP            = .FALSE.
+         CPP            = .FALSE.
+         WNPP           = .FALSE.
+         CGPP           = .FALSE.
+         KPP            = .FALSE.
+         LPP            = .FALSE.
+         PEAKD          = .FALSE.
+         PEAKDSPR       = .FALSE.
+         DPEAK          = .FALSE.
+         UBOT           = .FALSE.
+         ORBITAL        = .FALSE.
+         BOTEXPER       = .FALSE.
+         TMBOT          = .FALSE.
+         URSELL         = .FALSE.
+         UFRIC          = .FALSE.
+         Z0             = .FALSE.
+         ALPHA_CH       = .FALSE.
+         WINDX          = .FALSE.
+         WINDY          = .FALSE.
+         CD             = .FALSE.
+         CURRTX         = .FALSE.
+         CURRTY         = .FALSE.
+         WATLEV         = .FALSE.
+         WATLEVOLD      = .FALSE.
+         DEPDT          = .FALSE.
+         DEP            = .FALSE.
+         WINDMAG        = .FALSE.
+         TAUW           = .FALSE.
+         TAUWX          = .FALSE.
+         TAUWY          = .FALSE.
+         TAUHF          = .FALSE.
+         TAUTOT         = .FALSE.
+         STOKESBOTTX    = .FALSE.
+         STOKESBOTTY    = .FALSE.
+         STOKESSURFX    = .FALSE.
+         STOKESSURFY    = .FALSE.
+         STOKESBAROX    = .FALSE.
+         STOKESBAROY    = .FALSE.
+         RSXX           = .FALSE.
+         RSXY           = .FALSE.
+         RSYY           = .FALSE.
+         CFL1           = .FALSE.
+         CFL2           = .FALSE.
+         CFL3           = .FALSE.
+         ZETA_SETUP     = .FALSE.
+         BEGTC          = MAIN%BEGT
+         DELTC          = MAIN%DELT
+         UNITC          = MAIN%UNIT
+         ENDTC          = MAIN%ENDT
          READ(INP%FHNDL, NML = STATION)
          wwm_print_namelist(STATION)
          FLUSH(CHK%FHNDL)
+         ! IOUTS -1 for reading wwm_station.in
+         IF (IOUTS .EQ. -1) THEN
+            CALL TEST_FILE_EXIST_DIE("ERROR: Missing input file : ", TRIM(STNIN%FNAME))
+            OPEN(STNIN%FHNDL, FILE=STNIN%FNAME, STATUS="OLD")
+            READ(STNIN%FHNDL) IOUTS
+            IF (IOUTS > INUMOUTS) THEN
+               CALL WWM_ABORT("ERROR: Number of stations exceeds limit, reduce wwm_station.in or increase INUMOUTS in wwm_input.F90")
+            END IF
+            DO I = 1, IOUTS
+               READ(STNIN%FHNDL) XOUTS(I), YOUTS(I), CUTOFF(I), NOUTS(I)
+            END DO
+            CLOSE(STNIN%FHNDL)
+         END IF
 #ifdef NCDF
          PARAMWRITE_STAT=PARAMWRITE
          USE_SINGLE_OUT_STAT=USE_SINGLE_OUT

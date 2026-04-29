@@ -438,16 +438,11 @@
                                      !    in the netcdf file (default T)
  FILEOUT        = 'wwm_sta.dat'      !not used
  LOUTITER       = F
- IOUTS   =          15,
- NOUTS   = 'P-1', 'P-2', 'P-3', 'P-4', 'P-5', 'P-6', 'P-7', 'P-8', 'P-9', 'P-10', 'P-11', 'P-12', 'P-13', 'P-14', 'P-15'
- XOUTS  =   -76.0460000000000     ,  -76.7780000000000     ,  -75.8100000000000     ,  -75.7200000000000     ,  -74.8420000000000     ,
-   -74.7030000000000     ,  -75.3300000000000     ,  -72.6310000000000     ,  -74.8350000000000     ,  -69.2480000000000     ,
-   -72.6000000000000 
- YOUTS   =   39.152, 38.556,  38.033,   37.551,
-    36.9740000000000     ,   37.2040000000000     ,   37.0230000000000     ,   36.9150000000000     ,   36.6110000000000     ,
-    38.4610000000000     ,   35.7500000000000     ,   34.5610000000000     ,   31.8620000000000     ,   40.5030000000000     ,
-    39.5840000000000
- CUTOFF         = 15*0.44            ! cutoff freq (Hz) for each station - consistent with buoys
+ IOUTS          = 2                  ! Number of stations, -1: read XOUTS, YTOUS, CUTOFF, NOUTS from wwm_station.in
+ NOUTS          = 'P-1'  , 'P-2'     ! Name of the station, 20 character, without space  
+ XOUTS          = -76.046, -76.778   ! X-coordinates
+ YOUTS          = 39.152 , 38.556    ! Y-coordinates
+ CUTOFF         = 0.44               ! cutoff freq (Hz) for each station - consistent with buoys
  LSP1D          = T                  ! 1D spectral station output
  LSP2D          = F                  ! 2D spectral station output
  LSIGMAX        = T                  ! Adjust the cut-freq. for the output (e.g. consistent with buoy cut-off freq.)

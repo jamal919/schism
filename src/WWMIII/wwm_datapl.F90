@@ -520,7 +520,8 @@
      &                             CHK,                                  &
      &                             MISC,                                 &
      &                             WINDBG,                               & 
-     &                             SRCDBG
+     &                             SRCDBG,                               &
+     &                             STNIN
 
          INTEGER                :: IDXHOTOUT = 0
          CHARACTER(LEN=140)     :: FILEGRID
@@ -1107,7 +1108,6 @@
          TYPE (OUTS), ALLOCATABLE :: STATION(:)
 
          LOGICAL                :: LLOUTS = .FALSE.
-         INTEGER                :: ILOUTS
 
          REAL(rkind), ALLOCATABLE :: DEPLOC_STATIONS(:)
          REAL(rkind), ALLOCATABLE :: WATLEVLOC_STATIONS(:)

@@ -469,7 +469,7 @@
         END IF
       END SUBROUTINE
 !**********************************************************************
-!*                                                                    *
+!* NOTE: Unused subroutine                                            *
 !**********************************************************************
       SUBROUTINE PRINT_HS_TRIPLE(eX, eY)
       USE DATAPOOL
@@ -521,23 +521,23 @@
       CHARACTER(LEN=15), INTENT(IN) :: CTIME
       LOGICAL, INTENT(IN)           :: LINIT_OUTPUT
 
-      REAL(rkind) :: ACLOC(MSC,MDC), ACOUT_1D(MSC,3), ACOUT_2D(MSC*MDC)
+      REAL(rkind)                   :: ACLOC(MSC,MDC), ACOUT_1D(MSC,3), ACOUT_2D(MSC*MDC)
 
-      CHARACTER(LEN=20) :: TITLEFORMAT,OUTPUTFORMAT
-      CHARACTER(LEN=2)  :: CHRTMP
-      character(len=256) :: FILEWRITE
-      INTEGER           :: I, IP, NI(3), IS
-      LOGICAL           :: ALIVE, LSAME
-      REAL(rkind)       :: WI(3)
+      CHARACTER(LEN=20)             :: TITLEFORMAT,OUTPUTFORMAT
+      CHARACTER(LEN=2)              :: CHRTMP
+      character(len=256)            :: FILEWRITE
+      INTEGER                       :: I, IP, NI(3), IS
+      LOGICAL                       :: ALIVE, LSAME
+      REAL(rkind)                   :: WI(3)
 #ifdef MPI_PARALL_GRID
-      REAL(rkind) :: TheIsumR
+      REAL(rkind)                   :: TheIsumR
 #endif
-      REAL(rkind) :: DEPLOC, WKLOC(MSC), CURTXYLOC(2)
+      REAL(rkind)                   :: DEPLOC, WKLOC(MSC), CURTXYLOC(2)
 #ifndef MPI_PARALL_GRID
-      REAL(rkind) :: WATLOC, ESUM
+      REAL(rkind)                   :: WATLOC, ESUM
 #endif
 #ifndef MPI_PARALL_GRID
-      REAL(rkind) :: USTARLOC, Z0LOC, ALPHALOC, WINDXLOC, WINDYLOC, CDLOC
+      REAL(rkind)                   :: USTARLOC, Z0LOC, ALPHALOC, WINDXLOC, WINDYLOC, CDLOC
 #endif
 
       WRITE(CHRTMP,'(I2)') OUTVARS
@@ -562,29 +562,29 @@
           CALL INTELEMENT(XP(NI),YP(NI),WINDXY(NI,2),STATION(I)%XCOORD,STATION(I)%YCOORD,WI,WINDYLOC,LSAME)
           CALL INTELEMENT(XP(NI),YP(NI),CD(NI),STATION(I)%XCOORD,STATION(I)%YCOORD,WI,CDLOC,LSAME)
         ELSE
-          USTARLOC = 0.
-          Z0LOC = 0.
-          ALPHALOC = 0.
-          WINDXLOC = 0.
-          WINDYLOC = 0.
-          CDLOC = 0.
-          WKLOC = 0.
-          DEPLOC = 0.
+          USTARLOC  = 0.
+          Z0LOC     = 0.
+          ALPHALOC  = 0.
+          WINDXLOC  = 0.
+          WINDYLOC  = 0.
+          CDLOC     = 0.
+          WKLOC     = 0.
+          DEPLOC    = 0.
           CURTXYLOC = 0.
-          ACLOC = 0.
-          WATLOC = 0.
+          ACLOC     = 0.
+          WATLOC    = 0.
         END IF
-        ACLOC_STATIONS(:,:,I)=ACLOC
-        CDLOC_STATIONS(I)=CDLOC
-        Z0LOC_STATIONS(I)=Z0LOC
-        ALPHALOC_STATIONS(I)=ALPHALOC
-        WINDXLOC_STATIONS(I)=WINDXLOC
-        WINDYLOC_STATIONS(I)=WINDYLOC
-        USTARLOC_STATIONS(I)=USTARLOC
-        DEPLOC_STATIONS(I)=DEPLOC
-        WKLOC_STATIONS(I,:)=WKLOC
-        CURTXYLOC_STATIONS(I,:)=CURTXYLOC
-        WATLEVLOC_STATIONS(I)=WATLOC
+        ACLOC_STATIONS(:,:,I)      =ACLOC
+        CDLOC_STATIONS(I)          =CDLOC
+        Z0LOC_STATIONS(I)          =Z0LOC
+        ALPHALOC_STATIONS(I)       =ALPHALOC
+        WINDXLOC_STATIONS(I)       =WINDXLOC
+        WINDYLOC_STATIONS(I)       =WINDYLOC
+        USTARLOC_STATIONS(I)       =USTARLOC
+        DEPLOC_STATIONS(I)         =DEPLOC
+        WKLOC_STATIONS(I,:)        =WKLOC
+        CURTXYLOC_STATIONS(I,:)    =CURTXYLOC
+        WATLEVLOC_STATIONS(I)      =WATLOC
 
         STATION(I)%OUTPAR_NODE(26) = USTARLOC_STATIONS(I)
         STATION(I)%OUTPAR_NODE(27) = Z0LOC_STATIONS(I)
@@ -611,35 +611,32 @@
           CALL INTELEMENT(XP(NI),YP(NI),WINDXY(NI,2),STATION(I)%XCOORD,STATION(I)%YCOORD,WI,WINDYLOC_STATIONS(I),LSAME)
           CALL INTELEMENT(XP(NI),YP(NI),CD(NI),STATION(I)%XCOORD,STATION(I)%YCOORD,WI,CDLOC_STATIONS(I),LSAME)
         ELSE
-          ACLOC_STATIONS(:,:,I) = 0.
-          DEPLOC_STATIONS(I) = 0.
-          WKLOC_STATIONS(I,:) = 0.
-          USTARLOC_STATIONS(I) = 0.
-          Z0LOC_STATIONS(I) = 0.
-          ALPHALOC_STATIONS(I) = 0.
-          WINDXLOC_STATIONS(I) = 0.
-          WINDYLOC_STATIONS(I) = 0.
-          CDLOC_STATIONS(I) = 0.
-          WATLEVLOC_STATIONS(I) = 0.
+          ACLOC_STATIONS(:,:,I)   = 0.
+          DEPLOC_STATIONS(I)      = 0.
+          WKLOC_STATIONS(I,:)     = 0.
+          USTARLOC_STATIONS(I)    = 0.
+          Z0LOC_STATIONS(I)       = 0.
+          ALPHALOC_STATIONS(I)    = 0.
+          WINDXLOC_STATIONS(I)    = 0.
+          WINDYLOC_STATIONS(I)    = 0.
+          CDLOC_STATIONS(I)       = 0.
+          WATLEVLOC_STATIONS(I)   = 0.
           CURTXYLOC_STATIONS(I,:) = 0.
         END IF
       END DO
-
-!         WRITE(STAT%FHNDL,*) 'DEPTH OF THE FOUND STATIONS', DEPLOC_STATIONS
-!         FLUSH(DBG%FHNDL)
-
-      DEPLOC_SUM = 0.
+      !
+      DEPLOC_SUM    = 0.
       WATLEVLOC_SUM = 0.
       CURTXYLOC_SUM = 0.
-      USTAR_SUM = 0.
-      Z0_SUM = 0.
-      ALPHA_SUM = 0.
-      CD_SUM = 0.
-      WINDX_SUM = 0.
-      WINDY_SUM = 0.
-      WKLOC_SUM = 0.
-      ACLOC_SUM = 0.
-
+      USTAR_SUM     = 0.
+      Z0_SUM        = 0.
+      ALPHA_SUM     = 0.
+      CD_SUM        = 0.
+      WINDX_SUM     = 0.
+      WINDY_SUM     = 0.
+      WKLOC_SUM     = 0.
+      ACLOC_SUM     = 0.
+      !
       DO I = 1, IOUTS
         CALL MPI_REDUCE(   DEPLOC_STATIONS(I),DEPLOC_SUM(I),1,rtype,MPI_SUM,0,COMM,IERR)
         CALL MPI_REDUCE(   WATLEVLOC_STATIONS(I),WATLEVLOC_SUM(I),1,rtype,MPI_SUM,0,COMM,IERR)
@@ -658,32 +655,32 @@
       IF (MYRANK == 0) THEN
         DO I = 1, IOUTS
           IF (STATION(I)%ISUM .EQ. 0) THEN
-            DEPLOC_STATIONS(I)           = -999.
-            CURTXYLOC_STATIONS(I,:)      = -999.
+            DEPLOC_STATIONS(I)                = -999.
+            CURTXYLOC_STATIONS(I,:)           = -999.
             STATION(I)%OUTPAR_NODE(1:OUTVARS) = -999.
-            ACLOC_STATIONS(:,:,I)        = -999.
-            WKLOC_STATIONS(I,:)          = -999.
-            USTARLOC_STATIONS(I)         = -999.
-            ALPHALOC_STATIONS(I)         = -999.
-            Z0LOC_STATIONS(I)            = -999.
-            CDLOC_STATIONS(I)            = -999.
-            WINDXLOC_STATIONS(I)         = -999.
-            WINDYLOC_STATIONS(I)         = -999.
+            ACLOC_STATIONS(:,:,I)             = -999.
+            WKLOC_STATIONS(I,:)               = -999.
+            USTARLOC_STATIONS(I)              = -999.
+            ALPHALOC_STATIONS(I)              = -999.
+            Z0LOC_STATIONS(I)                 = -999.
+            CDLOC_STATIONS(I)                 = -999.
+            WINDXLOC_STATIONS(I)              = -999.
+            WINDYLOC_STATIONS(I)              = -999.
             IF (WRITEDBGFLAG == 1) WRITE(DBG%FHNDL,*) 'STATION OUT OF MESH', I
           ELSE
-            TheIsumR=MyREAL(STATION(I)%ISUM)
-            DEPLOC_STATIONS(I)       = DEPLOC_SUM(I)      / TheIsumR
-            CURTXYLOC_STATIONS(I,:)  = CURTXYLOC_SUM(I,:) / TheIsumR
-            CURTXYLOC_STATIONS(I,:)  = CURTXYLOC_SUM(I,:) / TheIsumR
-            WATLEVLOC_STATIONS(I)    = WATLEVLOC_SUM(I)   / TheIsumR
-            WKLOC_STATIONS(I,:)      = WKLOC_SUM(I,:)     / TheIsumR
-            ACLOC_STATIONS(:,:,I)    = ACLOC_SUM(:,:,I)   / TheIsumR
-            USTARLOC_STATIONS(I)     = USTAR_SUM(I)       / TheIsumR
-            Z0LOC_STATIONS(I)        = Z0_SUM(I)          / TheIsumR
-            ALPHALOC_STATIONS(I)     = USTAR_SUM(I)       / TheIsumR
-            CDLOC_STATIONS(I)        = CD_SUM(I)          / TheIsumR
-            WINDXLOC_STATIONS(I)     = WINDX_SUM(I)       / TheIsumR
-            WINDYLOC_STATIONS(I)     = WINDY_SUM(I)       / TheIsumR
+            TheIsumR                = MyREAL(STATION(I)%ISUM)
+            DEPLOC_STATIONS(I)      = DEPLOC_SUM(I)      / TheIsumR
+            CURTXYLOC_STATIONS(I,:) = CURTXYLOC_SUM(I,:) / TheIsumR
+            CURTXYLOC_STATIONS(I,:) = CURTXYLOC_SUM(I,:) / TheIsumR
+            WATLEVLOC_STATIONS(I)   = WATLEVLOC_SUM(I)   / TheIsumR
+            WKLOC_STATIONS(I,:)     = WKLOC_SUM(I,:)     / TheIsumR
+            ACLOC_STATIONS(:,:,I)   = ACLOC_SUM(:,:,I)   / TheIsumR
+            USTARLOC_STATIONS(I)    = USTAR_SUM(I)       / TheIsumR
+            Z0LOC_STATIONS(I)       = Z0_SUM(I)          / TheIsumR
+            ALPHALOC_STATIONS(I)    = USTAR_SUM(I)       / TheIsumR
+            CDLOC_STATIONS(I)       = CD_SUM(I)          / TheIsumR
+            WINDXLOC_STATIONS(I)    = WINDX_SUM(I)       / TheIsumR
+            WINDYLOC_STATIONS(I)    = WINDY_SUM(I)       / TheIsumR
             !WRITE(STAT%FHNDL,*) 'SUM BEFORE INTPAR', SUM(ACLOC_STATIONS(:,:,I))
             CALL INTPAR_LOC(I ,STATION(I)%ISMAX,WKLOC_STATIONS(I,:), DEPLOC_STATIONS(I), CURTXYLOC_STATIONS(I,:), ACLOC_STATIONS(:,:,I), STATION(I)%OUTPAR_NODE)
             STATION(I)%OUTPAR_NODE(26) = USTARLOC_STATIONS(I)
@@ -709,14 +706,17 @@
           WKLOC=WKLOC_STATIONS(I,:)
           DEPLOC=DEPLOC_STATIONS(I)
           CURTXYLOC=CURTXYLOC_STATIONS(I,:)
-          FILEWRITE=TRIM(STATION(I)%NAME)//'.site'
+          !
+          ! Wave parameters file for station
+          ! 
+          FILEWRITE="outputs/"//TRIM(STATION(I)%NAME)//'.site'
           INQUIRE(FILE=FILEWRITE,EXIST=ALIVE)
           IF (LINIT_OUTPUT) THEN
             OPEN(OUTPARM%FHNDL,FILE=FILEWRITE, STATUS = 'UNKNOWN')
             WRITE(OUTPARM%FHNDL, TITLEFORMAT) 'TIME', OUTT_VARNAMES
           ELSE
             IF (ALIVE.eqv..false.) THEN
-              CALL WWM_ABORT('Unexisting .site file please debug')
+              CALL WWM_ABORT('Nonexisting .site file please debug')
             ENDIF
             OPEN(OUTPARM%FHNDL,FILE=FILEWRITE, STATUS = 'OLD' , POSITION = 'APPEND')
           ENDIF
@@ -727,9 +727,11 @@
           IF (LSP1D .OR. LSP2D) THEN
             CALL CLSPEC( WKLOC, DEPLOC, CURTXYLOC, ACLOC, ACOUT_1D, ACOUT_2D )
           END IF
-
+          !
+          ! 1D Spectra output for stations
+          ! 
           IF (LSP1D) THEN
-            FILEWRITE=TRIM(STATION(I)%NAME)//'.sp1d'
+            FILEWRITE="outputs/"//TRIM(STATION(I)%NAME)//'.sp1d'
             INQUIRE(FILE=FILEWRITE,EXIST=ALIVE)
             IF (LINIT_OUTPUT) THEN
               OPEN(OUTSP1D%FHNDL,FILE=FILEWRITE, STATUS = 'UNKNOWN')
@@ -757,9 +759,11 @@
             FLUSH(OUTSP1D%FHNDL)
             CLOSE(OUTSP1D%FHNDL)
           END IF
-
+          !
+          ! 2D Spectra file for stations
+          ! 
           IF (LSP2D) THEN
-            FILEWRITE=TRIM(STATION(I)%NAME)//'.sp2d'
+            FILEWRITE="outputs/"//TRIM(STATION(I)%NAME)//'.sp2d'
             INQUIRE(FILE=FILEWRITE,EXIST=ALIVE )
             IF (LINIT_OUTPUT) THEN
               OPEN(OUTSP2D%FHNDL,FILE=FILEWRITE, STATUS = 'UNKNOWN', FORM = 'UNFORMATTED')
@@ -873,8 +877,8 @@
           WKLOC = 0.
           ACLOC = 0.
           OUTPAR = 0.
-          ACOUT_1D=0.
-          ACOUT_2D=0.
+          ACOUT_1D = 0.
+          ACOUT_2D = 0.
         END IF
         OUTPAR_STATIONS(I,:) = OUTPAR
         WK_STATIONS(I,:) = WKLOC
@@ -1084,7 +1088,7 @@
       END SUBROUTINE
 #endif
 !**********************************************************************
-!*                                                                    *
+!* NOTE: Unused subroutine                                            *
 !**********************************************************************
       SUBROUTINE OUTPUT_LINE(CTIME,LINIT_OUTPUT)
          USE DATAPOOL
@@ -1260,8 +1264,8 @@
          USE DATAPOOL
          IMPLICIT NONE
 
-         INTEGER, INTENT(IN)    :: IP
-         REAL(rkind)   , INTENT(OUT)   :: OUTPAR(CURRVARS)
+         INTEGER, INTENT(IN)         :: IP
+         REAL(rkind)   , INTENT(OUT) :: OUTPAR(CURRVARS)
 
          OUTPAR    = 0.
 
@@ -1383,7 +1387,7 @@
 
       END SUBROUTINE
 !**********************************************************************
-!*                                                                    *
+!* NOTE: Unused subroutine                                            *
 !**********************************************************************
       SUBROUTINE DEBUG_PRINT_HS_STATS
       USE DATAPOOL
@@ -1697,20 +1701,20 @@
          OUTPAR(26:35) = ZERO 
       END SUBROUTINE
 !**********************************************************************
-!*                                                                     *
+!* NOTE: Unused subroutine                                            *
 !**********************************************************************
       SUBROUTINE INTSPEC(MSC, MDC, DDIR, ACLOC, SPSIG, HS)
          USE DATAPOOL, ONLY : rkind, stat
          IMPLICIT NONE
 
-         INTEGER, INTENT(IN) :: MSC, MDC
+         INTEGER, INTENT(IN)      :: MSC, MDC
 
-         REAL(rkind), INTENT(IN)    :: ACLOC(MSC,MDC), SPSIG(MSC), DDIR
-         REAL(rkind), INTENT(OUT)   :: HS
+         REAL(rkind), INTENT(IN)  :: ACLOC(MSC,MDC), SPSIG(MSC), DDIR
+         REAL(rkind), INTENT(OUT) :: HS
 
 
-         INTEGER :: ID, IS
-         REAL(rkind)    :: ETOT, EAD , DS
+         INTEGER                  :: ID, IS
+         REAL(rkind)              :: ETOT, EAD , DS
 
          ETOT = 0.
          DO ID = 1, MDC
@@ -1732,7 +1736,7 @@
 
       END SUBROUTINE
 !**********************************************************************
-!*                                                                    *
+!* NOTE: Unused subroutine                                            *
 !**********************************************************************
       SUBROUTINE OUTPUT_TEST()
          USE DATAPOOL
@@ -1998,36 +2002,36 @@
       USE DATAPOOL
       USE NETCDF
       IMPLICIT NONE
-      INTEGER            :: IP
+      INTEGER                        :: IP
 # ifdef MPI_PARALL_GRID
-      REAL(rkind), allocatable  :: OUTT_LOC(:,:)
-      REAL(rkind), allocatable  :: OUTT(:,:)
+      REAL(rkind), allocatable       :: OUTT_LOC(:,:)
+      REAL(rkind), allocatable       :: OUTT(:,:)
 # else
-      REAL(rkind)               :: OUTT(MNP,OUTVARS_COMPLETE)
+      REAL(rkind)                    :: OUTT(MNP,OUTVARS_COMPLETE)
 # endif
-      REAL(rkind)               :: ACLOC(MSC,MDC), OUTPAR(OUTVARS_COMPLETE)
-      REAL(rkind)  :: eTimeDay
+      REAL(rkind)                    :: ACLOC(MSC,MDC), OUTPAR(OUTVARS_COMPLETE)
+      REAL(rkind)                    :: eTimeDay
 ! NC defs
-      INTEGER :: LPOS
-      character(len =256) :: FILE_NAME, PRE_FILE_NAME
-      integer :: iret, ncid, ntime_dims, nnode_dims
-      integer :: var_id
-      integer :: I, irec_dim
+      INTEGER                        :: LPOS
+      character(len =256)            :: FILE_NAME, PRE_FILE_NAME
+      integer                        :: iret, ncid, ntime_dims, nnode_dims
+      integer                        :: var_id
+      integer                        :: I, irec_dim
       integer POSITION_BEFORE_POINT
       character (len = *), parameter :: CallFct="OUTPUT_HISTORY_NC"
       character (len = *), parameter :: UNITS = "units"
       character (len = *), parameter :: FULLNAME = "full-name"
       character (len = *), parameter :: COORD = "coordinates"
-      character(len=1), parameter :: ePoint = '.'
-      integer, save ::  recs_his
-      integer, save ::  recs_his2
-      integer, save ::  ifile = 1
-      logical, save :: IsInitDone = .FALSE.
-      integer :: np_write, ne_write
-      character(len=40) :: eStr, eStrUnit
-      character(len=80) :: eStrFullName
-      integer, allocatable :: IOBPDoutput(:,:)
-      integer nbTime
+      character(len=1), parameter    :: ePoint = '.'
+      integer, save                  ::  recs_his
+      integer, save                  ::  recs_his2
+      integer, save                  ::  ifile = 1
+      logical, save                  :: IsInitDone = .FALSE.
+      integer                        :: np_write, ne_write
+      character(len=40)              :: eStr, eStrUnit
+      character(len=80)              :: eStrFullName
+      integer, allocatable           :: IOBPDoutput(:,:)
+      integer                        :: nbTime
 !
       eTimeDay=MAIN%TMJD
 # ifdef MPI_PARALL_GRID

@@ -1050,7 +1050,7 @@
          OUTT_VARNAMES(7)  = 'ETOTS'
          OUTT_VARNAMES(8)  = 'ETOTC'
          OUTT_VARNAMES(9)  = 'DM'
-         OUTT_VARNAMES(10)  = 'DSPR'
+         OUTT_VARNAMES(10) = 'DSPR'
          OUTT_VARNAMES(11) = 'TPPD'
          OUTT_VARNAMES(12) = 'TPP'
          OUTT_VARNAMES(13) = 'CPP'
@@ -1403,21 +1403,25 @@
          OPEN( IOBPDOUT%FHNDL, FILE = TRIM(IOBPDOUT%FNAME))
 #endif
 
-           OUT1D%FHNDL = STARTHNDL + 19 
-            MISC%FHNDL = STARTHNDL + 20 
-         OUTSP1D%FHNDL = STARTHNDL + 21 
-         OUTPARM%FHNDL = STARTHNDL + 22 
-         OUTSP2D%FHNDL = STARTHNDL + 23 
+           OUT1D%FHNDL       = STARTHNDL + 19 
+            MISC%FHNDL       = STARTHNDL + 20 
+         OUTSP1D%FHNDL       = STARTHNDL + 21 
+         OUTPARM%FHNDL       = STARTHNDL + 22 
+         OUTSP2D%FHNDL       = STARTHNDL + 23 
 
-         OUT%FHNDL     = STARTHNDL + 24
+         OUT%FHNDL           = STARTHNDL + 24
          
        FHNDL_EXPORT_BOUC_WW3 = STARTHNDL + 25
        FHNDL_EXPORT_WIND_WW3 = STARTHNDL + 26
        FHNDL_EXPORT_CURR_WW3 = STARTHNDL + 27
        FHNDL_EXPORT_WALV_WW3 = STARTHNDL + 28
        FHNDL_EXPORT_GRID_WW3 = STARTHNDL + 29
-
-         
+       !
+       ! STNIN
+       !
+       STNIN%FHNDL           = STARTHNDL + 30
+       STNIN%FNAME           = "wwm_station.in"
+       !
        END SUBROUTINE
 !**********************************************************************
 !*                                                                    *
