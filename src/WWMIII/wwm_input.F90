@@ -12,10 +12,10 @@
          USE DATAPOOL, only : OUTSTYLE, LOUTITER,                       &
      &        LENERGY, LWXFN, OUT_HISTORY, OUT_STATION, INP, LSP1D,     &
      &        LSP2D, INP, CHK, LOUTS, IOUTS, LSIGMAX, LLOUTS,           &
-     &        OUT, DAY2SEC, FRHIGH, DBG, LINES, VAROUT_HISTORY, &
+     &        OUT, DAY2SEC, FRHIGH, DBG, LINES, VAROUT_HISTORY,         &
      &        VAROUT_STATION, GRIDWRITE, RKIND, LVAR_READ,              &
      &        PARAMWRITE_HIS, PARAMWRITE_STAT, wwmerr, LCFL, myrank,    &
-     &        istat,WRITEDBGFLAG, STNIN
+     &        istat, WRITEDBGFLAG, STNIN
 #ifdef NCDF
          USE NETCDF
          USE DATAPOOL, only : USE_SINGLE_OUT_STAT, USE_SINGLE_OUT_HIS,  &
@@ -396,18 +396,35 @@
          READ(INP%FHNDL, NML = STATION)
          wwm_print_namelist(STATION)
          FLUSH(CHK%FHNDL)
-         ! IOUTS -1 for reading wwm_station.in
+        ! IOUTS -1 for reading wwm_station.in
          IF (IOUTS .EQ. -1) THEN
-            CALL TEST_FILE_EXIST_DIE("ERROR: Missing input file : ", TRIM(STNIN%FNAME))
-            OPEN(STNIN%FHNDL, FILE=STNIN%FNAME, STATUS="OLD")
-            READ(STNIN%FHNDL) IOUTS
-            IF (IOUTS > INUMOUTS) THEN
-               CALL WWM_ABORT("ERROR: Number of stations exceeds limit, reduce wwm_station.in or increase INUMOUTS in wwm_input.F90")
+            IF (myrank .EQ. 0) THEN
+               CALL TEST_FILE_EXIST_DIE("ERROR: Missing input file : ", TRIM(STNIN%FNAME))
+               OPEN(STNIN%FHNDL, FILE=STNIN%FNAME, STATUS="OLD", IOSTAT=istat)
+               IF (istat /= 0) CALL WWM_ABORT("ERROR: Failed to open wwm_station.in")
+               
+               READ(STNIN%FHNDL, *, IOSTAT=istat) IOUTS
+               IF (istat /= 0) CALL WWM_ABORT("ERROR: Failed to read number of stations from wwm_station.in")
+               
+               IF (IOUTS > INUMOUTS) THEN
+                  CALL WWM_ABORT("ERROR: Number of stations exceeds limit, reduce wwm_station.in or increase INUMOUTS in wwm_input.F90")
+               END IF
+               
+               DO I = 1, IOUTS
+                  READ(STNIN%FHNDL, *, IOSTAT=istat) XOUTS(I), YOUTS(I), CUTOFF(I), NOUTS(I)
+                  IF (istat /= 0) CALL WWM_ABORT("ERROR: Failed to read station data line in wwm_station.in")
+               END DO
+               CLOSE(STNIN%FHNDL)
             END IF
-            DO I = 1, IOUTS
-               READ(STNIN%FHNDL) XOUTS(I), YOUTS(I), CUTOFF(I), NOUTS(I)
-            END DO
-            CLOSE(STNIN%FHNDL)
+
+#ifdef MPI_PARALL_GRID
+            ! Broadcast station count and data to all MPI ranks
+            CALL MPI_BCAST(IOUTS, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, istat)
+            CALL MPI_BCAST(XOUTS, INUMOUTS, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, istat)
+            CALL MPI_BCAST(YOUTS, INUMOUTS, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, istat)
+            CALL MPI_BCAST(CUTOFF, INUMOUTS, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, istat)
+            CALL MPI_BCAST(NOUTS, INUMOUTS * LEN(NOUTS), MPI_CHARACTER, 0, MPI_COMM_WORLD, istat)
+#endif
          END IF
 #ifdef NCDF
          PARAMWRITE_STAT=PARAMWRITE
@@ -1720,3 +1737,5 @@
         END DO
       END IF
       END SUBROUTINE
+
+
